@@ -43,9 +43,31 @@ echo $contents; } ?>
 
 <!-- end of project description -->
 
-<p> No content added. </p>
+<h1>CALIBER health records research toolkit</h1>
 
-<p> The <strong>project summary page</strong> you can find <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
+<p>This project under development will comprise a set of R packages to assist in epidemiological
+studies using electronic health records databases.</p>
+
+<p>CALIBER (<a href="http://caliberresearch.org/">http://caliberresearch.org/</a>) is
+led from the Centre for Health Service and Academic Partnership in Translational Electronic
+health record Research (CHAPTER) incorporating the National Institute for Cardiovascular Outcomes
+Research (NICOR). CHAPTER is led from University College London (UCL) and Partners, which include
+UCL, the London School of Hygiene and Tropical Medicine and Queen Mary University of London.
+CALIBER investigators represent a collaboration between epidemiologists, clinicians, statisticians,
+health informaticians and computer scientists with initial funding from the Wellcome Trust and the
+National Institute for Health Research.</p>
+
+<p>The goal of CALIBER is to provide evidence across different stages of translation, from discovery,
+through evaluation to implementation where electronic health records provide new scientific opportunities.</p>
+
+<h2>CALIBERrfimpute</h2>
+
+<p>Missing data are frequently handled by multiple imputation, but parametric imputation methods
+may lead to biased results if the imputation method is incorrectly specified. Random Forest is a
+non-parametric prediction method which can handle non-linearities and interactions in a flexible way.</p>
+
+<p>The CALIBERrfimpute package contains novel imputation functions using Random Forest within the
+framework of Multivariate Imputation by Chained Equations.</p>
 
 </body>
 </html>
