@@ -38,7 +38,7 @@ Maintainer: anoop@doctors.org.uk
 }
 
 \references{
-[reference to submitted Am J Epid paper]
+[to be added]
 
 }
 
