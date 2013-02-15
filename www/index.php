@@ -33,16 +33,6 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 <!-- get project title  -->
 <!-- own website starts here, the following may be changed as you like -->
 
-<?php if ($handle=fopen('http://'.$domain.'/export/projtitl.php?group_name='.$group_name,'r')){
-$contents = '';
-while (!feof($handle)) {
-	$contents .= fread($handle, 8192);
-}
-fclose($handle);
-echo $contents; } ?>
-
-<!-- end of project description -->
-
 <h1>CALIBER health records research toolkit</h1>
 
 <p>This project under development will comprise a set of R packages to assist in epidemiological
@@ -68,6 +58,12 @@ non-parametric prediction method which can handle non-linearities and interactio
 
 <p>The CALIBERrfimpute package contains novel imputation functions using Random Forest within the
 framework of Multivariate Imputation by Chained Equations.</p>
+
+<hr/>
+
+Link to project summary page:
+<a href="http://r-forge.r-project.org/projects/caliberanalysis/">
+http://r-forge.r-project.org/projects/caliberanalysis/</a>
 
 </body>
 </html>
