@@ -1,0 +1,202 @@
+==================================================
+Changes in CALIBERcodelists version 0.2-0
+==================================================
+
+CHANGES
+
+- the assignmetadata function is not longer exported
+  for simplicity; users are expected to use the
+  setMetadata function and this is now the only
+  metadata assignment function documented.
+- added in the main menu, the option to process an existing
+  Rmd file, or to convert a codelist to the standard format
+  (which will automatically load it, ask you for metadata
+  and save it using the standard name.)
+- ignore a column named 'termlc' when importing a codelist
+- add documentation about how best to use the package with
+  Stata.
+
+BUG FIXES
+
+- Missing line break character at the end of export
+  statement (thanks to Joshua for spotting)
+- Recognise dd.mm.yyyy and dd.mm.yy date formats
+- fix a bug in importing ICD-10 codelists with a blank
+  medcode column.
+
+==================================================
+Changes in CALIBERcodelists version 0.1-9
+==================================================
+
+BUG FIXES
+
+- type conversion error when importing a codelist to
+  the master dictionary
+- incorrect R copying of a data.table in export()
+
+==================================================
+Changes in CALIBERcodelists version 0.1-8
+==================================================
+
+NEW FEATURES
+
+- allow setdictionary to initialise the master
+  dictionary using an existing codelist (thank you
+  Harriet for the idea)
+- add people who have tested the package as official
+  "contributors" (role "ctb")
+- codelist function allows non-case-sensitive
+  detection of readcode, readterm columns, and
+  non-standard versions such as icd, icdcode,
+  opcs, opcs.Code, read_code
+- allow comparison of the codelist under construction
+  with another codelist interactively
+- a codelist format for drugs, from CALIBER_PRODDICT
+  (no interactive mode yet); the source dictionary
+  codename is 'GPRDPROD'. The code column contains
+  the Multilex code (thanks Kate for suggesting)
+- allow 'ONS' as a type of ICD-10 codelist, to allow
+  different sets of codes to be used for HES and ONS.
+  ONS codelists can be exported using demo(makecodelist)
+  but not demo(explore). The difference between a HES
+  and ONS codelist is the name suffix and the Source
+  attribute.
+- documentation to explain the menus in more detail,
+  including which menu links to another
+
+BUG FIXES
+
+- export did not contract ICD-10 codelists, fixed.
+- ensure that entries in the categories table are
+  not duplicated (keep only one per category number)
+
+==================================================
+Changes in CALIBERcodelists version 0.1-7
+==================================================
+
+MAJOR CHANGES
+
+- new setMetadata function (suggested by Joshua)
+  to alter the metadata for a codelist
+
+IMPROVEMENTS
+
+- in introduction document, add more examples for
+  regular expressions, including comparison with
+  Stata strmatch or GPRD Medical term browser
+  (thanks to Emily for suggesting)
+
+BUG FIXES
+
+- loading a Stata DTA codelist results in an error
+  if the variable names are different from the label
+  names, because the importDTA function did not check
+  if they were different.
+- fixed error on trying to export a codelist with
+  NULL Name (thanks to Joshua for picking it up); test
+  added in the export example.
+- categories are incorrect if they contain non-ASCII
+  characters (problem with acute psychosis codelists,
+  now non-ASCII characters in category labels are
+  converted by iconv.)
+
+==================================================
+Changes in CALIBERcodelists version 0.1-6
+==================================================
+
+BUG FIXES
+
+- if there exists an object named 'temp' in the global
+  environment and an attempt is made to create a
+  codelist out of something that is not a codelist,
+  temp is returned instead. This was an error in the
+  codelist function, which has been fixed.
+- 'identical' S3 method for codelists did not work so
+  it has been removed.
+- when loading a codelist format object, extra
+  categories were created from blank rows in the
+  metadata column, because sub was used instead of
+  gsub in extractMetadataFromColumn
+
+==================================================
+Changes in CALIBERcodelists version 0.1-5
+==================================================
+
+MAJOR CHANGES
+
+- dictionaries are now in a separate CALIBERlookups
+  package, so that the main package can be distributed
+  separately from the lookups
+- renamed dictionaries CALIBER_DICT, CALIBER_DICTMAPS
+  so that they are less likely to conflict with other
+  objects in the user's workspace
+- codelists are saved under a new standardised naming
+  system <name>_<source>.codelist.<version>.csv
+- Markdown files can end in .Rmd.txt (may be easier
+  on Windows)
+- the 'process' function sutomatically invokes showhtml()
+  in a Markdown document if there is no other showhtml
+  in the document. Also R output is not shown by default.
+
+IMPROVEMENTS
+
+- a detailed user guide (suggested by Mar and Emily)
+- modified the Stata export format so that it puts
+  metadata in the datalabel field rather than in a
+  column
+- option in 'process' whether to include R output in 
+  HTML document (thanks to Mar for suggesting)
+- can supply custom CSS for the process function, and
+  the default CSS has been changed (suggested by Mar)
+- 'compare' function also compares metadata and the
+  category table, but by default only reports
+  the number of terms changed
+- the program confirms that the version number is a
+  number
+- package version is retrieved from the package itself
+  rather than being hard-coded
+- new 'identical' S3 method for codelists uses the
+  compare function
+- more sensible object names suggested by iAskName
+- interactive mode does not ask to export empty
+  codelists
+- interactive browser warns if not showing the entire
+  list (suggested by Emily)
+
+BUG FIXES
+
+- corrected errors in browseDICT (thanks to Emily
+  and Kate for reporting) 
+- undo in interactive mode would cause an error if 
+  there was only one selection statement 
+- convert did not work with a selection, now fixed
+- fixed a bug in showing empty ICD10 categories in
+- remove Warning message: In retrieveCategoriesFromMETA()
+  showhtml : NAs introduced by coercion
+
+==================================================
+Changes in CALIBERcodelists version 0.1-4
+==================================================
+
+IMPROVEMENTS
+
+- more flexible management of selections
+- menu-driven system for manipulating codelists
+- separate functions for browsing selections
+  (and manually excluding terms), for browsing a codelist
+  under construction in the main dictionary
+  (and assigning categories) or browsing an existing
+  codelist (which has nothing to do with DICT).
+
+BUG FIXES
+
+- makecodelist demo had the wrong filename for R script file
+- error in category updates after using browsedict
+
+TODO
+
+- installation guide for Windows
+- introduction to Read, OPCS and ICD-10 codes
+- vignette for making a codelist
+
+

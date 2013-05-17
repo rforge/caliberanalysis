@@ -1,0 +1,27 @@
+export(browseSelection, browseCodelist, exploreCodes)
+export(getdictionary, setdictionary, setMetadata)
+export(as.codelist, codelist, print.codelist, is.codelist, subset.codelist)
+export(expandCodelist, contractCodelist, convert, compare, print.codelistComparison, merge.codelist)
+export(codematch, dictis, termhas, explode)
+export(process, showhtml, export, exportall)
+export(retrieveCategories, addCategory, saveCategories, removeUnusedCategories, assigncat)
+export(selection, as.selection, is.selection, print.selection, length.selection)
+export("&.selection", "|.selection", "!.selection", "%OR%", "%AND%", NOT)
+export("%&%")
+export(textToDate)
+
+S3method(print, codelist)
+S3method(subset, codelist)
+S3method(merge, codelist)
+
+S3method(length, selection)
+S3method(print, selection)
+S3method("&", selection)
+S3method("|", selection)
+S3method("!", selection)
+
+S3method(print, codelistComparison)
+
+import(data.table, markdown, knitr, foreign)
+
+
