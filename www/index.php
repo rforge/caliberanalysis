@@ -59,6 +59,12 @@ non-parametric prediction method which can handle non-linearities and interactio
 <p>The CALIBERrfimpute package contains novel imputation functions using Random Forest within the
 framework of Multivariate Imputation by Chained Equations.</p>
 
+<h2>CALIBERcodelists</h2>
+
+<p>Identifying patients with particular medical diagnoses in electronic health record data requires an algorithm to select the appropriate diagnostic codes. Research groups may accumulate a large number of code lists for different medical conditions, and the CALIBERcodelists package contains functions for creating codelists and storing them in a standardised format with metadata such as the authors and version number.</p>
+
+<p>CALIBER investigators can use this package in conjunction with the CALIBERlookups package which contains the source dictionaries; other researchers can use the scripts provided to create lookup tables from the official sources of the Read, ICD-10, OPCS and CPRD dictionaries.</p>
+
 <hr/>
 
 Link to project summary page:
