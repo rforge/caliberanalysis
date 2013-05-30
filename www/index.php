@@ -65,6 +65,12 @@ framework of Multivariate Imputation by Chained Equations.</p>
 
 <p>CALIBER investigators can use this package in conjunction with the CALIBERlookups package which contains the source dictionaries; other researchers can use the scripts provided to create lookup tables from the official sources of the Read, ICD-10, OPCS and CPRD dictionaries.</p>
 
+<h2>CALIBERfma</h2>
+
+<p>The Freetext Matching Algorithm is a natural language processing system for analysing clinical free text, and is available from the <a href="https://github.com/anoopshah/freetext-matching-algorithm">freetext-matching-algorithm GitHub repository</a>. It uses lookup tables from the <a href="https://github.com/anoopshah/freetext-matching-algorithm-lookups">freetext-matching-algorithm-lookups GitHub repository</a>.
+
+This R package provides an interface to the program, as well as tools to help manipulate the lookup tables. It is currently only availble for Linux systems as it requires <a href="http://www.winehq.org/">wine</a> and <a href="http://en.wikipedia.org/wiki/Git_%28software%29">git</a>.</p>
+
 <hr/>
 
 Link to project summary page:
