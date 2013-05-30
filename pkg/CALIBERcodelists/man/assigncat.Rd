@@ -10,8 +10,8 @@ Assigns a set of terms to a category in the master dictionary (\code{\link{CALIB
 }
 
 \usage{
-assigncat(number, definition = NULL, logic=NULL,
-cats_to_convert=NULL, dictionary=NULL, codes=NULL)
+assigncat(number, definition = NULL, logic = NULL,
+    cats_to_convert = NULL, dictionary = NULL, codes = NULL)
 }
 
 \arguments{

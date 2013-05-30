@@ -17,7 +17,7 @@ Terms with category 0 or negative categories are not exported.
 \usage{
 export(codelist, filename, categories = 'all', contractIfICD10 = TRUE)
 exportall(directory = getwd(), varname = NULL, saveMessage = TRUE,
-	icd10_source = 'hes')
+    icd10_source = 'hes')
 }
 
 \arguments{

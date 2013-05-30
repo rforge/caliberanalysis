@@ -8,7 +8,7 @@ Script to replace the source dictionaries used by CALIBERcodelists
 \description{
 This script is called using the command \code{demo(loadnewdicts)}.
 
-The scripts replaces the existing dictionaties in your installed
+The scripts replaces the existing dictionaries in your installed
 version of the CALIBERcodelists package.
 It loads terminology dictionaries from text files, converts them
 into a standardised format and saves them in the data folder of the

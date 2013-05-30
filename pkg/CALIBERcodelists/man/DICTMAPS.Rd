@@ -21,7 +21,7 @@ Dagger ICD-10 terms are not used for matching.
 \details{
 A data table with observations on the following 8 variables.
   \describe{
-    \item{\code{code}}{OPCS or ICD-10 code, a character vector}
+    \item{\code{code}}{OPCS, ICD-9 or ICD-10 code, a character vector}
     \item{\code{map_stat}}{Map status, a character vector. Map status, a character vector.
 D is the default map, A is the alternative map, E is an exact match, and
 G is a map where the OPCS or ICD-10 term is more general than the Read term.
@@ -36,7 +36,7 @@ and A, D, G, E or T when searching for Read codes that map to ICD-10 or OPCS cod
     \item{\code{elem_num}}{element number within the block, a numeric vector (currently not used)}
     \item{\code{block_num}}{block number, a numeric vector (currently not used)}
     \item{\code{medcode}}{CPRD medcode (key column)}
-    \item{\code{dict}}{a character vector: 'icd10', 'icdhead' or 'opcs'}
+    \item{\code{dict}}{a character vector: 'icd9', 'icd10', 'icdhead' or 'opcs'}
   }
 }
 

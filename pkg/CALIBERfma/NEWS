@@ -1,0 +1,11 @@
+==================================================
+CALIBERfma version 0.1-0
+==================================================
+
+This is the first version of a R package to make it
+easier to use and develop the Freetext Matching
+Algorithm. It has functions for invoking the algorithm
+(a compiled Visual basic 6.0 program) to analyse text
+in a flat file or as an R object, and return the result
+as an R object.
+

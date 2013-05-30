@@ -21,7 +21,7 @@ elsewhere if the directory is specified in the \code{\link{export}} or
 
 \usage{
 process(filename, varname = NULL, showR = FALSE, 
-  showhtml = TRUE, show_not_selected = TRUE, css = customCSS())
+    showhtml = TRUE, show_not_selected = TRUE, css = customCSS())
 }
 
 \arguments{

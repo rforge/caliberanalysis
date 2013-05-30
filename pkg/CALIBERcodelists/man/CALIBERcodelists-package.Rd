@@ -26,7 +26,7 @@ To create a Markdown document for defining a new codelist interactively,
 type \code{demo(makecodelist)} and press ENTER.
 
 If you are not a CALIBER user, you will need to create your own lookup tables
-using \code{demo(loadnewdicts)}.
+using \code{demo(loadnewdicts)} (see \link{loadDicts} for documentation).
 
 The CALIBERlookups package contains the International Classification of Diseases
 sub-licensed to the Department of Health from the World Health Organization,
@@ -41,8 +41,8 @@ Government Licence. The program code is licensed under GPL-3.
 \tabular{ll}{
 Package: \tab CALIBERcodelists\cr
 Type: \tab Package\cr
-Version: \tab 0.2-0\cr
-Date: \tab 2013-05-5\cr
+Version: \tab 0.2-1\cr
+Date: \tab 2013-05-29\cr
 License: \tab GPL-3\cr
 }
 

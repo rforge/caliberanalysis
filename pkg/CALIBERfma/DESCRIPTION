@@ -1,0 +1,14 @@
+Package: CALIBERfma
+Type: Package
+Title: R interface to the Freetext Matching Algorithm
+Version: 0.1-0
+Date: 2013-05-29
+Author: Anoop Shah
+Maintainer: Anoop Shah <anoop@doctors.org.uk>
+Authors@R: c(person("Anoop Shah", "Developer", role=c("aut", "cre"), email="anoop@doctors.org.uk"), person("Harry Hemingway", "Supervisor", role="ths"))
+Description: The Freetext Matching Algorithm is a natural language processing system for clinical text. This R package facilitates the use of the program in R for Linux systems with wine. The CALIBER programme is funded by the Wellcome Trust (086091/Z/08/Z) and the National Institute for Health Research (NIHR) under its Programme Grants for Applied Research programme (RP-PG-0407-10314). The author is supported by a Wellcome Trust Clinical Research Training Fellowship (0938/30/Z/10/Z).
+License: GPL-3
+Depends: R (>= 2.14.1), data.table (>= 1.8.8)
+LazyData: true
+OS_type: unix
+SystemRequirements: git, wine (>= wine-1.5.26)

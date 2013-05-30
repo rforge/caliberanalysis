@@ -14,9 +14,9 @@ or retrieve the categories table from a codelist.
 \usage{
 retrieveCategories(codelist = NULL)
 saveCategories(numbers, shortnames = NULL, descriptions = NULL,
-	cattable = NULL, codelist = NULL)
+    cattable = NULL, codelist = NULL)
 addCategory(number, shortname, description = "",
-	codelist = NULL)
+    codelist = NULL)
 removeUnusedCategories(codelist = NULL)
 }
 

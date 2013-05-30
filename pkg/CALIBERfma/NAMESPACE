@@ -1,0 +1,10 @@
+export(doAnalysis, downloadFMA)
+export(fmaTest, print.fmaTest, print.fmaTestElement)
+export("[.fmaTest", "[[.fmaTest")
+export(exportLookup, importLookup, addtoLookup)
+
+S3method("[", fmaTest)
+S3method("[[", fmaTest)
+S3method(print, fmaTestElement)
+S3method(print, fmaTest)
+

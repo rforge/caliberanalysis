@@ -15,7 +15,7 @@ so that it can be saved or edited.
 
 \usage{
 exploreCodes(spreadsheet = 'Default', texteditor = 'Default',
-  showLog = TRUE, direct = NULL)
+    showLog = TRUE, direct = NULL)
 }
 
 \arguments{

@@ -1,8 +1,9 @@
 codematch <- function(regexpr,
 	dictionary=ifelse(length(getdictionary())==1, getdictionary(), ''), 
 	mapStatus=NULL, exact=FALSE){
-	# Identifies terms by their ICD-10, OPCS or Read code, and also
-	# selects mapped terms
+	# Identifies terms by their ICD-10, ICD-9, OPCS or Read code, and also
+	# selects mapped terms (there are no ICD-9 terms so these are only
+	# used for mapping to Read)
 	# Arguments: regexpr - pattern to match ICD-10 codes of interest
 	#            dictionary - a single dictionary in which to look for codes
 	#            mapStatus - D=default, A=alternative, G=ICD-10 or OPCS
@@ -26,14 +27,15 @@ codematch <- function(regexpr,
 			length(dictionary))
 	}
 	
-	if (!(dictionary %in% ALLDICTS)){
+	if (!(dictionary %in% c(ALLDICTS, 'icd9'))){
 		stop('Dictionary is ' %&% dictionary %&% ' but should be one of ' %&%
 			paste(ALLDICTS, collapse=', '))
 	}
 	
 	if (is.null(mapStatus)){
 		mapStatus <- switch(dictionary, read=c('A', 'D', 'E', 'T'), 
-			icd10=c('A', 'D', 'G', 'E', 'T'), opcs=c('A', 'D', 'G', 'E', 'T'))
+			icd10=c('A', 'D', 'G', 'E', 'T'), icd9=c('A', 'D', 'G', 'E', 'T'), 
+			opcs=c('A', 'D', 'G', 'E', 'T'))
 	}
 	
 	if (dictionary=='icd10'){
@@ -83,6 +85,21 @@ codematch <- function(regexpr,
 				CALIBER_DICTMAPS[(dict == 'opcs') & (medcode %in% medcodes) &
 					(map_stat %in% mapStatus), code])
 			out[CALIBER_DICT$dict=='opcs' & CALIBER_DICT$code %in% tempOPCScodes] <- TRUE
+		}
+	} else if (dictionary=='icd9'){
+		if (exact){
+			out <- CALIBER_DICTMAPS[, dict == 'icd9' & code==regexpr]
+		} else {
+			out <- CALIBER_DICTMAPS[, dict == 'icd9' & grepl(regexpr, code)]
+		}
+		# can only select Read terms
+		if (META['read'][, value]=='TRUE'){
+			icdcodes <- unique(CALIBER_DICTMAPS[out, code])
+			tempMedcodes <- unique(
+				CALIBER_DICTMAPS[(dict =='icd9') &
+						(code %in% icdcodes) &
+						(map_stat %in% mapStatus), medcode])
+			out <- CALIBER_DICT[, dict=='read' & medcode %in% tempMedcodes]
 		}
 	}
 	class(out) <- 'selection'

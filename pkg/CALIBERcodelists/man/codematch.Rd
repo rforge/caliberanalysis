@@ -19,10 +19,10 @@ codematch(regexpr, dictionary = ifelse(length(getdictionary()) == 1,
 
 \arguments{
   \item{regexpr}{
-Read / ICD10 / OPCS code to match. This can be a regular expression if EXACT=FALSE, otherwise it should be the exact code.
+Read, ICD-9, ICD-10 or OPCS code to match. This can be a regular expression if EXACT=FALSE, otherwise it should be the exact code.
 }
   \item{dictionary}{
-One of 'icd10', 'opcs' or 'read'. If not given, and if only one dictionary is in use, this dictionary is taken as the set of codes to match.
+One of 'icd10', 'icd9', 'opcs' or 'read'. If not given, and if only one dictionary is in use, this dictionary is taken as the set of codes to match.
 }
   \item{mapStatus}{
 Character vector stating which terms are acceptable to include according to the match characteristics. \code{D} is the default map, \code{A} is the alternative map, \code{E} is an exact match, and \code{G} is a map where the OPCS or ICD-10 term is more general than the Read term. \code{T} is not supplied by the NHS but is a mapping between identical terms (non-case-sensitive). \code{R} is for a term which must be ruled out before allocating a specified ICD-10 term, for example myocardial infarction must be ruled out in order to code to the ICD-10 term for essential hypertension, but myocardial infarction is not a map for essential hypertension. The default \code{mapStatus} is A, D, E or T when searching Read codes, and A, D, G, E or T when searching ICD-10 or OPCS codes.
@@ -30,6 +30,10 @@ Character vector stating which terms are acceptable to include according to the 
   \item{exact}{
 Whether the \code{regexpr} should be treated as a code for exact matching or a regular expression.
 }
+}
+
+\note{
+If dictionary is 'icd9', only the linked Read terms are returned, as the ICD-9 terms themselves are not included in the master dictionary. These maps are only present in CALIBERlookups 0.1-3 or later.
 }
 
 \details{

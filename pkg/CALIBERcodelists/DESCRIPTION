@@ -1,7 +1,7 @@
 Package: CALIBERcodelists
 Type: Package
 Title: Generate ICD10, Read and OPCS codelists
-Version: 0.2-0
+Version: 0.2-1
 Date: 2013-04-24
 Author: Anoop Shah
 Maintainer: Anoop Shah <anoop@doctors.org.uk>

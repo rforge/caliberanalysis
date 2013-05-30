@@ -1,5 +1,20 @@
 ==================================================
+Changes in CALIBERcodelists version 0.2-1
+(second version on R-Forge)
+==================================================
+
+NEW FEATURES
+
+- ability to use the ICD-9 to Read mapping
+
+BUG FIXES
+
+- shortname and description are interchanged when
+  extracting from META (master dictionary)
+
+==================================================
 Changes in CALIBERcodelists version 0.2-0
+(first version on R-Forge)
 ==================================================
 
 CHANGES

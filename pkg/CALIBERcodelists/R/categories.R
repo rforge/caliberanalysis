@@ -24,15 +24,18 @@ retrieveCategoriesFromMETA <- function(){
 	# Ensure that dictionary is loaded
 	loadDICT()
 	
-	temp <- META[item %in%
-		c('category', 'shortname', 'description')][, value] %&% '|'
-	splitlist <- strsplit(temp, '\\|')
-	names(splitlist) <- c('temp', 'shortname', 'description')
-	splitlist$category <- NA_integer_
-	splitlist$category[!splitlist$temp %in% c('', 'NA')] <-
-		as.integer(splitlist$temp[!splitlist$temp %in% c('', 'NA')])
-	splitlist$temp <- NULL
-	out <- as.data.table(splitlist)
+	theshortnames <- strsplit(META[item == 'shortname'][, value] %&% '|',
+		'\\|')[[1]]
+	thedescriptions <- strsplit(META[item == 'description'][, value] %&% '|',
+		'\\|')[[1]]
+
+	temp <- strsplit(META[item == 'category'][, value] %&% '|', '\\|')[[1]]
+	thecats <- integer(length(temp))
+	thecats[!temp %in% c('', 'NA')] <- as.integer(temp[!temp %in% c('', 'NA')])
+
+	out <- data.table(category=thecats,
+		shortname=theshortnames,
+		description=thedescriptions)
 	out <- subset(out, !is.na(category))
 	setcolorder(out, c('category', 'shortname', 'description'))
 	setkey(out, 'category')

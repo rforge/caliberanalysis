@@ -11,7 +11,7 @@ Sets the metadata attributes for a codelist or the master dictionary (the \code{
 
 \usage{
 setMetadata(codelist=NULL, Name=NULL, Version=NULL, Author=NULL,
-	Date=NULL, Categories=NULL, Source=NULL)
+    Date=NULL, Categories=NULL, Source=NULL)
 }
 
 \arguments{

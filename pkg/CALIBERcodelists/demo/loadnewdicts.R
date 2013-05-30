@@ -79,12 +79,15 @@ opcsVersion <- askMe(
 icdMapFilename <- askMe(
 	"filename of mapping of ICD-10 codes to Read codes, pipe delimited text file",
 	"Icd10.v3")
+icd9MapFilename <- askMe(
+	"filename of mapping of ICD-9 codes to Read codes, pipe delimited text file",
+	"Icd9.v3")
 opcsMapFilename <- askMe(
 	"filename of mapping of OPCS codes to Read codes, pipe delimited text file",
 	"Opcs4.v3")
 mapVersion <- askMe(
 	"version name for mappings",
-	"NHS UK Read Codes Clinical Terms Version 3, Release October 2012, UK Terminology Centre", isFile = FALSE)
+	"NHS UK Read Codes Clinical Terms Version 3, Release March 2013, UK Terminology Centre", isFile = FALSE)
 
 #### PEGASUS PRODUCT DICTIONARY (GPRD PROD) ####
 # There are two extra lines at the beginning of the Pegasus
@@ -181,7 +184,8 @@ dict.opcs[, events:=NA_integer_]
 dict.opcs[, medcode:=NA_integer_]
 
 #### COMBINED DICTIONARY ####
-CALIBER_DICT <- rbind(dict.read, dict.opcs, dict.icd10, dict.icdhead)
+CALIBER_DICT <- rbind(dict.read, dict.opcs, dict.icd10,
+	dict.icdhead, use.names=TRUE)
 CALIBER_DICT[, termlc:=sub('^\\[[sodqvx]+\\]', '', tolower(term))]
 # Convert quotation marks to single quotes (for simplicity)
 CALIBER_DICT[, term:=gsub('"', "'", term)]
@@ -192,21 +196,31 @@ setattr(CALIBER_DICT, 'VERSION_READ',
 setattr(CALIBER_DICT, 'VERSION_ICD10', icdVersion)
 setattr(CALIBER_DICT, 'VERSION_OPCS', opcsVersion)
 
-#### MAPPINGS READ TO OPCS AND ICD10 ####
-map.read.icd10 <- read.delim(icdMapFilename, sep='|', as.is=TRUE, header=FALSE)
-names(map.read.icd10) <- c('read5', 'code', 'map_stat', 'ref_flag',
-	'add_flag', 'elem_num', 'block_num')
-map.read.opcs <- read.delim(opcsMapFilename, sep='|', as.is=TRUE, header=FALSE)
-names(map.read.opcs) <-  c('read5', 'code', 'map_stat', 'ref_flag',
+#### MAPPINGS READ TO OPCS, ICD9 AND ICD10 ####
+# Note that ICD9 terms are in the mappings but not available for
+# creation of codelists (currently).
+map.read.icd10 <- read.delim(icdMapFilename,
+	sep='|', as.is=TRUE, header=FALSE)
+map.read.icd9 <- read.delim(icd9MapFilename,
+	sep='|', as.is=TRUE, header=FALSE)
+map.read.opcs <- read.delim(opcsMapFilename,
+	sep='|', as.is=TRUE, header=FALSE)
+names(map.read.opcs) <- names(map.read.icd10) <- names(map.read.icd9) <-
+	c('read5', 'code', 'map_stat', 'ref_flag',
 	'add_flag', 'elem_num', 'block_num')
 
 # Merge with GPRD Read dictionary
 map.read.icd10 <- data.table(map.read.icd10, key='read5')
+map.read.icd9 <- data.table(map.read.icd9, key='read5')
 map.read.opcs <- data.table(map.read.opcs, key='read5')
 map.icd10 <- merge(map.read.icd10, read5toTerm, by='read5')
+map.icd9 <- merge(map.read.icd9, read5toTerm, by='read5')
 map.opcs <- merge(map.read.opcs, read5toTerm, by='read5')
+
+# Dictionary names
 map.icd10[nchar(code)==3, dict:='icdhead']
 map.icd10[nchar(code)>3, dict:='icd10']
+map.icd9[, dict:='icd9']
 map.opcs[, dict:='opcs']
 
 # Map from Read code to medcode via Read term (so that
@@ -216,6 +230,8 @@ READ <- CALIBER_DICT[dict=='read']
 READ[, term:=sub('^\\[[sodqvx]+\\]', '', tolower(term))]
 MAP_ICD10 <- merge(map.icd10, READ[, list(medcode, term)], by='term')
 MAP_ICD10[, term:=NULL]
+MAP_ICD9 <- merge(map.icd9, READ[, list(medcode, term)], by='term')
+MAP_ICD9[, term:=NULL]
 MAP_OPCS <- merge(map.opcs, READ[, list(medcode, term)], by='term')
 MAP_OPCS[, term:=NULL]
 
@@ -236,7 +252,8 @@ READ_ICD <- merge(READ, ICD, by='term')[, list(read5='', code=code.y,
 cat('\nExact term maps (non case sensitive) between Read and ICD-10:\n')
 print(READ_ICD)
 
-CALIBER_DICTMAPS <- rbind(MAP_ICD10, MAP_OPCS, READ_OPCS, READ_ICD)
+CALIBER_DICTMAPS <- rbind(MAP_ICD10, MAP_ICD9, MAP_OPCS,
+	READ_OPCS, READ_ICD, use.names=TRUE)
 CALIBER_DICTMAPS[, read5:=NULL]
 # Remove duplicates
 CALIBER_DICTMAPS <- copy(CALIBER_DICTMAPS[!duplicated(CALIBER_DICTMAPS)])
