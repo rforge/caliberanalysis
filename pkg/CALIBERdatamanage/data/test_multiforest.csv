@@ -1,0 +1,10 @@
+"s1text";"s1fontface";"s1just";"s1fontsize";"a2text";"x1mean";"x1se";"x1xlab";"s2text";"s2fontface";"s2just";"s2fontsize";"s3text";"s3just";"g1boxsize";"g1mean";"g1se";"g1xlab";"g1linewidth";"g1boxcolour";"g1linecolour";"g1graphwidth";"g1summary"
+"Stable angina";"italic";"left";15;"N";;;"Odds ratio";"OR (95% CI)";"italic";"right";12;;"left";;;;"Hazard ratio";;;;4;
+"Women";"plain";"left";13;3542;0.3;0.3;;"1.35 (0.75, 2.43)";"plain";"right";10;;"left";1;0.3;0.3;;2;"red";"red";;0
+"Men";"plain";"left";13;5642;0.4;0.2;;"1.49 (1.01, 2.21)";"plain";"right";10;"*";"left";1;0.4;0.2;;3;"green";"green";;0
+;;;;;;;;;;;;;;;;;;;;;;
+"Myocardial infarction";"italic";"left";15;;;;;;;;;;;;;;;;;;;
+"Women";"plain";"left";13;7843;0.5;0.3;;"1.65 (0.92, 2.97)";"plain";"right";10;;"left";1;0.5;0.3;;4;"blue";"blue";;0
+"Men";"plain";"left";13;9764;0.1;0.2;;"1.11 (0.75, 1.64)";"plain";"right";10;;"left";1;0.1;0.2;;5;"orange";"orange";;0
+;;;;;;;;;;;;;;;;;;;;;;
+"OVERALL";"bold.italic";"left";16;26791;0.6;0.1;;"1.82 (1.50, 2.22)";"plain";"right";14;"***";"left";2;0.6;0.1;;6;"black";"black";;1

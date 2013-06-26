@@ -1,0 +1,13 @@
+Package: CALIBERdatamanage
+Title: Data management tools for CALIBER datasets
+Type: Package
+Version: 0.1-2
+Date: 2013-06-24
+Author: Anoop Shah
+Maintainer: Anoop Shah <anoop@doctors.org.uk>
+Authors@R: c(person("Anoop Shah", "Developer", role=c("aut", "cre"),
+        email="anoop@doctors.org.uk"))
+Description: Data management tools for CALIBER datasets of electronic health records. The CALIBER programme is funded by the Wellcome Trust (086091/Z/08/Z) and the National Institute for Health Research (NIHR) under its Programme Grants for Applied Research programme (RP-PG-0407-10314). The author is supported by a Wellcome Trust Clinical Research Training Fellowship (0938/30/Z/10/Z).
+License: GPL-3
+Depends: R (>= 2.14.1), ff, ffbase, grid, foreign, data.table (>= 1.8.8)
+Suggests: tools

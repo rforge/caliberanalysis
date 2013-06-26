@@ -1,0 +1,27 @@
+lookup;category;description
+CER;0;"Data Not Entered"
+CER;1;Tentative
+CER;2;Unlikely
+OPR;0;"Data Not Entered"
+OPR;1;<
+OPR;2;<=
+OPR;3;=
+POP;0;"Data Not Entered"
+POP;1;"Age based"
+POP;2;"Age and race based"
+RCT;0;"Data Not Entered"
+RCT;1;Allergy
+RCT;2;Intolerance
+RCT;3;"Adverse Effect"
+SEV;0;"Data Not Entered"
+SEV;1;Minimal
+SEV;2;Mild
+SUM;0;"No Data Entered"
+SUM;1;%
+TQU;0;"Data Not Entered"
+TQU;1;<
+TQU;2;<=
+TQU;3;=
+YND;0;"Data Not Entered"
+YND;1;Yes
+YND;2;No

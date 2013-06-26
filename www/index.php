@@ -71,6 +71,20 @@ framework of Multivariate Imputation by Chained Equations.</p>
 
 This R package provides an interface to the program, as well as tools to help manipulate the lookup tables. It is currently only availble for Linux systems as it requires <a href="http://www.winehq.org/">wine</a> and <a href="http://en.wikipedia.org/wiki/Git_%28software%29">git</a>.</p>
 
+<h2>CALIBERdatamanage</h2>
+
+<p>The CALIBER data management package includes functions to:</p>
+
+<ol>
+<li><strong>Import data</strong> - Import single or multiple files to data.table or ffdf objects in R, with automatic unzipping of compressed files and conversion of dates, and decoding using lookup tables in the CALIBERlookups package.</li>
+
+<li><strong>Build cohorts</strong> - A 'cohort' S3 class to store information about a cohort, and functions for generating analysis variables from multiple row per patient data.</li>
+
+<li><strong>Create presentation tables</strong> - Produce summary tables in LaTeX or plain text, and format numbers and percentages.</li>
+
+<li><strong>Make forest plots</strong> - Produce forest plots using a spreadsheet template, with the facility to include several plots side by side, and specify the formatting of text.</li>
+</ol>
+
 <hr/>
 
 Link to project summary page:

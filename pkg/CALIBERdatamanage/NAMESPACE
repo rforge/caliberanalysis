@@ -1,0 +1,22 @@
+export(cohort, as.cohort, is.cohort, print.cohort, summary.cohort, merge.cohort, subset.cohort)
+export(modifyDescription, purgeDescription)
+export(addCodelistToCohort, addToCohort)
+export(chooseByPriority, extractEntity, extractCodes, transferVariables, removeColumn)
+export(YYYYMMDDtoDate, GEN_SDCtoDate, textToDate, convertDates)
+export(multiforest, multiforestPNG, multiforestPDF)
+export(formatp, formatci, formatnum, formathr, percentConf, meansd, npercent, percent, nmissing)
+export(istrue, isfalse)
+export(importFFDF, importDT)
+export(summaryTable, exportTable)
+export(as.data.table.ffdf)
+export(as.ffdf.data.table)
+
+S3method(print, cohort)
+S3method(summary, cohort)
+S3method(merge, cohort)
+S3method(subset, cohort)
+
+S3method(as.data.table, ffdf)
+S3method(as.ffdf, data.table)
+
+import(grid, ff, ffbase, foreign, data.table)

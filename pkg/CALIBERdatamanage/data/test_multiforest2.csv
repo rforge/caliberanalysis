@@ -1,0 +1,10 @@
+"a1text";"a1fontface";"a1just";"a1numcols";"a1fontsize";"a2text";"g1graphwidth";"g1mean";"g1se"
+"Sample graph";"bold";"centre";3;14;"    ";6;;
+;;;;;;;;
+"Heart rate";"italic";;;13;;;;
+"< 60";;"right";;12;;;0.0297068;0.0811291
+"60-74";;"right";;12;;;0;0
+"75-90";;"right";;12;;;0.3651509;0.0476691
+"> 90";;"right";;12;;;0.6053476;0.0556393
+;;;;;;;;
+"Sex";;"right";;12;;;-0.0434892;0.0406638

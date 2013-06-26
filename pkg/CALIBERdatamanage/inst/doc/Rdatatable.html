@@ -1,0 +1,832 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<title>A quick guide to the data.table package in R</title>
+
+<base target="_blank"/>
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 12px;
+   margin: 8px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 { 
+   font-size:1.6em; 
+}
+
+h2 { 
+   font-size:1.5em; 
+}
+
+h3 { 
+   font-size:1.3em; 
+}
+
+h4 { 
+   font-size:1em; 
+}
+
+h5 { 
+   font-size:0.9em; 
+}
+
+h6 { 
+   font-size:0.8em; 
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre {	
+   margin-top: 0;
+   max-width: 95%;
+   border: 1px solid #ccc;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code.r {
+   background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * { 
+      background: transparent !important; 
+      color: black !important; 
+      filter:none !important; 
+      -ms-filter: none !important; 
+   }
+
+   body { 
+      font-size:12pt; 
+      max-width:100%; 
+   }
+       
+   a, a:visited { 
+      text-decoration: underline; 
+   }
+
+   hr { 
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote { 
+      padding-right: 1em; 
+      page-break-inside: avoid; 
+   }
+
+   tr, img { 
+      page-break-inside: avoid; 
+   }
+
+   img { 
+      max-width: 100% !important; 
+   }
+
+   @page :left { 
+      margin: 15mm 20mm 15mm 10mm; 
+   }
+     
+   @page :right { 
+      margin: 15mm 10mm 15mm 20mm; 
+   }
+
+   p, h2, h3 { 
+      orphans: 3; widows: 3; 
+   }
+
+   h2, h3 { 
+      page-break-after: avoid; 
+   }
+}
+
+</style>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: rgb(88, 72, 246)
+   }
+
+   pre .number {
+     color: rgb(0, 0, 205);
+   }
+
+   pre .comment {
+     color: rgb(76, 136, 107);
+   }
+
+   pre .keyword {
+     color: rgb(0, 0, 255);
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: rgb(3, 106, 7);
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+</head>
+
+<body>
+<h1>A quick guide to the data.table package in R</h1>
+
+<p>Anoop Shah</p>
+
+<p>The <a href = "http://cran.r-project.org/web/packages/data.table/index.html"><strong>data.table</strong></a> package allows R to handle large datasets efficiently, and perform data management in a similar way to  Stata (with by and egen-style functionality), SAS DATA steps or SQL. It is different from the flat file package (<a href = "http://cran.r-project.org/web/packages/ff/index.html"><strong>ff</strong></a>) because the dataset is held in RAM at all times. However, in common with data.frames and unlike SQL database tables, data.tables are not designed to have rows added incrementally. (In R if you want to collect data in an incremental fashion, you first need to create an empty object (e.g. data.table or data.frame) which is big enough, and then start to fill it.)</p>
+
+<h1>Using data.table instead of data.frame</h1>
+
+<p>If a data.table is sent as an argument to a function in a package which does not know about data.table, it behaves as a data.frame. For example, you can use data.tables instead of data.frames when fitting statistical models.</p>
+
+<p>However when you create and manipulate data.tables there are some important differences:</p>
+
+<h2>1. Data.table objects behave as references (pointers) to the actual data.table</h2>
+
+<p>The assignment operator -&gt; assigns a new reference (pointer, alias) but does not make a copy of the object. Several named objects can point to the same data.table. If a data.table is modified by code in a function, it is modified in place.</p>
+
+<p>If you want to be sure of making a separate copy of a data.table or part of a data.table (e.g. the vector of column names) you should do so explicity using the <strong>copy()</strong> function. The <strong>c()</strong> vector concatenation function also makes a copy.</p>
+
+<p>This is demonstrated by the code below. Bcopy is a copy of b but B is just another pointer. I will explain the special updating syntax := later, which is specific to data.tables.</p>
+
+<pre><code class="r">library(data.table)
+b &lt;- data.table(me = 2)
+Bcopy &lt;- copy(b)
+Bcopy[, me:=3]
+</code></pre>
+
+<pre><code>##    me
+## 1:  3
+</code></pre>
+
+<pre><code class="r">b
+</code></pre>
+
+<pre><code>##    me
+## 1:  2
+</code></pre>
+
+<pre><code class="r">B &lt;- b
+B[, me:=3]
+</code></pre>
+
+<pre><code>##    me
+## 1:  3
+</code></pre>
+
+<pre><code class="r">b
+</code></pre>
+
+<pre><code>##    me
+## 1:  3
+</code></pre>
+
+<pre><code class="r">## Extracting a vector of names
+Bnames &lt;- names(b) # Using the &lt;- assignment operator
+BnamesC &lt;- c(names(b)) # Using the vector concatenation function
+BnamesCopy &lt;- copy(names(b)) # Using the copy function
+## Change the column name of the data.table b
+setnames(b, 'me', 'you')
+</code></pre>
+
+<pre><code class="r">Bnames
+</code></pre>
+
+<pre><code>## you
+</code></pre>
+
+<pre><code class="r">BnamesC
+</code></pre>
+
+<pre><code>## me
+</code></pre>
+
+<pre><code class="r">BnamesCopy
+</code></pre>
+
+<pre><code>## me
+</code></pre>
+
+
+<h2>2. Data.tables can have indexes but don&#39;t have row names</h2>
+
+<p>Data table indexes are sorted lists which can be used for fast binary searches. Indexes are called <strong>key</strong>s and can be set using the <strong>setkey</strong> command, with the unquoted key column name(s) as arguments.  
+<strong>setkeyv</strong> is a version of this function which takes quoted column names.
+Keys do not have to be unique.</p>
+
+<pre><code class="r">A &lt;- data.table(a = 1:5, b = c(1, 1, 2, 3, 3))
+setkeyv(A, &quot;a&quot;)
+setkey(A, a)
+</code></pre>
+
+<p>This is an example where more than one variable is used for the key (events within patient):</p>
+
+<pre><code class="r">A &lt;- data.table(events = 1:5, patients = c(1, 3, 2, 1, 3), value = 5:1)
+setkey(A, patients, events)
+A
+</code></pre>
+
+<pre><code>##    events patients value
+## 1:      1        1     5
+## 2:      4        1     2
+## 3:      3        2     3
+## 4:      2        3     4
+## 5:      5        3     1
+</code></pre>
+
+<p>This data.table is now sorted by patients and then by events.</p>
+
+<p>Keys are useful for aggregating results and are required when merging (joining) data.tables.</p>
+
+<h2>3. Square brackets [] behave differently in data.tables compared to data.frames</h2>
+
+<p>Virtually all the manipulation of data.tables that you may want to do (updating, subsetting, selecting, joining) is handled by the square brackets. I have categorised the features by their approximate SQL equivalents.</p>
+
+<p>Let A be a data.table. You can perform operations on A using the syntax <strong>A[i, j, &hellip;]</strong> where &hellip; are optional arguments. The <strong>i</strong> argument relates to rows and <strong>j</strong> to columns. At least one of i or j must be provided; if you are providing j and not i you must put a comma before j.</p>
+
+<p>The square brackets are like a function, but with notation that is more concise than the traditional myfunction(A, i, j, &hellip;) because you don&#39;t need to type a word such as &#39;myfunction&#39;.</p>
+
+<p>All arguments within [] are evaluated within the scope of the data.table, as if using <strong>with()</strong>. This means that column names are available as vector objects. To subset a data.frame using one of its columns you need to fully specify the column (e.g. mydataframe[mydataframe$col1==1,]), but for data.tables you can do this more concisely (e.g. mydatatable[col1==1,]).</p>
+
+<h3>Select</h3>
+
+<p>You can select columns or functions in the <strong>j</strong> argument. </p>
+
+<p>Using the default (with=TRUE), you can specify the columns as objects. If you want to select more than one column you must combine them with <strong>list()</strong>. You can use the name= syntax in list to name the columns, similar to SQL <strong>As</strong>.</p>
+
+<pre><code class="r">A[, value]
+</code></pre>
+
+<pre><code>## [1] 5 2 3 4 1
+</code></pre>
+
+<pre><code class="r">A[, list(events, value)]
+</code></pre>
+
+<pre><code>##    events value
+## 1:      1     5
+## 2:      4     2
+## 3:      3     3
+## 4:      2     4
+## 5:      5     1
+</code></pre>
+
+<pre><code class="r">A[, list(myevents = events, myvalue = value)]
+</code></pre>
+
+<pre><code>##    myevents myvalue
+## 1:        1       5
+## 2:        4       2
+## 3:        3       3
+## 4:        2       4
+## 5:        5       1
+</code></pre>
+
+<p>Using the option with=FALSE, you can specify a vector of column names.</p>
+
+<pre><code class="r">A[, &quot;value&quot;, with = FALSE]
+</code></pre>
+
+<pre><code>##    value
+## 1:     5
+## 2:     2
+## 3:     3
+## 4:     4
+## 5:     1
+</code></pre>
+
+<pre><code class="r">A[, c(&quot;events&quot;, &quot;value&quot;), with = FALSE]
+</code></pre>
+
+<pre><code>##    events value
+## 1:      1     5
+## 2:      4     2
+## 3:      3     3
+## 4:      2     4
+## 5:      5     1
+</code></pre>
+
+<p>If with=TRUE, you can use functions within j.</p>
+
+<pre><code class="r">A[, exp(value)]
+</code></pre>
+
+<pre><code>## [1] 148.413   7.389  20.086  54.598   2.718
+</code></pre>
+
+<pre><code class="r">A[, list(exp = exp(value), square = value^2)]
+</code></pre>
+
+<pre><code>##        exp square
+## 1: 148.413     25
+## 2:   7.389      4
+## 3:  20.086      9
+## 4:  54.598     16
+## 5:   2.718      1
+</code></pre>
+
+<p>You can also use functions that give a scalar results (i.e. a single number), in this case the resultant data.table will have a single row or short vectors will be recycled to make them up to the length of the longest vector.</p>
+
+<pre><code class="r">A[, min(value)]
+</code></pre>
+
+<pre><code>## [1] 1
+</code></pre>
+
+<pre><code class="r">A[, list(exp = exp(value), min = min(value))]
+</code></pre>
+
+<pre><code>##        exp min
+## 1: 148.413   1
+## 2:   7.389   1
+## 3:  20.086   1
+## 4:  54.598   1
+## 5:   2.718   1
+</code></pre>
+
+<p>If you don&#39;t know the column names in advance but want to use a complicated function, it may be easiest to create the expression from text using <strong>parse(text= )</strong> and then evaluate it within [] using <strong>eval()</strong>.</p>
+
+<pre><code class="r">colname &lt;- &quot;value&quot;
+myexpr &lt;- paste(&quot;list(exp=exp(&quot;, colname, &quot;), square=&quot;, colname, &quot;^2)&quot;, sep = &quot;&quot;)
+A[, eval(parse(text = myexpr))]
+</code></pre>
+
+<pre><code>##        exp square
+## 1: 148.413     25
+## 2:   7.389      4
+## 3:  20.086      9
+## 4:  54.598     16
+## 5:   2.718      1
+</code></pre>
+
+<h3>Where</h3>
+
+<p>You can select rows by specifying the <strong>i</strong> argument in one of three ways:</p>
+
+<h4>A numeric vector of column numbers</h4>
+
+<p>You can also use an expression which produces column numbers.</p>
+
+<pre><code class="r">A[1]
+</code></pre>
+
+<pre><code>##    events patients value
+## 1:      1        1     5
+</code></pre>
+
+<pre><code class="r">A[1:2 * 2]
+</code></pre>
+
+<pre><code>##    events patients value
+## 1:      4        1     2
+## 2:      2        3     4
+</code></pre>
+
+<p>(Note that if you are selecting all columns and do not have a <strong>j</strong> argument, the comma after the <strong>i</strong> argument is optional, unlike with data.frames.)</p>
+
+<h4>A logical vector with as many rows as the data.table</h4>
+
+<p>You may have to manually coerce the vector to logical.</p>
+
+<pre><code class="r">A[TRUE]  # TRUE is recycled, all events are selected
+</code></pre>
+
+<pre><code>##    events patients value
+## 1:      1        1     5
+## 2:      4        1     2
+## 3:      3        2     3
+## 4:      2        3     4
+## 5:      5        3     1
+</code></pre>
+
+<pre><code class="r">A[events == 3]
+</code></pre>
+
+<pre><code>##    events patients value
+## 1:      3        2     3
+</code></pre>
+
+<pre><code class="r"># A[events] does not work, you need to use A[events==TRUE] or
+# A[as.logical(events)]
+</code></pre>
+
+<h4>Another data.table with the same key columns</h4>
+
+<p>The data.tables are linked using the key columns like an SQL table join, except that it is ordered. The <strong>mult</strong> option can be used to specify whether to include the <strong>first</strong>, <strong>last</strong> or <strong>all</strong> rows in the join.</p>
+
+<pre><code class="r">setkey(A, patients)
+B &lt;- data.table(patients = 2:4, age = c(23, 34, 45))
+setkey(B, patients)
+
+B[A]  # data.table B indexed by the rows of A.
+</code></pre>
+
+<pre><code>##    patients age events value
+## 1:        1  NA      1     5
+## 2:        1  NA      4     2
+## 3:        2  23      3     3
+## 4:        3  34      2     4
+## 5:        3  34      5     1
+</code></pre>
+
+<pre><code class="r"># patient 4, who occurs in B but not A, is not included.
+
+A[B]  # data.table A indexed by the rows of B.
+</code></pre>
+
+<pre><code>##    patients events value age
+## 1:        2      3     3  23
+## 2:        3      2     4  34
+## 3:        3      5     1  34
+## 4:        4     NA    NA  45
+</code></pre>
+
+<pre><code class="r"># patient 1, who is in A but not B, is not included.
+
+A[B, mult = &quot;first&quot;]  # if the key is the same, include only the first row.
+</code></pre>
+
+<pre><code>##    patients events value age
+## 1:        2      3     3  23
+## 2:        3      2     4  34
+## 3:        4     NA    NA  45
+</code></pre>
+
+<pre><code class="r">
+A[B, mult = &quot;last&quot;]  # if the key is the same, include only the last row.
+</code></pre>
+
+<pre><code>##    patients events value age
+## 1:        2      3     3  23
+## 2:        3      5     1  34
+## 3:        4     NA    NA  45
+</code></pre>
+
+<p>A self-join may be useful to show e.g. only the top row per patient. If a data.table has only one column, it is implicitly taken to be the first key column. In this example we sort by value within patient.</p>
+
+<pre><code class="r">setkey(A, patients, value)
+A[data.table(unique(patients)), mult = &quot;first&quot;]
+</code></pre>
+
+<pre><code>##    patients events value
+## 1:        1      4     2
+## 2:        2      3     3
+## 3:        3      5     1
+</code></pre>
+
+<h3>Update</h3>
+
+<p>You can&#39;t update and select in the same function. The format of the <strong>j</strong> argument is different for updating, and uses the := operator.</p>
+
+<p>This modifies the actual data.table in memory, and returns the modified table.</p>
+
+<p>On the left hand side of :=, you can have a single unquoted column name or a vector of quoted column names if with=FALSE. On the right hand side, you can have a single vector or a list of vectors. You can use list(NULL) to delete columns. The column names can be new or existing. If it is an existing column, you must supply the same data type (e.g. you cannot replace an integer with a double) because the new values replace the old ones in the same memory location.</p>
+
+<p>Some examples:</p>
+
+<pre><code class="r">A[, new:=1]
+</code></pre>
+
+<pre><code>##    events patients value new
+## 1:      4        1     2   1
+## 2:      1        1     5   1
+## 3:      3        2     3   1
+## 4:      5        3     1   1
+## 5:      2        3     4   1
+</code></pre>
+
+<pre><code class="r">A[events == 3, new:=2]
+</code></pre>
+
+<pre><code>##    events patients value new
+## 1:      4        1     2   1
+## 2:      1        1     5   1
+## 3:      3        2     3   2
+## 4:      5        3     1   1
+## 5:      2        3     4   1
+</code></pre>
+
+<pre><code class="r">A[, c(&quot;this&quot;, &quot;that&quot;):=list(2, 3), with = FALSE]
+</code></pre>
+
+<pre><code>##    events patients value new this that
+## 1:      4        1     2   1    2    3
+## 2:      1        1     5   1    2    3
+## 3:      3        2     3   2    2    3
+## 4:      5        3     1   1    2    3
+## 5:      2        3     4   1    2    3
+</code></pre>
+
+<pre><code class="r">A[, c(&quot;this&quot;, &quot;that&quot;):=list(NULL), with = FALSE]
+</code></pre>
+
+<pre><code>##    events patients value new
+## 1:      4        1     2   1
+## 2:      1        1     5   1
+## 3:      3        2     3   2
+## 4:      5        3     1   1
+## 5:      2        3     4   1
+</code></pre>
+
+<pre><code class="r">A[, new:=NULL]
+</code></pre>
+
+<pre><code>##    events patients value
+## 1:      4        1     2
+## 2:      1        1     5
+## 3:      3        2     3
+## 4:      5        3     1
+## 5:      2        3     4
+</code></pre>
+
+<p>To transfer a column from another data.table (in this example, age from data.table B):</p>
+
+<pre><code class="r">A[, age:=B[A]$age]
+</code></pre>
+
+<pre><code>##    events patients value age
+## 1:      4        1     2  NA
+## 2:      1        1     5  NA
+## 3:      3        2     3  23
+## 4:      5        3     1  34
+## 5:      2        3     4  34
+</code></pre>
+
+<pre><code class="r">
+# other ways of ensuring you are getting a vector
+A[, age:=B[A, age][, age]]  # quickest with large datasets
+</code></pre>
+
+<pre><code>##    events patients value age
+## 1:      4        1     2  NA
+## 2:      1        1     5  NA
+## 3:      3        2     3  23
+## 4:      5        3     1  34
+## 5:      2        3     4  34
+</code></pre>
+
+<pre><code class="r">A[, age:=B[A][, age]]
+</code></pre>
+
+<pre><code>##    events patients value age
+## 1:      4        1     2  NA
+## 2:      1        1     5  NA
+## 3:      3        2     3  23
+## 4:      5        3     1  34
+## 5:      2        3     4  34
+</code></pre>
+
+<pre><code class="r">
+# DO NOT DO: A[, age:=B[A, age]] because B[A, age] returns a data.table
+# with two columns: the key column and age, but you need a vector
+</code></pre>
+
+<p>If you don&#39;t want to print the updated data.table each time, use the <strong>invisible()</strong> function (e.g. invisible(A[, age:=B[A]$age])).</p>
+
+<p>Data.frame style notation using $ also works, but is not advised with large data.table objects because it may require the object to be copied and will therefore be slower.</p>
+
+<pre><code class="r">A$age &lt;- NULL
+</code></pre>
+
+<h3>By</h3>
+
+<p>The <strong>by</strong> function is very useful, because it evaluates the j expression (select or update) for every group specified in the <strong>by</strong> option (e.g. per patient, per practice, per date). It is similar to by: egen in Stata, but you can specify expressions instead of column names. </p>
+
+<p>If you are using by over more than one column, they have to be supplied as a list. The only requirement is </p>
+
+<pre><code class="r"># Select
+A[, min(value), by = patients]
+</code></pre>
+
+<pre><code>##    patients V1
+## 1:        1  2
+## 2:        2  3
+## 3:        3  1
+</code></pre>
+
+<pre><code class="r">
+# Update (with vector recycling)
+A[, minvalue := min(value), by = patients]
+</code></pre>
+
+<pre><code>##    events patients value minvalue
+## 1:      4        1     2        2
+## 2:      1        1     5        2
+## 3:      3        2     3        3
+## 4:      5        3     1        1
+## 5:      2        3     4        1
+</code></pre>
+
+<pre><code class="r">A[, minvalue := min(value), by = list(patients, events)]
+</code></pre>
+
+<pre><code>##    events patients value minvalue
+## 1:      4        1     2        2
+## 2:      1        1     5        5
+## 3:      3        2     3        3
+## 4:      5        3     1        1
+## 5:      2        3     4        4
+</code></pre>
+
+<pre><code class="r">
+# within groups: patients==1 vs. patients!=1
+A[, minvalue := min(value), by = list(patients == 1)]
+</code></pre>
+
+<pre><code>##    events patients value minvalue
+## 1:      4        1     2        2
+## 2:      1        1     5        2
+## 3:      3        2     3        1
+## 4:      5        3     1        1
+## 5:      2        3     4        1
+</code></pre>
+
+<h3>Having</h3>
+
+<p>The output of A[i, j, &hellip;] is a data.table. If you put square brackets after it, you can do another query on the result, and so on. For example, you can do a select query with where and then select a subset of the results to display.</p>
+
+<pre><code class="r">A[patients == 3, list(patients, sq = value^2)]
+</code></pre>
+
+<pre><code>##    patients sq
+## 1:        3  1
+## 2:        3 16
+</code></pre>
+
+<pre><code class="r">A[patients == 3, list(patients, sq = value^2)][sq &gt; 1]
+</code></pre>
+
+<pre><code>##    patients sq
+## 1:        3 16
+</code></pre>
+
+<h3>Order by</h3>
+
+<p>You can use the order() function in square brackets in the <strong>i</strong> argument to order the result of a query.</p>
+
+<pre><code class="r">A[order(-patients, events)]
+</code></pre>
+
+<pre><code>##    events patients value minvalue
+## 1:      2        3     4        1
+## 2:      5        3     1        1
+## 3:      3        2     3        1
+## 4:      1        1     5        2
+## 5:      4        1     2        2
+</code></pre>
+
+<pre><code class="r">A[patients == 3, list(patients, sq = value^2)][order(-sq)]
+</code></pre>
+
+<pre><code>##    patients sq
+## 1:        3 16
+## 2:        3  1
+</code></pre>
+
+<h2>Other special features</h2>
+
+<h3>setnames()</h3>
+
+<p>A convenient way to rename columns. Column names should be quoted.</p>
+
+<pre><code class="r">setnames(A, c(&quot;patients&quot;, &quot;value&quot;), c(&quot;patid&quot;, &quot;value2&quot;))
+A
+</code></pre>
+
+<pre><code>##    events patid value2 minvalue
+## 1:      4     1      2        2
+## 2:      1     1      5        2
+## 3:      3     2      3        1
+## 4:      5     3      1        1
+## 5:      2     3      4        1
+</code></pre>
+
+<h3>IDate</h3>
+
+<p>The <strong>IDate</strong> object type provided by the data.table package by is an integer date class, which stores dates using less memory than the conventional date class. IDate objects can be created using the <strong>as.IDate</strong> function, and behave similarly to Date objects, e.g.:</p>
+
+<pre><code class="r">as.IDate(&quot;2000-01-02&quot;)
+</code></pre>
+
+<pre><code>## [1] &quot;2000-01-02&quot;
+</code></pre>
+
+<pre><code class="r">as.IDate(&quot;2000-01-02&quot;) - as.Date(&quot;2000-01-01&quot;)
+</code></pre>
+
+<pre><code>## Time difference of 1 days
+</code></pre>
+
+<h3>tables()</h3>
+
+<p>The tables() function lists all the data.tables in your current workspace, along with their size in megabytes.</p>
+
+<h3>print()</h3>
+
+<p>The on-screen print() function for data.tables (invoked by typing the name of the data.table at the R prompt, or using print(mydatatable)) by default prints only the top 5 and bottom 5 rows of large data.tables rather than the whole data.table. This is convenient to quickly view a data.table, and doesn&#39;t fill up your screen.</p>
+
+<h3>merge()</h3>
+
+<p><strong>merge(X, Y, by = </strong><i>varname</i></strong>)</strong>, where <i>varname</i> is the name of the the common column, merges data.tables X and Y in a similar way to data.frames.</p>
+
+<h2>Similarities to data.frames and lists</h2>
+
+<p>A data.table is a special type of data.frame, and a data.frame is a special type of list containing vectors (or lists) of identical length. Any data.frame can be made into a data.table. Columns of a data.table can be referred to by $, as with lists. List-based functions such as <strong>lapply</strong> also work on data.tables, and they can be coerced to a matrix for using the <strong>apply</strong> function (although this is ill-advised for large data.tables).</p>
+
+<p>However, dont use syntax such as mydatatable$column &lt;- something for assigment, because this might be inefficient. It is better to use the data.table := operator for in-place assignment.</p>
+
+<p>As mentioned above, data.tables can be used in place of data.frames when supplying <strong>data</strong> to a model fitting function.</p>
+
+<h2>Warnings</h2>
+
+<p>Be careful when trying to select a single column in order to get a vector (e.g. to use in assignment). If you get it wrong you will end up with a data.table instead of a vector. This may occur when you are indexing by another data.table. </p>
+
+<p>A way of ensuring you have a vector is using the <strong>$</strong> list subsetting operator in order to ensure you select a single column, e.g.:</p>
+
+<pre><code class="r">A &lt;- data.table(events = 1:5, patients = c(1, 3, 2, 1, 3), value = 5:1)
+A[, list(value)]  # a data.table with one column
+</code></pre>
+
+<pre><code>##    value
+## 1:     5
+## 2:     4
+## 3:     3
+## 4:     2
+## 5:     1
+</code></pre>
+
+<pre><code class="r">A[, value, by = events]  # a data.table with two columns
+</code></pre>
+
+<pre><code>##    events value
+## 1:      1     5
+## 2:      2     4
+## 3:      3     3
+## 4:      4     2
+## 5:      5     1
+</code></pre>
+
+<pre><code class="r">A[, value]  # a vector
+</code></pre>
+
+<pre><code>## [1] 5 4 3 2 1
+</code></pre>
+
+<pre><code class="r">A[, list(value)]$value  # always a vector, same as A[, list(value)][, value]
+</code></pre>
+
+<pre><code>## [1] 5 4 3 2 1
+</code></pre>
+
+</body>
+
+</html>
+

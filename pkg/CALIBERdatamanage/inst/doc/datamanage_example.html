@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Data management for electronic health record data using the CALIBERdatamanagement package</title>
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 12px;
+   margin: 8px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 { 
+   font-size:1.6em; 
+}
+
+h2 { 
+   font-size:1.5em; 
+}
+
+h3 { 
+   font-size:1.3em; 
+}
+
+h4 { 
+   font-size:1em; 
+}
+
+h5 { 
+   font-size:0.9em; 
+}
+
+h6 { 
+   font-size:0.8em; 
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre {	
+   margin-top: 0;
+   max-width: 95%;
+   border: 1px solid #ccc;
+   white-space: pre-wrap;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code.r, code.cpp {
+   background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * { 
+      background: transparent !important; 
+      color: black !important; 
+      filter:none !important; 
+      -ms-filter: none !important; 
+   }
+
+   body { 
+      font-size:12pt; 
+      max-width:100%; 
+   }
+       
+   a, a:visited { 
+      text-decoration: underline; 
+   }
+
+   hr { 
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote { 
+      padding-right: 1em; 
+      page-break-inside: avoid; 
+   }
+
+   tr, img { 
+      page-break-inside: avoid; 
+   }
+
+   img { 
+      max-width: 100% !important; 
+   }
+
+   @page :left { 
+      margin: 15mm 20mm 15mm 10mm; 
+   }
+     
+   @page :right { 
+      margin: 15mm 10mm 15mm 20mm; 
+   }
+
+   p, h2, h3 { 
+      orphans: 3; widows: 3; 
+   }
+
+   h2, h3 { 
+      page-break-after: avoid; 
+   }
+}
+
+</style>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: rgb(88, 72, 246)
+   }
+
+   pre .number {
+     color: rgb(0, 0, 205);
+   }
+
+   pre .comment {
+     color: rgb(76, 136, 107);
+   }
+
+   pre .keyword {
+     color: rgb(0, 0, 255);
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: rgb(3, 106, 7);
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+
+
+
+</head>
+
+<body>
+<h1>Data management for electronic health record data using the CALIBERdatamanagement package</h1>
+
+<p>Databases of electronic health records such as CALIBER have large numbers of patients and can create challenges for data management. The CALIBER suite of R packages has tools to assist in the analysis of these data. These packages are particularly designed for CALIBER data, but may be of use for other electronic health record datasets.</p>
+
+<h2>The R packages comprise:</h2>
+
+<ul>
+<li>CALIBERcodelists &ndash; tools for handling lists of Read, ICD-10 or OPCS codes, used to identify medical conditions in the databases</li>
+<li>CALIBERdatamanage &ndash; data management functions</li>
+<li>CALIBERlookups &ndash; lookup tables for the Clinical Practice Research Datalink</li>
+</ul>
+
+<h2>Handling large datasets in R</h2>
+
+<p>Standard data.frame objects are not suitable for handling very large datasets, because they are unsorted, can be slow to search and multiple copies may be made whenever they are modified. We recommend the use of the following:</p>
+
+<h3>data.table</h3>
+
+<p>Data.table objects are like data.frames but are updated by reference, and can be sorted to enable fast binary searches. In particular, the <code>&lt;-</code> assignment operator creates a new name which refers to the same object rather than creating a new object. We recommend using the <code>copy()</code> function when you explicitly want to make a copy of an object.</p>
+
+<p>Data.table allows SQL-type operations, but using its own concise syntax. Data.table operations are faster than aggregate, table, doBy, plyr, etc.</p>
+
+<h3>ffdf</h3>
+
+<p>Flat file data frames reside on the hard drive (usually in the temporary directory, but can be saved elsewhere for storage). The methods for using them are different from data.table or data.frame, but some of the CALIBERdatamanage functions behave exactly the same regardless of the data format.</p>
+
+<p>We recommend the use of ffdf objects for raw datasets which are too large to fit in memory, e.g. raw CPRD clinical, test or therapy data.</p>
+
+<h2>Data conversion and data management</h2>
+
+<p>The CALIBERdatamanage package contains functions for:</p>
+
+<ul>
+<li>importing data directly from text file, zip file, or (for data.table only) Stata file.</li>
+<li>converting text representations of dates into actual dates</li>
+<li>selecting a summary of multiple records per patient and adding it to a patient file, in one easy function call</li>
+<li>decoding additional clinical data and test results in CPRD data, using the lookup tables in CALIBERlookups </li>
+</ul>
+
+<h2>Example analysis</h2>
+
+<p>First we load the required packages and specify the path to the data.</p>
+
+<pre><code class="r">library(CALIBERcodelists)
+
+library(CALIBERdatamanage)
+
+library(CALIBERlookups)  # optional, it will otherwise be
+# loaded automatically when required
+
+kRawPath &lt;- &quot;~/RAWDATA/&quot;
+</code></pre>
+
+<p>We are using raw data for the stable angina cohort. We can load raw files directly from zip or gz files (if from zip they are automatically unzipped into the temporary directory and loaded). </p>
+
+<p>It is assumed that the first row contains the column headings. The delimiter is detected automatically (tab or comma). Internally, importDT uses <code>fread</code> instead of read.delim, as it is faster and uses less memory. Dates are converted to IDate.</p>
+
+<pre><code class="r"># Load patient data to data.table
+PATS &lt;- importDT(kRawPath %&amp;% &quot;patients.csv.zip&quot;)
+</code></pre>
+
+<pre><code>## Imported to data.table with 115305 rows and 17 columns
+
+## Column classes after attempted date conversion:
+
+## anonpatid pracid pracregion pracuts praclcd 
+## &quot;integer&quot; &quot;integer&quot; &quot;integer&quot; &quot;IDate&quot; &quot;IDate&quot; 
+
+## frd crd tod deathdate toreason
+## &quot;IDate&quot; &quot;IDate&quot; &quot;IDate&quot; &quot;IDate&quot; &quot;integer&quot;
+
+## gender year_of_birth in_hes_source hes_start hes_end
+## &quot;integer&quot; &quot;integer&quot; &quot;integer&quot; &quot;IDate&quot; &quot;IDate&quot;
+
+## hes_ethnicity in_hes
+## &quot;character&quot; &quot;integer&quot;
+</code></pre>
+
+<pre><code>## Converting in_hes_source to logical.
+
+## Converting in_hes to logical.
+</code></pre>
+
+<p>We designate the patient file as a &#39;cohort&#39;, which means that it contains one row per patient, each variable has an optional description and all the variables are sorted alphabetically. A cohort object is also a data.table, which means it is updated by reference. Converting a data.table to a cohort changes the original data.table</p>
+
+<pre><code class="r"># Convert to cohort
+cohort(PATS, idcolname = &quot;anonpatid&quot;)
+# This is the same as PATS &lt;- as.cohort(PATS, idcolname = &#39;anonpatid&#39;)
+</code></pre>
+
+<p>The <code>importFFDF</code> function can load and append multiple files if supplied with a vector of file names. Unlike importDT, character strings are loaded as factors and dates as Date types.</p>
+
+<pre><code class="r"># Load clinical data to ffdf
+CLIN &lt;- importFFDF(kRawPath %&amp;% &quot;clinical.part.&quot; %&amp;% 0:3 %&amp;% &quot;.zip&quot;)
+</code></pre>
+
+<pre><code>## Importing /tmp/RtmpSuhHlK/clinical.part.0
+## Importing /tmp/RtmpSuhHlK/clinical.part.1
+## Importing /tmp/RtmpSuhHlK/clinical.part.2
+## Importing /tmp/RtmpSuhHlK/clinical.part.3
+
+## Imported to ffdf with 29739915 rows and 18 columns
+
+## Column classes after attempted date conversion:
+
+## anonpatid eventdate sysdate constype consid medcode staffid
+## &quot;integer&quot; &quot;Date&quot; &quot;Date&quot; &quot;integer&quot; &quot;integer&quot; &quot;integer&quot; &quot;integer&quot; 
+
+## textid episode enttype adid data1 data2 data3
+## &quot;integer&quot; &quot;integer&quot; &quot;integer&quot; &quot;integer&quot; &quot;numeric&quot; &quot;integer&quot; &quot;numeric&quot; 
+
+## data4 data5 data6 data7
+## &quot;integer&quot; &quot;integer&quot; &quot;integer&quot; &quot;logical&quot;
+</code></pre>
+
+<p>FFDF objects are saved on the hard drive, and use up very little RAM. This can be checked using the function <code>object.size</code>:</p>
+
+<pre><code class="r">print(object.size(PATS), units = &quot;auto&quot;)
+</code></pre>
+
+<pre><code>## 9.7 Mb
+</code></pre>
+
+<pre><code class="r">print(object.size(CLIN), units = &quot;auto&quot;)
+</code></pre>
+
+<pre><code>## 60.7 Kb
+</code></pre>
+
+<p>To save the dataset for future use, we can use the function <code>pack.ffdf</code>. Loading from a &#39;packed&#39; file is quicker than loading from a text file.</p>
+
+<pre><code class="r"># Save clinical table as packed FFDF on file
+pack.ffdf(kRawPath %&amp;% &quot;mypackedCLIN.zip&quot;, CLIN)
+
+# To unpack (CLIN is restored to the global environment)
+unpack.ffdf(kRawPath %&amp;% &quot;mypackedCLIN.zip&quot;)
+</code></pre>
+
+<p>We are trying to identify diagnoses of stable angina. To do this, we load the stable angina codelist.</p>
+
+<pre><code class="r">sa_codelist &lt;- codelist(&quot;sa_diagnosis_gprd.codelist.1.csv&quot;)
+sa_codelist
+</code></pre>
+
+<pre><code>## Codelist based on read dictionary with 26 terms.
+## 
+## Name: sa_diagnosis_gprd
+## Version: 1
+## Source: GPRD
+## Author: Julie George, Emily Herrett, Liam Smeeth, Harry Hemingway
+## Date: 12 Apr 2011
+## Timestamp: 15.04 23-Apr-13
+## Categories:
+## 1. History of stable angina
+## 2. Vasospastic angina
+## 3. Cardiac syndrome X
+## 4. Stable angina
+## 
+## TERMS (sorted by category and code):
+##     category    code                              term medcode
+##  1:        1 14A5.00              H/O: angina pectoris    6336
+##  2:        1 14AJ.00          H/O: Angina in last year   57062
+##  3:        2 G331.00               Prinzmetal&#39;s angina   12986
+##  4:        2 G331.11           Variant angina pectoris   11048
+##  5:        2 G332.00             Coronary artery spasm   36854
+##  6:        3 G37..00                Cardiac syndrome X    8568
+##  7:        4 662K.00                    Angina control   13185
+##  8:        4 662K000             Angina control - good   19542
+##  9:        4 662K100             Angina control - poor   15373
+## 10:        4 662K200        Angina control - improving   14782
+## 11:        4 662Kz00                Angina control NOS   15349
+## 12:        4 8B27.00               Antianginal therapy   45960
+## 13:        4 G33..00                   Angina pectoris    1430
+## 14:        4 G330.00                  Angina decubitus   20095
+## 15:        4 G330000                  Nocturnal angina   18125
+## 16:        4 G330z00              Angina decubitus NOS   29902
+## 17:        4 G33z.00               Angina pectoris NOS   25842
+## 18:        4 G33z100                       Stenocardia   54535
+## 19:        4 G33z200                  Syncope anginosa    7696
+## 20:        4 G33z300                  Angina on effort    1414
+## 21:        4 G33z500               Post infarct angina    9555
+## 22:        4 G33z600                  New onset angina   26863
+## 23:        4 G33z700                     Stable angina   12804
+## 24:        4 G33zz00               Angina pectoris NOS   28554
+## 25:        4 G34y000    Chronic coronary insufficiency   24540
+## 26:        4 Gyu3000 [X]Other forms of angina pectoris   39546
+##     category    code                              term medcode
+</code></pre>
+
+<p>We want to find the date of the earliest angina record per patient, and add it to the patient cohort as the index date.</p>
+
+<pre><code class="r">ANGINA &lt;- as.data.table(extractCodes(CLIN, sa_codelist))
+
+# The new variable sa_diagnosis_gprd is a factor
+ANGINA[, .N, by = list(sa_diagnosis_gprd, as.integer(sa_diagnosis_gprd))]
+</code></pre>
+
+<pre><code>##           sa_diagnosis_gprd as.integer      N
+## 1:            Stable angina          4 152274
+## 2:       Vasospastic angina          2    297
+## 3: History of stable angina          1   4184
+## 4:       Cardiac syndrome X          3    465
+</code></pre>
+
+<pre><code class="r">
+# Now we create an index date for the cohort
+ANGINA &lt;- ANGINA[(!is.na(eventdate)) &amp; sa_diagnosis_gprd %in% c(&quot;Stable angina&quot;, 
+    &quot;History of stable angina&quot;)]
+ANGINA[, indexdate := min(eventdate), by = anonpatid]
+
+# Convert indexdate back to date in case it is a number
+ANGINA[, indexdate := as.IDate(indexdate, origin = &quot;1970-01-01&quot;)]
+
+# Transfer the index date to the PATS cohort
+transferVariables(ANGINA, PATS, &quot;indexdate&quot;, description = &quot;date of initial diagnosis&quot;)
+</code></pre>
+
+<pre><code>##  [1] &quot;anonpatid&quot;     &quot;crd&quot;           &quot;deathdate&quot;     &quot;frd&quot;          
+##  [5] &quot;gender&quot;        &quot;hes_end&quot;       &quot;hes_ethnicity&quot; &quot;hes_start&quot;    
+##  [9] &quot;in_hes&quot;        &quot;in_hes_source&quot; &quot;pracid&quot;        &quot;praclcd&quot;      
+## [13] &quot;pracregion&quot;    &quot;pracuts&quot;       &quot;tod&quot;           &quot;toreason&quot;     
+## [17] &quot;year_of_birth&quot; &quot;indexdate&quot;
+</code></pre>
+
+<pre><code class="r">
+# Generate a variable to include patients only if the indexdate is after
+# their current registration date
+PATS[, include, := istrue(indexdate &gt;= crd)]
+</code></pre>
+
+<pre><code>## Cohort with 115305 patients; ID column = anonpatid 
+## 
+## COLUMN DESCRIPTIONS
+## crd (IDate): 
+## deathdate (IDate): 
+## frd (IDate): 
+## gender (integer): 
+## hes_end (IDate): 
+## hes_ethnicity (character): 
+## hes_start (IDate): 
+## in_hes (logical): 
+## in_hes_source (logical): 
+## indexdate (IDate): date of initial diagnosis
+## pracid (integer): 
+## praclcd (IDate): 
+## pracregion (integer): 
+## pracuts (IDate): 
+## tod (IDate): 
+## toreason (integer): 
+## year_of_birth (integer): 
+</code></pre>
+
+<pre><code class="r">modifyDescription(PATS, &quot;include&quot;, &quot;Whether to include in main analysis&quot;)
+
+# Count the number of patients included
+PATS[, .N, by = include]
+</code></pre>
+
+<pre><code>##    include     N
+## 1:   FALSE 77242
+## 2:    TRUE 38063
+</code></pre>
+
+<p>Additional variables can be added for medical conditions prior
+to the index date, such as whether a patient has diabetes.</p>
+
+<pre><code class="r">dm_codelist &lt;- codelist(&quot;dm_gprd.codelist.2.csv&quot;)
+dm_codelist
+</code></pre>
+
+<pre><code>## Codelist based on read dictionary with 513 terms.
+## 
+## Name: dm_gprd
+## Version: 2
+## Source: GPRD
+## Author: Julie George, Emily Herrett, Anoop Shah, Liam Smeeth, Harry Hemingway
+## Date: 06 Jan 2012
+## Timestamp: 15.04 23-Apr-13
+## Categories:
+## 1. H/O diabetes
+## 2. Possible diabetes
+## 3. T1DM diagnosed
+## 4. T2DM diabetes diagnosed
+## 5. Secondary diabetes
+## 6. Diabetes, not otherwise specified
+## 7. Diabetes excluded
+## 8. Diabetes resolved
+## 
+## TERMS (sorted by category and code):
+##      category    code                                         term medcode
+##   1:        1 1434.00                       H/O: diabetes mellitus    6813
+##   2:        1 14F4.00 H/O: Admission in last year for diabetes ...    7045
+##   3:        1 14P3.00                         H/O: insulin therapy   17236
+##   4:        1 2126300                            Diabetes resolved   28622
+##   5:        1 212H.00                            Diabetes resolved   18766
+##  ---                                                                      
+## 509:        6 TJ23z00 Adverse reaction to insulins and antidiab...   61210
+## 510:        6 U602311 [X] Adverse reaction to insulins and anti...   65684
+## 511:        6 ZC2C800         Dietary advice for diabetes mellitus   10642
+## 512:        6 ZV65312  [V]Dietary counselling in diabetes mellitus   16881
+## 513:        7 1I0..00                   Diabetes mellitus excluded   19203
+</code></pre>
+
+<pre><code class="r">
+# Use categories 3, 4 and 6
+addCodelistToCohort(PATS, &quot;diabetes&quot;, CLIN, dm_codelist, categories = c(3, 4, 
+    6), binary = TRUE, limit_years = c(-Inf, 0), description = &quot;Diabetes prior to index date&quot;)
+</code></pre>
+
+<pre><code>## Called from: addToCohort(x, varname, USE, old_varname = &quot;value&quot;, value_choice = function(x) any(istrue(x)), 
+##     limit_years = limit_years, overwrite = overwrite, idcolname = idcolname, 
+##     datecolname = datecolname, description = description)
+</code></pre>
+
+<pre><code>##    diabetes      N
+## 1:    FALSE 109777
+## 2:     TRUE   5528
+</code></pre>
+
+<p>Adding the most recent systolic blood pressure within 2 years before the index date, taking the mean if there is more than one measurement on the same day.</p>
+
+<pre><code class="r"># First extract the blood pressure readings
+BP &lt;- extractEntity(CLIN, 1)
+
+# Now use the addToCohort function to add the mean BP
+addToCohort(PATS, &quot;sbp&quot;, BP, &quot;Systolic&quot;, value_choice = mean, date_priority = &quot;last&quot;, 
+    limit_years = c(-2, 0), date_varname = &quot;sbp_date&quot;, description = &quot;Most recent SBP within 2y prior to index date&quot;)
+</code></pre>
+
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA&#39;s 
+##       0     130     140     143     156    1130   82651
+</code></pre>
+
+</body>
+
+</html>
+
