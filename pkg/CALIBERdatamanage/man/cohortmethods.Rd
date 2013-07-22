@@ -71,7 +71,7 @@ Anoop Shah
 
 
 \seealso{
-\code{\link{cohort}}, \code{\link{removeColumn}}
+\code{\link{cohort}}, \code{\link{removeColumns}}
 }
 
 \examples{
@@ -79,7 +79,4 @@ COHORT <- cohort(data.table(anonpatid = 1:3, indexdate = as.IDate(c("2012-1-3",
 	"2012-1-2", "2010-1-9"))))
 is.cohort(COHORT)
 subset(COHORT, anonpatid == 2)
-
-
-
 }

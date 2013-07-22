@@ -1,33 +1,31 @@
-\name{removeColumn}
-\alias{removeColumn}
+\name{removeColumns}
+\alias{removeColumns}
 
 \title{
 Remove columns from a cohort object
 }
 
 \description{
-Deletes one or more columns and also deletes their description. The cohort
-object is updated by reference.
+Deletes one or more columns and also deletes their description. 
+If the cohort object is a data.table, it is updated by reference,
+if a flat file data frame the modified object is returned.
 }
 
 \usage{
-removeColumn(x, colname)
+removeColumns(x, colnames)
 }
 
 \arguments{
   \item{x}{
 a \code{\link{cohort}} object
 }
-  \item{colname}{
+  \item{colnames}{
 a character vector of the column names to delete
 }
 }
 
 \value{
-Returns the description table, invisibly.
-
-\item{colname}{Column name}
-\item{description}{Column description}
+Returns the modified ffdf or data.table, invisibly.
 }
 
 \author{
@@ -43,6 +41,6 @@ Anoop Shah
 COHORT <- cohort(data.table(anonpatid = 1:3,
     indexdate = as.IDate(c("2012-1-3", "2012-1-2", "2010-1-9")),
     sex = c("M", "F", "M")))
-removeColumn(COHORT, c('indexdate', 'sex'))
+removeColumns(COHORT, c('indexdate', 'sex'))
 print(COHORT)
 }

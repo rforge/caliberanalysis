@@ -50,6 +50,12 @@ National Institute for Health Research.</p>
 <p>The goal of CALIBER is to provide evidence across different stages of translation, from discovery,
 through evaluation to implementation where electronic health records provide new scientific opportunities.</p>
 
+Download R packages here:
+<a href="http://r-forge.r-project.org/R/?group_id=1598">
+http://r-forge.r-project.org/R/?group_id=1598</a>
+
+<hr/>
+
 <h2>CALIBERrfimpute</h2>
 
 <p>Missing data are frequently handled by multiple imputation, but parametric imputation methods
@@ -90,6 +96,10 @@ This R package provides an interface to the program, as well as tools to help ma
 Link to project summary page:
 <a href="http://r-forge.r-project.org/projects/caliberanalysis/">
 http://r-forge.r-project.org/projects/caliberanalysis/</a>
+
+Download R packages here:
+<a href="http://r-forge.r-project.org/R/?group_id=1598">
+http://r-forge.r-project.org/R/?group_id=1598</a>
 
 </body>
 </html>

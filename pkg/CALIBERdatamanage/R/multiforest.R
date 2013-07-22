@@ -164,7 +164,7 @@ multiforest <- function(data = NULL, rowheights = 1.1,
     # text and data parameters should be in a data.frame
     # returns a list of textGrobs
     
-    # allow align to be used instead of hjust
+    # allow align to be used instead of just
     if (is.null(data$just) & !is.null(data$align)){
       data$just <- data$align
     }
@@ -179,9 +179,12 @@ multiforest <- function(data = NULL, rowheights = 1.1,
       data[,param][data[,param]==''] <- get('default' %&% param)
     }
 		
-		# Ensure that font faces and justification are in lower case		
-		data$fontface <- tolower(data$fontface)
-		data$just <- tolower(data$just)
+		# Ensure that font faces and justification are in lower case
+		# and remove excess spaces
+		data$fontface <- tolower(gsub(' ', '', data$fontface))
+		data$fontface[!(data$fontface %in% c('plain', 'italic', 'bold', 'bold.italic'))] <- NA
+		data$just <- tolower(gsub(' ', '', data$just))
+		data$just[!(data$just %in% c('left', 'right', 'center', 'centre'))] <- NA
 
     grobs <- vector("list", nrow(data))
     data$text <- as.character(data$text)

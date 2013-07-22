@@ -1,4 +1,35 @@
 =================================================
+CALIBERdatamanage Version 0.1-3
+(second version on R-Forge)
+=================================================
+
+NEW FEATURES:
+
+- extractEntity allows extraction of more than one
+  entity type
+- extractCodes uses parallel execution for extracting
+  ICD-10 codes
+- 'cohort' object can be either ffdf or data.table
+- convertDates works on ffdf objects
+- setnames function for cohort, which also updates
+  description table
+- new function AddCategoryToCohort which allows the
+  creation of binary variables from multiple records
+  of categorical variables.
+
+CHANGES:
+
+- transferVariables uses the ID column of fromdata or
+	todata (if either is a cohort) as the default 'by'
+	variable.
+
+BUG FIXES:
+
+- summaryTable had an error when exporting to CSV, now
+  fixed
+- removeColumns would also delete the description table
+
+=================================================
 CALIBERdatamanage Version 0.1-2
 =================================================
 

@@ -33,10 +33,10 @@ retrieveCategoriesFromMETA <- function(){
 	thecats <- integer(length(temp))
 	thecats[!temp %in% c('', 'NA')] <- as.integer(temp[!temp %in% c('', 'NA')])
 
-	out <- data.table(category=thecats,
-		shortname=theshortnames,
-		description=thedescriptions)
-	out <- subset(out, !is.na(category))
+	out <- data.table(category = thecats,
+		shortname = theshortnames,
+		description = thedescriptions)
+	out <- subset(out, !is.na(category) & category > 0)
 	setcolorder(out, c('category', 'shortname', 'description'))
 	setkey(out, 'category')
 	actualCats <- unique(CALIBER_DICT[!is.na(category), category])

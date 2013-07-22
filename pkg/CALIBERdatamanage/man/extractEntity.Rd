@@ -22,7 +22,9 @@ extractEntity(data, enttype, CALIBER_ENTITY = NULL,
 data.table or FFDF data frame containing the CPRD GOLD format data.
 }
   \item{enttype}{
-the entity type to extract, a single integer.
+entity type(s) to extract, either a single integer or a vector.
+If extracting multiple entity types, the data specification for each
+entity type must be identical.
 }
   \item{CALIBER_ENTITY}{
 a table with columns enttype, data_fields, data1, data1_lkup, \dots.

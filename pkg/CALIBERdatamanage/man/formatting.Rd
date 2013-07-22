@@ -14,10 +14,10 @@ Functions to format numbers for publication, producing either plain text or LaTe
 
 \usage{
 formatnum(numbers, dp = NA, sigfig = 3, scientific = TRUE,
-  latex = (getOption("xtable.type") == "latex"),
-  usephantom = getOption("CALIBERdatamanage_phantom"), names = NULL)
+    latex = (getOption("xtable.type") == "latex"),
+    usephantom = getOption("CALIBERdatamanage_phantom"), names = NULL)
 formatp(pvalues, minp = 0.0001,
-  latex=(getOption('xtable.type')=='latex'), ...)
+    latex=(getOption('xtable.type')=='latex'), ...)
 formathr(coef, se, df = Inf, dp = NA, pstar = TRUE, ...)
 formatci(range, scientific = FALSE, intsep = ", ", ...)
 }

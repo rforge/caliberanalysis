@@ -47,8 +47,9 @@ a character vector of key column names, to set the data.table key
 whether to convert 1 / 0 columns to logical
 }
   \item{fread}{
-whether to use the \code{fread} function
-(fast and friendly file finagler) in data.table.
+whether to use the new \code{fread} fast file
+loader in data.table. It is not used if \code{nrows} is
+supplied, because \code{fread} loads the entire file.
 This function cannot currently handle escaped quotes, so if the
 input file contains escaped quotes, set \code{fread} to FALSE.
 }

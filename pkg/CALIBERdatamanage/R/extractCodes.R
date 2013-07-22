@@ -2,16 +2,9 @@ extractCodes <- function(data, codelist, enttypes = NULL,
 	codename = switch(attr(codelist, 'Source'),
 	GPRD = 'medcode', ONS = 'cod', HES = 'icd', OPCS = 'opcs',
 	GPRDPROD = 'prodcode'), varname = attr(codelist, 'Name')){
-	# Extracts and decodes a specified entity type from a 
-	# ffdf or data.table, automatically using CALIBER lookups
-	# to decode the data. Returns a data.table.
-	
-	# Coded integer values are converted to factors
-	# YYYYMMDD dates are converted to IDate
-	# Medcodes, prodcodes and score method are converted to factors
-	# (Read terms, product names or score method) if the
-	# CALIBERlookups package is available
-	
+	# Extracts a subset of records with a particular Read, OPCS
+	# or ICD-10 code.
+
 	# Arguments: data -- ffdf or data.table or data.frame
 	#            codelist -- a Read codelist
 	#            enttypes -- vector of entity types to extract,
@@ -75,24 +68,29 @@ extractCodes <- function(data, codelist, enttypes = NULL,
 				icd = as.character(data[[codename]]),
 				category = NA_integer_)
 		}
-		minICD <- min(nchar(mycodelist$code))
-		maxICD <- max(nchar(mycodelist$code))
-		for (i in minICD:maxICD){
-			tomatch[, part := substr(tomatch[, icd], 1, i)]
-			setkey(tomatch, part)
-			temp <- subset(mycodelist, nchar(code) == i)
-			setkey(temp, code)
-			tomatch[, tempcat := temp[tomatch][, category]]
-			tomatch[!is.na(tempcat), category := as.integer(tempcat)]
+		# Loop through categories, grepping ICD codes
+		allcats <- unique(as.integer(mycodelist$category))
+		for (i in allcats){
+			regexpr <- paste(mycodelist[category == i,
+				paste('^', code, sep = '')], collapse = '|')
+			if ('parallel' %in% loadedNamespaces()){
+				# Use parallel grep
+				found <- pvec(tomatch$icd, function(x){
+					grepl(regexpr, x)
+				})
+				tomatch[found, category := i]
+			} else {
+				tomatch[grepl(regexpr, icd), category := i]
+			}
 		}
 	} else if (attr(codelist, 'Source') == 'OPCS'){
 		# Ensure that opcs column is character
 		if (is.ffdf(data)){
 			tomatch <- data.table(order = 1:nrow(data),
-				opcs = sub('\\.', '', as.character(as.ram(data[, codename]))))
+				opcs = as.character(as.ram(data[, codename])))
 		} else {
 			tomatch <- data.table(order = 1:nrow(data),
-				opcs = sub('\\.', '', as.character(data[[codename]])))
+				opcs = as.character(data[[codename]]))
 		}
 		setkey(tomatch, opcs)
 		setkey(mycodelist, code)
@@ -127,7 +125,12 @@ extractCodes <- function(data, codelist, enttypes = NULL,
 			if (!('enttype' %in% colnames(data))){
 				stop('No enttype column in the data.')
 			}
-			out <- subset(out, enttype %in% enttypes)
+			if (is.ffdf(out)){
+				keep <- as.ff(as.ram(out$enttype) %in% enttypes)
+				out <- subset(out, keep)
+			} else {
+				out <- subset(out, out$enttype %in% enttypes)
+			}
 		}
 	}
 

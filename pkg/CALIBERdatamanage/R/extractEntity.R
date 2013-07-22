@@ -11,7 +11,10 @@ extractEntity <- function(data, enttype,
 	# CALIBERlookups package is available
 	
 	# Arguments: data -- ffdf or data.table or data.frame
-	#            enttype -- a single entity type to extract
+	#            enttype -- one or more entity types to extract;
+	#                if extracting from multiple entity types, the
+	#                data fields must be identical -- this will be
+	#                checked
 	#            CALIBER_ENTITY -- entity definitions
 	#            CALIBER_LOOKUPS -- lookups tables
 	#            ... -- arguments to pass to YYYYMMDDtoDate
@@ -26,20 +29,39 @@ extractEntity <- function(data, enttype,
 		# to external users.
 		eval(parse(text="require('CALIBERlookups', quietly=TRUE)"))
 		data('CALIBER_ENTITY', envir = environment())
+	} else {
+		# Check that CALIBER_ENTITY is a data.table
+		CALIBER_ENTITY <- as.data.table(CALIBER_ENTITY)
 	}
 
 	this_enttype <- enttype
+	# If multiple entity types, ensure that the data fields are identical
+	if (length(this_enttype) > 1){
+		for (i in 2:length(this_enttype)){
+			if (!identical(
+				unlist(CALIBER_ENTITY[enttype == this_enttype[i],
+					colnames(CALIBER_ENTITY)[grepl('data',
+					colnames(CALIBER_ENTITY))], with = FALSE]),
+				unlist(CALIBER_ENTITY[enttype == this_enttype[i - 1],
+					colnames(CALIBER_ENTITY)[grepl('data',
+					colnames(CALIBER_ENTITY))], with = FALSE]))){
+				stop('If extracting multiple entity types the data specification must be identical')
+			}
+		}
+	}
+
 	if (is.ffdf(data)){
 		use <- as.ffdf(data.frame(enttype = this_enttype, use = TRUE))
-		A <- as.data.table(as.data.frame(merge(data, use)))
+		A <- as.data.table(as.data.frame(merge(data, use, by = 'enttype')))
 		A[, use := NULL]
 	} else {
-		A <- as.data.table(data[data$enttype == this_enttype, ])
+		A <- as.data.table(data[data$enttype %in% this_enttype, ])
 	}
 	
 	# Generate new columns with interpreted data
 	# (doesn't translate medcode or prodcode)
-	template <- CALIBER_ENTITY[enttype == this_enttype]
+	# If multiple rows, they must be identical
+	template <- CALIBER_ENTITY[enttype %in% this_enttype][1]
 	# template is a data.table with 1 row
 	
 	uselookup <- function(vector, lookupname, categorycol, labelcol,
@@ -143,6 +165,9 @@ extractEntity <- function(data, enttype,
 						} else {
 							stop('CALIBERlookups package unavailable.')
 						}	
+					} else {
+						# Ensure that CALIBER_LOOKUPS is a data.table
+						CALIBER_LOOKUPS <- as.data.table(CALIBER_LOOKUPS)
 					}
 					if (is.null(CALIBER_LOOKUPS)){
 						stop('Unable to fund CALIBER_LOOKUPS')

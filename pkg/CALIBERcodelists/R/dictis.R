@@ -1,8 +1,7 @@
 dictis <- function(dictName1, dictName2=NULL, dictName3=NULL){
-	# Returns a Boolean vector as long as the number of rows in CALIBER_DICT
-	# for whether a term is in a specified dictionary. This is intended
-	# for use in the code selection process together with termhas,
-	# codematch etc.
+	# Returns a selection object stating whether a term is in a
+  # specified dictionary. This is intended for use in the
+  # code selection process together with termhas, codematch etc.
 	# Arguments: dictionary names, either as a vector or as separate
 	#            arguments for convenience.
 
@@ -15,7 +14,8 @@ dictis <- function(dictName1, dictName2=NULL, dictName3=NULL){
 		' is not a valid dictionary.\nIt should be in ' %&%
 		paste(ALLDICTS, collapse=', '))
 	} else {
-		invisible(CALIBER_DICT$dict %in% META[dicts][value=='TRUE'][, item])
+		as.selection(CALIBER_DICT$dict %in% META[dicts][value=='TRUE'][, item])
 	}
 }
+
 

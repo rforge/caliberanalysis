@@ -1,6 +1,8 @@
 \name{as.data.table.ffdf}
 \alias{as.data.table.ffdf}
 \alias{as.ffdf.data.table}
+\alias{as.data.table.cohort}
+\alias{as.ffdf.cohort}
 
 \title{
 S3 methods to convert between FFDF and data.table
@@ -10,17 +12,22 @@ S3 methods to convert between FFDF and data.table
 Converts a Flat File Data Frame (ffdf) to a data.table object, or the other way around.
 FFDF is a convenient form for storing very large datasets without
 using RAM, but data.table is faster and convenient for data processing.
+
+Also converts cohort objects from data.table cohorts to ffdf cohorts and vice versa.
 }
 
 \usage{
 \method{as.data.table}{ffdf}(x, keep.rownames = FALSE)
+\method{as.data.table}{cohort}(x, keep.rownames = FALSE)
 \method{as.ffdf}{data.table}(x, vmode = NULL,
+    col_args = list(), ...)
+\method{as.ffdf}{cohort}(x, vmode = NULL,
     col_args = list(), ...)
 }
 
 \arguments{
   \item{x}{
-object to convert (FFDF data frame or data.table). FFDF objects
+object to convert (FFDF data frame, data.table or cohort). FFDF objects
 must have more than one row in order to be converted to data.table.
 }
   \item{keep.rownames}{
@@ -46,6 +53,7 @@ factors in the original data.table then calls \code{as.ffdf.data.frame}.
 
 \value{
 \code{as.ffdf} returns a FFDF object; \code{as.data.table} returns a data.table object.
+If the original object is a cohort, the output is also a cohort.
 }
 
 \author{

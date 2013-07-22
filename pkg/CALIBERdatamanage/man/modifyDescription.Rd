@@ -29,8 +29,8 @@ vector of new descriptions
 
 
 \value{
-Both functions invisibly return the modified description table.
-The cohort object is updated by reference.
+Both functions invisibly return the modified cohort object and
+update it by reference.
 }
 
 

@@ -11,17 +11,17 @@ relative to an index date and a defined time window.
 }
 
 \usage{
-addToCohort(x, varname, data, old_varname = "value",
+addToCohort(cohort, varname, data, old_varname = "value",
     value_choice = function(x) max(x, na.rm = TRUE),
     date_priority = c("all", "first", "last"), limit_years = c(-Inf, 0),
-    date_varname = NULL, idcolname = "anonpatid", datecolname = "eventdate",
-    indexcolname = "indexdate", overwrite = FALSE, description = NULL)
+    date_varname = NULL,  idcolname = attr(cohort, 'idcolname'),
+    datecolname = "eventdate", indexcolname = "indexdate",
+    overwrite = FALSE, description = NULL)
 }
 
 \arguments{
-  \item{x}{
-a \link{cohort} object which must have an index date whose name should be supplied as
-the argument \code{indexcolname}.
+  \item{cohort}{
+a \link{cohort} object which must have an index date whose name should be supplied as the argument \code{indexcolname}.
 }
   \item{varname}{
 new variable name
@@ -56,7 +56,8 @@ of the event from which the category was drawn.
 Not valid if date_priority is 'any'
 }
   \item{idcolname}{
-name of the patient identifier column in \code{data}
+name of the patient identifier column in \code{data}, default
+is the ID column in the cohort.
 }
   \item{datecolname}{
 name of the event date column in \code{data}
@@ -69,24 +70,33 @@ whether to overwrite the variable if it already
 exists in cohort, or merely fill in missing values.
 }
   \item{description}{
-description for the new variable
+description for the new variable. Defaults to the function call which generated this variable.
 }
 }
 
 \details{
 Summarises the events of interest within the date range of interest,
-and adds the result (one entry per patient) to the cohort data.table.
-The cohort data.table is updated by reference.
+and adds the result (one entry per patient) to the cohort.
+
+Summary statistics of the new variable are displayed. For categorical
+variables, this is a tabulation; for variables summarised using a 
+function it is the mean, median, min, max, sd and N missing.
+
+The functions \code{\link{addCodelistToCohort}} and
+\code{\link{addCategoryToCohort}} are convenience functions for adding
+particular types of variable, particularly for generating binary variables
+(e.g. presence of a particular code or category within a time period for
+each patient). They call \code{\link{addToCohort}} with date_priority = "all"
+and take a codelist or a vector of categories as an argument.
 }
 
 \value{
-Summary statistics of the new variable generated. For categorical
-variables, this is a tabulation; for variables summarised using a 
-function it is the mean, median, min, max, sd and N missing.
+Cohort with extra column(s). If \code{cohort} is a data.table,
+it is also modified by reference.
 }
 
 \seealso{
-\code{\link{addCodelistToCohort}}
+\code{\link{addCodelistToCohort}}, \code{\link{addCategoryToCohort}}
 }
 
 \examples{
@@ -104,7 +114,7 @@ addToCohort(COHORT, "newvar", newdata, "value", value_choice = c(3,
 print(COHORT)
 
 # Data in FFDF
-removeColumn(COHORT, 'newvar')
+removeColumns(COHORT, 'newvar')
 newffdf <- as.ffdf(newdata)
 addToCohort(COHORT, "newvar", newffdf, "value", value_choice = c(3, 
     1, 2))
@@ -122,5 +132,25 @@ print(COHORT)
 # Now over-writing
 addToCohort(COHORT, "newvar", newdata2, "value",
     value_choice = c(3, 1, 2), overwrite = TRUE)
+print(COHORT)
+
+# Trials with FFDF cohort
+# Need to assign the modified cohort to a name using <-
+# (ffdf is not updated by reference)
+
+COHORT <- cohort(data.table(anonpatid = 1:3, indexdate = as.IDate(c("2012-1-3", 
+    "2012-1-2", "2010-1-9"))))
+COHORT <- as.ffdf(COHORT)
+print(COHORT)
+
+# Data in data.table
+COHORT <- addToCohort(COHORT, "newvar", newdata, "value",
+    value_choice = c(3, 1, 2))
+print(COHORT)
+
+# Data in FFDF
+COHORT <- removeColumns(COHORT, 'newvar')
+COHORT <- addToCohort(COHORT, "newvar", newffdf, "value",
+    value_choice = c(3, 1, 2))
 print(COHORT)
 }

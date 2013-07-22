@@ -6,18 +6,25 @@ cohort <- function(x, idcolname = c('patid', 'anonpatid', 'id'),
 	# Designates a data.table as a 'cohort'
 	# Creates a data dictionary
 	# Data.tables are not copied
-	if (!is.data.table(x)){
-		out <- as.data.table(as.data.frame(x))
-	} else {
+	if (is.cohort(x)){
 		out <- x
+	} else if (is.data.table(x)){
+		out <- x
+	} else if (is.ffdf(x)){
+		out <- x
+		setattr(out, 'class', c('cohort', class(out)))
+	} else {
+		out <- as.data.table(as.data.frame(x))
 	}
 
 	# Find ID column
-	idcolname <- idcolname[which(idcolname %in% names(out))]
+	idcolname <- idcolname[which(idcolname %in% colnames(out))]
 	if (length(idcolname) == 1){
 		setattr(out, 'idcolname', idcolname)
+	} else if (length(idcolname) > 1){
+		stop('Multiple potential ID columns, please specify')
 	} else {
-		stop('Invalid ID column  name')
+		stop('Invalid ID column name')
 	}
 	if (any(is.na(out[[idcolname]]))){
 		stop('ID may not be missing')
@@ -27,50 +34,56 @@ cohort <- function(x, idcolname = c('patid', 'anonpatid', 'id'),
 	}
 
 	if (is.null(description)){
-		description <- data.table(colname = setdiff(names(x), idcolname),
-			description = '')
+		description <- data.frame(colname = setdiff(colnames(x), idcolname),
+			description = '', stringsAsFactors = FALSE)
 	} else {
-		description <- data.table(description)
-		if (names(description) != c('colname', 'description')){
+		description <- data.frame(description)
+		if (!identical(colnames(description), c('colname', 'description'))){
 			stop('Description table must have two columns: colname and description')
 		}
 	}
 	# Keep only the entries in description that are relevant to this cohort
 	description <- subset(description, colname %in% names(x))
-	setkey(description, colname)
+	description <- description[order(description$colname), ]
 
 	# Change the class to cohort
 	if (!('cohort' %in% class(out))){
-		setattr(out, 'class', c('cohort', 'data.table', 'data.frame'))
+		setattr(out, 'class', c('cohort', class(out)))
 	}
 	
-	# Set column order to be alphabetical
-	setcolorder(out, c(idcolname, sort(setdiff(names(out), idcolname))))
-	setkeyv(out, idcolname)
+	# Set column order to be alphabetical (only works for data.tables)
+	if (is.data.table(out)){
+		setcolorder(out, c(idcolname, sort(setdiff(names(out), idcolname))))
+		setkeyv(out, idcolname)
+	}
 	setattr(out, 'description', description)
 	out
 }
 
 purgeDescription <- function(x){
 	if (!is.cohort(x)){
-		stop('This function purges descriptions for nonexistent columns from a cohort object')
+		warning('This function only works on cohort objects')
 	} else {
 		DESC <- attr(x, 'description')
-		DESC <- subset(DESC, colname %in% names(x))
+		DESC <- subset(DESC, colname %in% colnames(x))
 		setattr(x, 'description', DESC)
-		invisible(DESC)
+		invisible(x)
 	}
 }
 
 modifyDescription <- function(x, colname, description){
-	# to modify the description attribute of a cohort file.
+	# Modify the description attribute of a cohort file
+	# Arguments: x = a cohort file
+	#            colname = vector of column names
+	#            description = vector of descriptions
 	if (!is.cohort(x)){
 		stop('x must be a cohort object')
 	}
 
 	# colname and description can be a vector
 	if (length(colname) > 1){
-		todo <- data.table(colnames = colname, descriptions = description)
+		todo <- data.frame(colnames = colname, descriptions = description,
+			stringsAsFactors = FALSE)
 		for (i in 1:nrow(todo)){
 			modifyDescription(x, todo$colnames[i], todo$descriptions[i])
 		}
@@ -81,19 +94,21 @@ modifyDescription <- function(x, colname, description){
 		rm(description)
 
 		DESC <- attr(x, 'description')
-		if (.colname %in% DESC[, colname]){
-			DESC[.colname == colname, description := .description]
+		if (.colname %in% DESC$colname){
+			DESC[.colname == DESC$colname, 'description'] <- .description
 		} else {
-			if (!(.description %in% colnames(x))){
-				warning(.colname %&% ' not in cohort')				
+			if (!(.colname %in% colnames(x))){
+				warning(.colname %&% ' not a column in x')				
 			}
-			DESC <- copy(rbind(DESC, data.table(colname = as.character(.colname),
-				description = as.character(.description))))
+			DESC <- copy(rbind(DESC, data.frame(
+				colname = as.character(.colname),
+				description = as.character(.description),
+				stringsAsFactors = FALSE)))
 		}
-		setkey(DESC, colname)
+		DESC <- DESC[order(DESC$colname), ]
 		setattr(x, 'description', DESC)
 	}
-	invisible(attr(x, 'description'))
+	invisible(x)
 }
 
 as.cohort <- function(x, ...){
@@ -115,10 +130,16 @@ is.cohort <- function(x){
 print.cohort <- function(x, ...){
 	# Prints the summary and then the cohort file itself
 	summary.cohort(x)
-	setcolorder(x, c(attr(x, 'idcolname'),
-		sort(setdiff(names(x), attr(x, 'idcolname')))))
+	if (is.data.table(x)){
+		setcolorder(x, c(attr(x, 'idcolname'),
+			sort(setdiff(names(x), attr(x, 'idcolname')))))
+	}
 	cat('\nDATA\n')
-	data.table:::print.data.table(x)
+	if (is.data.table(x)){
+		data.table:::print.data.table(x)
+	} else if (is.ffdf(x)){
+		ff:::print.ffdf(x)
+	}
 }
 
 summary.cohort <- function(object, ...){
@@ -131,7 +152,7 @@ summary.cohort <- function(object, ...){
 		# Get the class of columns in a data.frame, returning
 		# NULL if the column does not exist
 		trygetclass <- function(z){
-			if (z %in% names(object)){
+			if (z %in% colnames(object)){
 				class(object[[z]])[1]
 			} else {
 				'NULL'
@@ -140,11 +161,31 @@ summary.cohort <- function(object, ...){
 		sapply(colnames, trygetclass)
 	}
 
-	cat(paste(attr(object, 'description')[,
-		colname %&% ' (' %&% getclass(colname) %&% '): ' %&%
-		description], collapse='\n'))
+	description <- attr(object, 'description')
+	
+	if (is.ffdf(object)){
+		object <- as.data.table(as.data.frame(object[1, ]))
+	}
+
+	cat(paste(description$colname %&% ' (' %&%
+		getclass(description$colname) %&% '): ' %&%
+		truncateChar(description$description,
+		getOption('width') - nchar(description$colname) -
+		nchar(getclass(description$colname)) - 7), collapse='\n'))
 	cat('\n')
 }
+
+truncateChar <- function(x, maxchar){
+	# Truncates a character vector so that each element does not have more
+	# than a specified number of characters, adding ... to the end of 
+	# truncated terms
+	# Arguments: x - character string to truncate
+	#            maxchar - length to truncate to
+	convert <- nchar(x) > maxchar
+	x[convert] <- substr(x[convert], 1, maxchar-3) %&% '...'
+	x
+}
+
 
 subset.cohort <- function(x, subset, select, ...){
 	# S3 method for subsetting a cohort
@@ -153,7 +194,7 @@ subset.cohort <- function(x, subset, select, ...){
 	#                   default is to keep all rows.
 	#            select - a character vector of columns to keep,
 	#                   default is to keep all columns.
-  #                   The ID column is always kept.
+	#                   The ID column is always kept.
 	
 	# Ensure that as a minimum, code, medcode if GPRD,
 	# term and category are kept. It is only valid as a codelist
@@ -174,21 +215,34 @@ subset.cohort <- function(x, subset, select, ...){
 		includeRow[is.na(includeRow)] <- FALSE
 	}
 	
-	out <- data.table:::subset.data.table(x, includeRow, select, ...)
+	if (is.data.table(x)){
+		out <- data.table:::subset.data.table(x, includeRow, select, ...)
+	} else if (is.ffdf(x)){
+		out <- ffbase:::subset.ffdf(x, includeRow, select, ...)
+	}
 	out <- as.cohort(out, idcolname = attr(x, 'idcolname'),
 		description = attr(x, 'description')) 
-	return(copy(out))
+	out <- purgeDescription(out)
+	out
 }
 
-removeColumn <- function(x, colname){
+removeColumns <- function(x, colnames){
 	# Removes one or more columns from a cohort file and description
-	for (col in colname){
-		x[, col := NULL, with = FALSE]
+	for (colname in colnames){
+		if (is.data.table(x)){
+			x[, colname := NULL, with = FALSE]
+		} else if (is.ffdf(x)){
+			# <- creates a copy of the object and leads to loss of 
+			# attributes. Hence it is necessary to store these
+			# attributes and restore them afterwards
+			x[[colname]] <- NULL
+		}
 	}
 	DESC <- attr(x, 'description')
-	DESC <- subset(DESC, colname %in% names(x))
+	DESC <- subset(DESC, colname %in% colnames(x))
 	setattr(x, 'description', DESC)
-	invisible(attr(x, 'description'))
+	# Return the dataset, invisibly
+	invisible(x)
 } 
 
 merge.cohort <- function(x, y, ...){
@@ -197,22 +251,39 @@ merge.cohort <- function(x, y, ...){
 	if (!(is.cohort(x) & is.cohort(y))){
 		stop('x and y must be cohort objects')
 	}
+	
+	# If one of the objects is a data.table, both must be data.tables
+	if (is.data.table(x) & !is.data.table(y)){
+		y <- as.data.table(y)
+	}
+	if (is.data.table(y) & !is.data.table(x)){
+		y <- as.data.table(x)
+	}
 
 	if (attr(x, 'idcolname') != attr(y, 'idcolname')){
 		y <- copy(y)
-		if (attr(x, 'idcolname') %in% names(y)){
+		if (attr(x, 'idcolname') %in% colnames(y)){
 			stop('ID column names in x and y are different')
 		} else {
-			setnames(y, attr(y, 'idcolname'), attr(x, 'idcolname'))
+			if (is.data.table(y)){
+				setnames(y, attr(y, 'idcolname'), attr(x, 'idcolname'))
+			} else if (is.ffdf(y)){
+				y[[attr(x, 'idcolname')]] <- y[[attr(y, 'idcolname')]]
+			}
 		}
 	}
 
-	if (length(intersect(names(x), names(y))) > 0){
+	if (length(intersect(colnames(x), colnames(y))) > 1){
 		warning('Columns ' %&%
-			paste(intersect(names(x), names(y)), collapse=', ') %&%
+			paste(intersect(colnames(x), colnames(y)), collapse=', ') %&%
 			' are in both cohort datasets')
 	}
-	out <- merge(x, y, by = attr(x, 'idcolname'), ...)
+
+	if (is.ffdf(x)){
+		out <- ffbase:::merge.ffdf(x, y, by = attr(x, 'idcolname'), ...)
+	} else {
+		out <- data.table:::merge.data.table(x, y, by = attr(x, 'idcolname'), ...)
+	}
 	out <- cohort(out, idcolname = attr(x, 'idcolname'),
 		description <- rbind(attr(x, 'description'), attr(y, 'description')))
 	out	

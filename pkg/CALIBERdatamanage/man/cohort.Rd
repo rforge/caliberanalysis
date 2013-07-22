@@ -30,12 +30,13 @@ Cohort objects have a number of associated methods which make it easier to manag
 }
 
 \value{
-An object with classes \sQuote{cohort} and \sQuote{data.table}, and the following attributes:
+An object with classes \sQuote{cohort} and either \sQuote{data.table} or \sQuote{ffdf},
+and the following attributes:
 \describe{
 \item{idcolname}{ID column name}
 \item{description}{description of the column}
 }
-The ID column is the leftmost column and all the others are arranged
+If it is a data.table cohort, the ID column is the leftmost column and all the others are arranged
 alphabetically.
 }
 
@@ -48,8 +49,14 @@ Anoop Shah
 }
 
 \examples{
-COHORT <- cohort(data.table(anonpatid = 1:3,
+DT <- cohort(data.table(anonpatid = 1:3,
     indexdate = as.IDate(c("2012-1-3", "2012-1-2", "2010-1-9"))))
-print(COHORT)
-summary(COHORT)
+print(DT)
+summary(DT)
+
+FFDF <- as.ffdf(data.table(anonpatid = 1:3,
+    indexdate = as.IDate(c("2012-1-3", "2012-1-2", "2010-1-9"))))
+FFDF <- cohort(FFDF)
+print(FFDF)
+summary(FFDF)
 }

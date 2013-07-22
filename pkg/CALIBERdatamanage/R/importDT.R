@@ -66,13 +66,13 @@ importDT <- function(filename, datecolnames = NULL,
 textfileToDT <- function(filename, verbose = TRUE, 
 	datecolnames = NULL, sep = NULL, fread = TRUE, nrows = nrows, ...){
 	# convert text tile to data.table and do date conversion
-	# eventually use fread, but currently it has problems with
-	# escaped " so use the (slower) read.delim function
+	# Only use fread if importing all rows, otherwise it is slow
+	# because it reads the entire file.
 	if (is.null(nrows)){
 		nrows <- -1
 	}
 
-	if (fread){
+	if (fread & nrows == -1){
 		if (is.null(sep)){
 			sep <- 'auto'
 		}
@@ -80,6 +80,10 @@ textfileToDT <- function(filename, verbose = TRUE,
 		# so set verbose = FALSE
 		datafile <- fread(filename, sep = sep,
 			verbose = FALSE, nrows = nrows, ...)
+		# Convert column names into data.frame style
+		# column names (i.e. row.names = X instead of blank,
+		# no duplicates, etc.)
+		setnames(datafile, readColNames(colnames(datafile)))
 	} else {
 		if (is.null(sep)){
 			sep <- findDelimiter(filename)
@@ -95,7 +99,7 @@ textfileToDT <- function(filename, verbose = TRUE,
 		message(paste(capture.output(print(
 			convertDates(datafile, datecolnames))), collapse = '\n'))
 	} else {
-		convertDates(datafile, datecolnames)
+		convertDates(datafile, datecolnames, verbose = verbose)
 	}
 	datafile
 }
@@ -125,5 +129,38 @@ getzipfilename <- function(filename, zipname = NULL){
 	}
 	unzip(zipname, exdir=tempdir(), junkpaths=TRUE)
 	paste(tempdir(), filename, sep='/')
+}
+
+readColNames <- function(colnames){
+	# Converts fread column names into read.delim-style column names, i.e.
+	# blank column names or duplicates are not allowed; if a duplicate is found
+	# it has .<number> appended, where the number is the lowest integer such that
+	# there are no duplicates. Row names are numbered X.
+
+	findName <- function(newname, existingnames){
+		# returns a version of newname which is not in existingnames
+		if (newname %in% existingnames){
+			thenumber <- 1
+			outname <- paste(newname, thenumber, sep = '.')
+			while (outname %in% existingnames){
+				thenumber <- thenumber + 1
+				outname <- paste(newname, thenumber, sep = '.')
+			}
+			outname
+		} else {
+			newname	 			
+		}
+	}
+
+	# Replace blank column names by 'X'
+	colnames[colnames == ''] <- 'X'
+	if (length(colnames) > 1){
+		for (i in 2:length(colnames)){
+			if (colnames[i] %in% colnames[1:(i-1)]){
+				colnames[i] <- findName(colnames[i], colnames[-i])
+			}
+		}
+	}
+	colnames
 }
 

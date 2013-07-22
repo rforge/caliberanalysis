@@ -1,13 +1,14 @@
-addToCohort <- function(x, varname, data, old_varname = 'value', 
+addToCohort <- function(cohort, varname, data, old_varname = 'value', 
 	value_choice = function(x) max(x, na.rm = TRUE),
 	date_priority = c('all', 'first', 'last'),
-	limit_years = c(-Inf, 0), date_varname = NULL, idcolname = 'anonpatid',
-	datecolname = 'eventdate', indexcolname = 'indexdate', overwrite = FALSE,
-	description = NULL){
+	limit_years = c(-Inf, 0), date_varname = NULL,
+	idcolname = attr(cohort, 'idcolname'),
+	datecolname = 'eventdate', indexcolname = 'indexdate',
+	overwrite = FALSE, description = NULL){
 	# Adds to the x data.table a column labelled varname
 	# containing the value of a category from a list of ID,
 	# category, eventdate.
-	# Arguments: x = a x object
+	# Arguments: x = a cohort object
 	#            varname = new variable name
 	#            data = data.table containing ID, value and eventdate
 	#                          columns
@@ -23,7 +24,7 @@ addToCohort <- function(x, varname, data, old_varname = 'value',
 	#                          Default is to choose the maximum
 	#                          and ignore missing values.
 	#            date_priority = if multiple records for a patient, which
-	#                          record to use based on date
+	#                          record(s) to use based on date
 	#            limit_years = a vector of length 2 for the time limits
 	#                          (inclusive) in years before or after index date
 	#            date_varname = optional name for date variable for the date
@@ -31,18 +32,34 @@ addToCohort <- function(x, varname, data, old_varname = 'value',
 	#                          Not valid if date_priority is 'any'
 	#            overwrite = whether to overwrite the variable if it already
 	#                          exists in x, or merely fill in missing values.
-	#            description = new description for the variable
+	#            description = new description for the variable, defaults to the
+	#                          function call
 	
-	#### Checking input variables ####
-	if (!is.cohort(x)){
-		x <- as.cohort(x)
-	}
-	if (!(indexcolname %in% names(x))){
-		stop(paste('x must contain a column named', indexcolname))
+	#### Check that cohort is a cohort ####
+	if (!is.cohort(cohort)){
+		cohort <- as.cohort(cohort)
 	}
 	
-	varname <- make.names(as.character(varname[1]))
+	if (is.ffdf(cohort)){
+		if (varname %in% colnames(cohort)){
+			x <- data.table(.v1 = as.ram(cohort[[idcolname]]),
+				.v2 = as.ram(cohort[[indexcolname]]),
+				.v3 = as.ram(cohort[[varname]]),
+				order = 1:nrow(cohort))
+			setnames(x, '.v3', varname)
+		} else {
+			x <- data.table(.v1 = as.ram(cohort[[idcolname]]),
+				.v2 = as.ram(cohort[[indexcolname]]),
+				order = 1:nrow(cohort))
+		}
+		setnames(x, '.v1', idcolname)
+		setnames(x, '.v2', indexcolname)
+	} else {
+		x <- cohort
+	}
+	setkeyv(x, attr(x, 'idcolname'))
 	
+	#### Function to choose a category ####
 	if (is.vector(value_choice)){
 		# choose a category
 		choiceFun <- function(x){
@@ -69,7 +86,7 @@ addToCohort <- function(x, varname, data, old_varname = 'value',
 	if (!is.data.table(data)){
 		DATA <- as.data.table(as.data.frame(data))
 	} else {
-		DATA <- copy(data[, c('anonpatid', old_varname, 'eventdate'),
+		DATA <- copy(data[, c(idcolname, old_varname, datecolname),
 			with = FALSE])
 	}
 
@@ -82,10 +99,10 @@ addToCohort <- function(x, varname, data, old_varname = 'value',
 	}
 	
 	#### Set indexes ####
-	setkeyv(x, attr(x, 'idcolname')) 
+	setkeyv(x, idcolname)
 	setnames(DATA, idcolname, '.id')
 	setkey(DATA, .id)
-	browser()
+
 	#### Identifying events of interest ####
 	DATA[, indexdate := x[DATA][, indexcolname, with = FALSE]]
 	DATA[, yearsdiff := as.numeric(.eventdate - indexdate)/365.25]
@@ -147,16 +164,51 @@ addToCohort <- function(x, varname, data, old_varname = 'value',
 	}
 	
 	#### Add description (if any) ####
-	if (!is.null(description)){
+	if (is.null(description)){
+		# Use the function call as the description
+		thecall <- match.call()
+		description <- paste(
+			gsub('\n|\t| +', ' ', capture.output(print(thecall))), collapse = ' ')
+	}
+	if (is.ffdf(cohort)){
+		modifyDescription(cohort, varname, description)
+	} else {
 		modifyDescription(x, varname, description)
 	}
 
-	#### Return a summary table ####
+	#### Summary message ####
+	message(paste('Summary of ', varname, ':', sep = ''))
 	if (is.vector(value_choice)){
 		# categorical
-		x[, .N, by = eval(varname)]
+		message(paste(capture.output(print(x[, .N, by = eval(varname)])),
+			collapse = '\n'))
 	} else {
 		# continuous
-		summary(x[[varname]])
+		message(paste(capture.output(print(summary(x[[varname]]))),
+			collapse = '\n'))
+	}
+
+	#### Return the updated cohort ####
+	if (is.ffdf(cohort)){
+		# restore original order
+		setkey(x, order)
+		for (i in 1:ncol(x)){
+			if (!(colnames(x)[i] %in% c(idcolname, indexcolname))){
+				# Transfer column back to original cohort
+				if (colnames(x)[i] %in% colnames(cohort)){
+					# remove old column
+					cohort[[colnames(x)[i]]] <- NULL
+				}
+				# Flush ff attributes to avoid error
+				setattr(x[[i]], 'physical', NULL)
+				setattr(x[[i]], 'virtual', NULL)
+				# Replace column
+				cohort[[colnames(x)[i]]] <- as.ff(x[[i]])
+			}
+		}
+		# Return entire cohort (as ffdf)
+		invisible(cohort)
+	} else {
+		invisible(x)
 	}
 }

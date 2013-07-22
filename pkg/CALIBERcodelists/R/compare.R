@@ -129,11 +129,11 @@ compare <- function(oldlist, newlist=NULL, expandICD10=TRUE){
 		if (sourceDict=='read'){
 			message <- c(message,
 				capture.output(printTerms(comparison[nowExcluded,
-				list(medcode, code_old, term=term_old)])))
+				list(medcode, code_old, term=term_old)][order(code_old)])))
 		} else {
 			message <- c(message,
 				capture.output(printTerms(comparison[nowExcluded,
-				list(code, term=term_old)])))			
+				list(code, term=term_old)][order(code)])))
 		}
 	}
 
@@ -148,7 +148,7 @@ compare <- function(oldlist, newlist=NULL, expandICD10=TRUE){
 			collapse='\n')
 		message <- c(message,
 			capture.output(printTerms(comparison[nowIncluded,
-			list(code, term, category)])))
+			list(code, term, category)][order(category, code)])))
 	}
 
 	message <- c(message, '', textTotalTerms(changeCat) %&%
@@ -162,7 +162,7 @@ compare <- function(oldlist, newlist=NULL, expandICD10=TRUE){
 			collapse='\n')
 		message <- c(message,
 			capture.output(printTerms(comparison[changeCat,
-			list(code, term, category, cat_old)])))
+			list(code, term, category, cat_old)][order(category, code)])))
 	}
 	
 	out <- list(same_terms=(!any(nowIncluded | nowExcluded | changeCat)),

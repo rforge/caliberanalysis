@@ -5,6 +5,7 @@ codematch <- function(regexpr,
 	# selects mapped terms (there are no ICD-9 terms so these are only
 	# used for mapping to Read)
 	# Arguments: regexpr - pattern to match ICD-10 codes of interest
+	#                    or a vector of patterns; results are combined using OR 
 	#            dictionary - a single dictionary in which to look for codes
 	#            mapStatus - D=default, A=alternative, G=ICD-10 or OPCS
 	#                    term is more general than Read, E=exact,
@@ -16,7 +17,12 @@ codematch <- function(regexpr,
 	loadDICT()
 	loadDICTMAPS()
 
-	if (dictionary == ''){
+	if (length(regexpr) > 1){
+		# concatenate regular expressions
+		regexpr <- paste('(' %&% regexpr %&% ')', collapse = '|')
+	}
+
+	if (identical(dictionary, '')){
 		dictionary <- select.list(ALLDICTS,
 			title='Which type of code to search for ' %&% regexpr %&% '?',
 			multiple=FALSE, graphics=FALSE)

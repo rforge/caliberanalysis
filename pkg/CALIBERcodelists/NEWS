@@ -1,4 +1,39 @@
 ==================================================
+Changes in CALIBERcodelists version 0.2-2
+(third version on R-Forge)
+==================================================
+
+NEW FEATURES
+
+- a new function medcodeis() which creates a selection
+  based on medcodes
+- codematch() can accept a vector of codes to match.
+  Thanks to Joshua for suggesting this.
+- a function getCodelist() which finds and loads a
+  CALIBER format codelist from a directory tree.
+
+CHANGES
+
+- when termhas() is called with a vector of regular
+  expressions, they are combined using OR rather than
+  AND. This is for consistency with the codematch,
+  medcodeis and dictis functions.
+- textToDate() is no longer exported so that it
+  does not conflict with the textToDate function
+  in the CALIBERdatamanage package.
+- compare() now lists changed codes sorted by code
+
+BUG FIXES
+
+- setdictionary() no longer misses out the first category
+  (error in CALIBERcodelists:::retrieveCategoriesFromMETA()
+  which returned an entry with category 0 if the META
+  category table was empty)
+- fixed bugs in codelistToDict (called by setdictionary()).
+  Only the first category was used, and the description
+  was not entered in the category table.
+
+==================================================
 Changes in CALIBERcodelists version 0.2-1
 (second version on R-Forge)
 ==================================================
@@ -33,9 +68,9 @@ CHANGES
 
 BUG FIXES
 
-- Missing line break character at the end of export
+- missing line break character at the end of export
   statement (thanks to Joshua for spotting)
-- Recognise dd.mm.yyyy and dd.mm.yy date formats
+- recognise dd.mm.yyyy and dd.mm.yy date formats
 - fix a bug in importing ICD-10 codelists with a blank
   medcode column.
 

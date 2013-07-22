@@ -27,7 +27,7 @@ Name of another dictionary to include
 
 
 \value{
-A Boolean vector, the same length as the number of rows in dict.
+A selection object.
 }
 
 \seealso{

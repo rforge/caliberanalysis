@@ -14,6 +14,8 @@ summaryTable <- function(template, output = NULL,
 	#            datatable = a data.table contains the
 	#                data to be summarised (or it can be
 	#                written in the template)
+	#            ... = additional arguments to send to
+	#                exportTable
 
 	# Format of template:
   # The first column should state whether a
@@ -97,7 +99,8 @@ summaryTable <- function(template, output = NULL,
 			hline.after = hline, ...)
 	} else if (grepl('CSV$|csv$', output)) {
 		# output to CSV file
-		write.csv(out, filename = output, row.names = FALSE, ...)
+		write.table(out, file = output, sep = ',', 
+			row.names = FALSE, col.names = FALSE)
 	}
 }
 

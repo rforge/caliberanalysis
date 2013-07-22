@@ -41,8 +41,8 @@ Government Licence. The program code is licensed under GPL-3.
 \tabular{ll}{
 Package: \tab CALIBERcodelists\cr
 Type: \tab Package\cr
-Version: \tab 0.2-1\cr
-Date: \tab 2013-05-29\cr
+Version: \tab 0.2-2\cr
+Date: \tab 2013-07-09\cr
 License: \tab GPL-3\cr
 }
 

@@ -118,7 +118,7 @@ codelistToDict <- function(codelist){
 		mylist[, category:=as.integer(category)]
 		setDictKey()
 		setkey(mylist, dict, code)
-		CALIBER_DICT[mylist, category:=mylist$category]	
+		CALIBER_DICT[, category:=mylist[CALIBER_DICT]$category]	
 		
 		# Now update category definitions
 		newCategories <- attr(codelist, 'Categories')
@@ -130,6 +130,19 @@ codelistToDict <- function(codelist){
 		} else {
 			for (i in 1:nrow(newCategories)){
 				if (!(newCategories[i, category] %in% oldCategories$category)){
+					needToAdd <- TRUE
+				} else if (is.na(oldCategories$shortname[
+					oldCategories$category == newCategories[i, category]])){
+					# if it has no shortname
+					needToAdd <- TRUE
+				} else if (oldCategories$shortname[
+					oldCategories$category == newCategories[i, category]] == ''){
+					# if the shortname is blank
+					needToAdd <- TRUE
+				} else {
+					needToAdd <- FALSE
+				}
+				if (needToAdd){
 					addCategory(number=newCategories[i, category],
 						shortname=newCategories[i, shortname],
 						description=newCategories[i, description])

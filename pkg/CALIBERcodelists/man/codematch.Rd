@@ -19,7 +19,9 @@ codematch(regexpr, dictionary = ifelse(length(getdictionary()) == 1,
 
 \arguments{
   \item{regexpr}{
-Read, ICD-9, ICD-10 or OPCS code to match. This can be a regular expression if EXACT=FALSE, otherwise it should be the exact code.
+Read, ICD-9, ICD-10 or OPCS code(s) to match.
+This can be a regular expression if EXACT = FALSE, otherwise it should be the exact code.
+If \code{regexpr} is a vector, the results are combined using OR. This is an easy way to match a list of codes.
 }
   \item{dictionary}{
 One of 'icd10', 'icd9', 'opcs' or 'read'. If not given, and if only one dictionary is in use, this dictionary is taken as the set of codes to match.
@@ -50,7 +52,7 @@ Anoop Shah
 }
 
 \seealso{
-\code{\link{as.codelist}},  \code{\link{assigncat}}, \code{\link{dictis}}, \code{\link{explode}}, \code{\link{getdictionary}}, \code{\link{setdictionary}}, \code{\link{termhas}}
+\code{\link{medcodeis}},  \code{\link{assigncat}}, \code{\link{dictis}}, \code{\link{explode}}, \code{\link{getdictionary}}, \code{\link{setdictionary}}, \code{\link{termhas}}
 
 To convert codelists from one dictionary to another: \code{\link{convert}}
 }

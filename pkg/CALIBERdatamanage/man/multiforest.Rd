@@ -4,7 +4,7 @@
 \alias{multiforestPNG}
 
 \title{
-Produces a forest plot
+Produce multiple forest plots side by side
 }
 
 \description{
@@ -13,12 +13,12 @@ Produces forest plot using data in a standardised format from a spreadsheet. Can
 
 \usage{
 multiforest(data = NULL, rowheights = 1.1, colgaps = unit(0.3, "cm"),
-	colgaps_cm = NULL, defaultfontface = "plain",
-	defaultjust = "left", defaultfontsize = 10,
-	defaultgraphwidth = unit(5, "cm"), 
-	defaultboxsize = 0.8, defaultxlab = "Hazard ratio",
-	xticks = NULL, xtickfontsize = 10, xlabfontsize = 12,
-	xlaboffset = -2.5, zerocolour = "gray", zerolinewidth = 1, ...)
+    colgaps_cm = NULL, defaultfontface = "plain",
+    defaultjust = "left", defaultfontsize = 10,
+    defaultgraphwidth = unit(5, "cm"), 
+    defaultboxsize = 0.8, defaultxlab = "Hazard ratio",
+    xticks = NULL, xtickfontsize = 10, xlabfontsize = 12,
+    xlaboffset = -2.5, zerocolour = "gray", zerolinewidth = 1, ...)
 multiforestPNG(data, outfile, border = 0.1, ...)
 multiforestPDF(data, outfile, border = 0.1, ...)
 }

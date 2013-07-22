@@ -8,22 +8,24 @@ Adds information from categories based on a Read codelist
 \description{
 Adds to the cohort data.table a column labelled varname
 containing the value of a category from a list of anonpatid,
-category, eventdate. Currently only for Read codelists. If a patient has
+category, eventdate. If a patient has
 more than one record, the category of choice is chosen according to
 an order of priority, or a binary outcome is generated if the patient
 has any records fulfilling the criteria.
+
+Currently this function only works for Read codelists. 
 }
 
 \usage{
-addCodelistToCohort(x, varname, data, codelist,
+addCodelistToCohort(cohort, varname, data, codelist,
     categories, entities = 'all', binary = FALSE,
-    limit_years = c(-Inf, 0), idcolname = 'anonpatid',
+    limit_years = c(-Inf, 0),  idcolname = attr(cohort, 'idcolname'),
     datecolname = 'eventdate', indexcolname = 'indexdate',
     overwrite = TRUE, description = NULL)
 }
 
 \arguments{
-  \item{x}{
+  \item{cohort}{
 a cohort object
 }
   \item{varname}{
@@ -64,7 +66,7 @@ name of the index date column in the cohort dataset \code{x}
 whether to overwrite this variable if it exists
 }
   \item{description}{
-description for the new variable
+description for the new variable. Defaults to the function call which generated this variable.
 }
 }
 
@@ -77,7 +79,8 @@ index date. The final variable is added to the cohort data.table.
 }
 
 \value{
-Data.table with number of patients by category.
+Cohort with a extra column(s). If \code{cohort} is a data.table,
+it is also modified by reference.
 }
 
 \seealso{
@@ -96,9 +99,10 @@ newdata <- data.table(anonpatid = c(2, 2, 3, 3, 4, 4, 4),
     "2011-1-1")), category = rep(2, 7))
 
 # Create a fake codelist
-mycodelist <- data.table(medcode = 1:2, code = c('246..00', '22A..00'),
-    term = c('O/E - weight', 'O/E - blood pressure reading'),
-    category = 1:2)
+mycodelist <- data.table(medcode = 1:4,
+	code = c('246..00', '22A..00', '229..00', '423..00'),
+    term = c('O/E - weight', 'O/E - blood pressure reading',
+    	'O/E - height', 'Haemoglobin estimation'), category = c(1, 2, 2, 2))
 setattr(mycodelist, 'Source', 'GPRD')
 class(mycodelist) <- c('codelist', 'data.table', 'data.frame')
 
@@ -106,10 +110,11 @@ class(mycodelist) <- c('codelist', 'data.table', 'data.frame')
 addCodelistToCohort(COHORT, varname = "newvar", data = newdata,
     codelist = mycodelist, categories = 1:2)
 print(COHORT)
-removeColumn(COHORT, 'newvar')
+removeColumns(COHORT, 'newvar')
 
 # Using ffdf
 newffdf <- as.ffdf(newdata)
+FFDFCOHORT <- as.ffdf(COHORT)
 
 # Category 1 only
 addCodelistToCohort(COHORT, varname = "V_1", data = newffdf,
@@ -127,4 +132,15 @@ addCodelistToCohort(COHORT, varname = "V_binary", data = newffdf,
 addCodelistToCohort(COHORT, varname = "V_12anytime", data = newffdf,
     codelist = mycodelist, categories = 2:1, limit_years = c(-Inf, Inf))
 print(COHORT)
+
+# Using FFDF cohort; need to reassign the result to the 
+# cohort object using <-
+# Category 1 only
+FFDFCOHORT <- addCodelistToCohort(FFDFCOHORT, varname = "V_1", data = newffdf,
+    codelist = mycodelist, categories = 1)
+
+# Category 2 or 1
+FFDFCOHORT <- addCodelistToCohort(FFDFCOHORT, varname = "V_12",
+    data = newffdf, codelist = mycodelist, categories = 2:1)
+print(FFDFCOHORT)
 }
