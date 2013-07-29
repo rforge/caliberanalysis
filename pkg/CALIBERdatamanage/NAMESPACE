@@ -19,6 +19,8 @@ S3method(summary, cohort)
 S3method(merge, cohort)
 S3method(subset, cohort)
 S3method(setnames, cohort)
+S3method(setnames, data.table)
+S3method(setnames, ffdf)
 
 S3method(as.data.table, ffdf)
 S3method(as.ffdf, data.table)

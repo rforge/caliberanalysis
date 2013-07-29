@@ -1,4 +1,13 @@
 =================================================
+CALIBERdatamanage Version 0.1-4
+(third version on R-Forge)
+=================================================
+
+BUG FIXES:
+
+- fixed a bug in merge.cohort
+
+=================================================
 CALIBERdatamanage Version 0.1-3
 (second version on R-Forge)
 =================================================

@@ -1,7 +1,7 @@
 Package: CALIBERdatamanage
 Title: Data management tools for CALIBER datasets
 Type: Package
-Version: 0.1-3
+Version: 0.1-4
 Date: 2013-07-17
 Author: Anoop Shah
 Maintainer: Anoop Shah <anoop@doctors.org.uk>

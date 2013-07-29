@@ -126,10 +126,10 @@ multiforest <- function(data = NULL, rowheights = 1.1,
 		data <- file.choose()
 	}
 	
-  # if colgaps are supplied in cm, convert to units
-  if (!is.null(colgaps_cm)){
-    colgaps <- unit(colgaps_cm, units='cm')
-  }
+	# if colgaps are supplied in cm, convert to units
+	if (!is.null(colgaps_cm)){
+		colgaps <- unit(colgaps_cm, units='cm')
+	}
   
 	# If you supply a character vector, load it and convert to list
 	if (length(data) == 1 & typeof(data) == 'character'){

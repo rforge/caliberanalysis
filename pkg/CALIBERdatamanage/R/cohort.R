@@ -218,7 +218,21 @@ subset.cohort <- function(x, subset, select, ...){
 	if (is.data.table(x)){
 		out <- data.table:::subset.data.table(x, includeRow, select, ...)
 	} else if (is.ffdf(x)){
-		out <- ffbase:::subset.ffdf(x, includeRow, select, ...)
+		# subset.ffdf does not use ...
+		out <- ffbase:::subset.ffdf(x, includeRow)
+		# If using the select argument, need to select the relevant
+		# vectors by setting the others to NULL
+		if (!missing(select)){
+			if (is.logical(select) | is.numeric(select)){
+				select <- colnames(out)[select]
+			} 
+			if (is.character(select) & length(select) > 0){
+				# Remove unwanted columns
+				for (thecol in select){
+					out[[thecol]] <- NULL
+				}
+			}
+		}
 	}
 	out <- as.cohort(out, idcolname = attr(x, 'idcolname'),
 		description = attr(x, 'description')) 
@@ -257,7 +271,7 @@ merge.cohort <- function(x, y, ...){
 		y <- as.data.table(y)
 	}
 	if (is.data.table(y) & !is.data.table(x)){
-		y <- as.data.table(x)
+		x <- as.data.table(x)
 	}
 
 	if (attr(x, 'idcolname') != attr(y, 'idcolname')){
