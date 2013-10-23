@@ -16,7 +16,7 @@ addToCohort(cohort, varname, data, old_varname = "value",
     date_priority = c("all", "first", "last"), limit_years = c(-Inf, 0),
     date_varname = NULL,  idcolname = attr(cohort, 'idcolname'),
     datecolname = "eventdate", indexcolname = "indexdate",
-    overwrite = FALSE, description = NULL)
+    overwrite = FALSE, description = NULL, limit_days = NULL)
 }
 
 \arguments{
@@ -71,6 +71,10 @@ exists in cohort, or merely fill in missing values.
 }
   \item{description}{
 description for the new variable. Defaults to the function call which generated this variable.
+}
+  \item{limit_days}{
+a vector of length 2 for the time limits, which over-rules limit_years if both are supplied.
+A year is considered to be 365.25 days.
 }
 }
 

@@ -1,10 +1,11 @@
-mice.impute.rfcont <-
-function(y, ry, x, ntree_cont=NULL, nodesize_cont=NULL, ...){
+mice.impute.rfcont <- function(y, ry, x,
+	ntree_cont = NULL, nodesize_cont = NULL, 
+	maxnodes_cont = NULL, ...){
 	# y is the vector of y (observed and unobserved)
 	# ry is a vector of indicators as to whether y is observed
 	# x is the matrix of predictors
 	x <- as.matrix(x)
-	bootsample <- sample(sum(ry), replace=TRUE)
+	bootsample <- sample(sum(ry), replace = TRUE)
 	
 	if (is.null(ntree_cont)){
 		if (is.null(getOption('CALIBERrfimpute_ntree_cont'))){
@@ -22,22 +23,29 @@ function(y, ry, x, ntree_cont=NULL, nodesize_cont=NULL, ...){
 		}
 	}
 
+	if (is.null(maxnodes_cont)){
+		# default is NULL
+		maxnodes_cont <- getOption('CALIBERrfimpute_maxnodes_cont')
+	}
+
 	# Only bootstrap if more than one tree, because Random Forest
-	# fits to a bootstrap sample
+	# fits to a bootstrap sample. Use as.matrix() to ensure that xobs
+	# is a matrix even if only one predictor
 	if (ntree_cont > 1){
 		yobs <- y[ry][bootsample]
-		xobs <- x[ry,][bootsample,]
+		xobs <- as.matrix(as.matrix(x[ry, ])[bootsample, ])
 	} else {
 		yobs <- y[ry]
-		xobs <- x[ry,]
+		xobs <- as.matrix(x[ry, ])
 	}
-	xmiss <- x[!ry,]
+	xmiss <- x[!ry, ]
 	# Build a random forest
-	rf <- randomForest(xobs, yobs, ntree=ntree_cont,
-		nodesize=nodesize_cont, ...)
+	rf <- randomForest(xobs, yobs, ntree = ntree_cont,
+		nodesize = nodesize_cont, maxnodes = maxnodes_cont, ...)
+
 	yhat <- predict(rf, xmiss)
 	# Draw imputed values from normal distributions
 	# centred on the means predicted by Random Forest 
-	yimp <- rnorm(length(yhat), mean=yhat, sd=sqrt(rf$mse[ntree_cont]))		
+	yimp <- rnorm(length(yhat), mean = yhat, sd = sqrt(rf$mse[ntree_cont]))		
 	return(yimp)
 }

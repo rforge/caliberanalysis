@@ -1,9 +1,11 @@
 # Functions for expanding or contracting ICD10 codelists
 
-contractICD10 <- function(icdCodes){
+contractICD <- function(icdCodes, whichicd = 'icd10'){
 	# Returns a vector of ICD codes with 3+ characters, choosing
 	# the smallest possible codes e.g. I21 encompassing I210, I211, ...
-	# Argument: a unique set of ICD10 codes (ALT_CODE format)
+	# Arguments: icdCodes = a unique set of ICD9 or ICD10 codes
+	#                       (ALT_CODE format)
+	#            dict = 'icd10' or 'icd9'
 	
 	# First remove blank ICD codes
 	icdCodes <- icdCodes[!is.na(icdCodes)]
@@ -16,10 +18,10 @@ contractICD10 <- function(icdCodes){
 	# allow for incorrect X or A or D at the end of codes
 	# include any 5-character codes under a 4-character code
 	selectedICDcodes <- unique(unlist(lapply(icdCodes, function(x){
-		out <- CALIBER_DICT[dict=='icd10'][grepl('^' %&% x, code), code]
+		out <- CALIBER_DICT[dict==whichicd][grepl('^' %&% x, code), code]
 		if (length(out)==0){
-			# try without terminal x
-			temp <- CALIBER_DICT[dict=='icd10' & 
+			# try without terminal A, D or X
+			temp <- CALIBER_DICT[dict==whichicd & 
 				grepl(sub('[ADX]$', '', x), code), code]
 			if (length(temp)==1){
 				out <- temp
@@ -40,7 +42,7 @@ contractICD10 <- function(icdCodes){
 	# and see if they are the same.
 	
 	checkCodes <- function(x){
-		main <- CALIBER_DICT[dict=='icd10'][grepl('^' %&% x, code), code]
+		main <- CALIBER_DICT[dict==whichicd][grepl('^' %&% x, code), code]
 		our <- selectedICDcodes[grepl('^' %&% x, selectedICDcodes)]
 		# All 4 character codes have to match up exactly
 		# You are allowed extra 5 character codes in 'main' because if the
@@ -97,15 +99,18 @@ contractICD10 <- function(icdCodes){
 ####################
 
 contractCodelist <- function(codelist){
-	# Returns a codelist with ICD10 codes grouped into category
+	# Returns a codelist with ICD9 or ICD10 codes grouped into category
 	# headings if possible.
 	# Argument: a codelist in the expanded format
 
 	loadDICT()
-	if (!is.codelist(codelist) |
-		!(attr(codelist, 'Source') %in% c('HES', 'ONS'))){
-		stop('Argument must be a ICD-10 codelist')
+	
+	if (!is.codelist(codelist)) stop('Not a codelist')
+	whichicd <- SOURCEDICTS[Source == attr(codelist, 'Source'), dict]
+	if (length(whichicd) == 0){
+		stop('Argument must be a ICD codelist')
 	}
+	whichicdhead <- ifelse(whichicd == 'icd10', 'icdhead', 'icd9head')
 
 	# Remove rows with missing ICD code
 	if (any(is.na(codelist$code))){
@@ -122,18 +127,19 @@ contractCodelist <- function(codelist){
 		# Encode NA as -2
 		codelist[is.na(category), category:=-2L]
 	
-		if (!identical(key(CALIBER_DICT), c('dict', 'code'))){
-			setkey(CALIBER_DICT, 'dict', 'code')
-		}
+		setDictKey()
 		out <- data.frame(do.call('rbind', lapply(
 			as.list(sort(unique(codelist$category))), function(x){
-				codes <- contractICD10(codelist[category==x, code])
+				codes <- contractICD(codelist[category==x, code], whichicd = whichicd)
 				# Include all combinations of dict and code
 				if (length(codes) > 0){
-					tmp2 <- data.table(dict=c(rep('icd10', length(codes)),
-						rep('icdhead', length(codes))), code=rep(codes, 2))
+					tmp2 <- data.table(dict=c(rep(whichicd, length(codes)),
+						rep(whichicdhead, length(codes))), code=rep(codes, 2))
 					setkey(tmp2, 'dict', 'code')
 					tmp <- merge(CALIBER_DICT, tmp2)[, list(code, term)]
+					# Remove duplicates
+					tmp <- tmp[!duplicated(tmp)]
+					# Set category for this chunk of codes
 					tmp$category <- x
 					tmp
 				} else {
@@ -150,7 +156,7 @@ contractCodelist <- function(codelist){
 	
 		# Restore attributes
 		out <- addAttributesToCodelist(out, metadata)
-		class(out) <- c('codelist', 'data.table', 'data.frame')
+		setattr(out, 'class', c('codelist', 'data.table', 'data.frame'))
 		setattr(out, 'Expanded', FALSE) 
 		return(out)
 	} else {
@@ -163,26 +169,28 @@ contractCodelist <- function(codelist){
 
 #######################
 
-expandICD10 <- function(icdCodes, allow5char=FALSE){
+expandICD <- function(icdCodes, allow5char = FALSE,
+	whichicd = 'icd10'){
 	# Expands a contracted ICD-10 code list to include
-	# all terms mapped to by these codes. Returns a vector of ICD-10 codes,
-	# with the attribute 'hierarchy' stating whether the code is
-	# parent, child or normal
-	# Arguments: icdCodes - character vector of ICD-10 codes
-	#            icd4charOnly - whether to ignore 5-letter ICD-10 codes
+	# all terms mapped to by these codes. Returns a vector of ICD-10 or
+	# ICD-9 codes, with the attribute 'hierarchy' stating whether the
+	# code is parent, child or normal
+	# Arguments: icdCodes - character vector of ICD-10 or ICD-9 codes
+	#            allow5char - whether to ignore 5-letter ICD-10 codes
 	#                    (e.g. body regions affected by musculoskeletal
 	#                    disorders), default is not to expand all these terms.
+	#            whichicd - 'icd10' to use ICD-10, 'icd9' for ICD-9.
 	
 	# First remove blank ICD codes
 	icdCodes <- icdCodes[!is.na(icdCodes)]
 	icdCodes <- unique(icdCodes[icdCodes != ''])
 	
 	expanded <- sort(unique(c(unlist(lapply(as.list(icdCodes), function(x){
-		out <- CALIBER_DICT[dict=='icd10' & (allow5char | nchar(code)<=4)][
+		out <- CALIBER_DICT[dict== whichicd & (allow5char | nchar(code)<=4)][
 			grepl('^' %&% x, code), code]
 		if (length(out)==0){
 			# try without terminal x
-			temp <- CALIBER_DICT[dict=='icd10' & (allow5char | nchar(code)<=4)][
+			temp <- CALIBER_DICT[dict== whichicd & (allow5char | nchar(code)<=4)][
 				grepl(sub('X$', '', x), code), code]
 			if (length(temp)==1){ # i.e. only allow if it is a unique match
 				out <- temp
@@ -190,7 +198,7 @@ expandICD10 <- function(icdCodes, allow5char=FALSE){
 		}
 		return(out)
 	})), icdCodes)))
-	
+
 	# Find out which are children, parents, headers etc.
 	# Assuming that the original list was the 'contracted' form
 
@@ -218,22 +226,34 @@ expandCodelist <- function(codelist, ...){
 	# ICD10 headings. The 'parent' terms in the output
 	# hierarchy can be ignored in the output when mathing to 
 	# actual terms in e.g. HES.
-	# Arguments: codelist - ICD10 codelist to contract
+	# Arguments: codelist - ICD9 or ICD10 codelist to contract
 	#            allow5char - whether to expand 5-character ICD codes
 	#                    default to only expand to 4 character codes
-	loadDICT()
+
+	loadDICT()	
 	if (!is.null(attr(codelist, 'Source'))){
-		if (!(attr(codelist, 'Source') %in% c('HES', 'ONS'))){
-			stop('Codelist must have the Source attribute set to "HES" or "ONS"')
+		if (!(attr(codelist, 'Source') %in%
+			SOURCEDICTS[dict %in% c('icd9', 'icd10'), Source])){
+			stop('Codelist has must have the Source attribute set to ' %&%
+				paste(SOURCEDICTS[dict %in% c('icd9', 'icd10'), Source],
+				collapse = ', '))
+		}
+		whichicd <- SOURCEDICTS[Source == attr(codelist, 'Source'), dict]
+	} else {
+		# Guess on the basis of codes
+		if (any(is.na(as.numeric(codelist$code)))){
+			# assume ICD10
+			whichicd <- 'icd9'
 		}
 	}
+	whichicdhead <- ifelse(whichicd == 'icd10', 'icdhead', 'icd9head')
 
 	# Remove rows with missing ICD code
 	if (any(is.na(codelist$code))){
 		codelist <- subset(codelist, !is.na(code))
 	}
-	if (any(codelist$code=='')){
-		codelist <- subset(codelist, code!='')
+	if (any(codelist$code == '')){
+		codelist <- subset(codelist, code != '')
 	}
 
 	if (nrow(codelist) > 0){
@@ -241,57 +261,57 @@ expandCodelist <- function(codelist, ...){
 		metadata <- extractMetadataFromCodelist(codelist)
 	
 		# Encode NA as -2
-		codelist[is.na(category), category:=-2L]
-    # Encode no category as -3
-    if (!('category' %in% names(codelist))){
-      codelist[, category:=-3L]
-    }    
+		codelist[is.na(category), category := -2L]
+		# Encode no category as -3
+		if (!('category' %in% names(codelist))){
+			codelist[, category := -3L]
+		}    
 		# Remove any missing ICDcodes
-		
 		if (!identical(key(CALIBER_DICT), c('dict', 'code'))){
 			setkey(CALIBER_DICT, 'dict', 'code')
-		}	
-		out <- data.frame(do.call('rbind', lapply(
+		}
+		mylist <- lapply(
 			as.list(sort(unique(codelist$category))), function(x){
-				codes <- codelist[category==x, code]
+				codes <- codelist[category == x, code]
 				if (isContractedCodelist(codelist)){
-					codes <- expandICD10(codes, ...)
+					codes <- expandICD(codes, whichicd = whichicd, ...)
 				} else {
-					codes <- expandICD10(contractICD10(codes), ...)
+					codes <- expandICD(contractICD(codes,
+						whichicd = whichicd), whichicd = whichicd, ...)
 				}
 				hierarchy <- attr(codes, 'hierarchy')
-				tempdt <- data.table(dict=c(rep('icd10', length(codes)),
-					rep('icdhead', length(codes))), code=rep(codes, 2),
-					hierarchy=rep(hierarchy, 2))
+				tempdt <- data.table(dict = c(rep(whichicd, length(codes)),
+					rep(whichicdhead, length(codes))), code = rep(codes, 2),
+					hierarchy = rep(hierarchy, 2))
 				setkey(tempdt, 'dict', 'code')
 				tmp <- merge(CALIBER_DICT, tempdt)[, list(code, term, hierarchy)]
-				if (nrow(tmp)==0){
+				if (nrow(tmp) == 0){
 					tmp$category <- integer(0)
 				} else {
 					tmp$category <- x
 				}
-				tmp
+				# ignore duplicates
+				as.data.frame(tmp[!duplicated(tmp)])
 			}
-		)))
-    if (ncol(out)==4){
-      names(out) <- c('code', 'term', 'hierarchy', 'category')
-      out <- data.table(out)
-      out[category==-2, category:=NA_integer_]	
-    } else {
-      out <- data.table(code=character(0),
-                        term=character(0),
-                        hierarchy=character(0),
-                        category=integer(0))
-    }
+		)
+		out <- data.frame(do.call('rbind', mylist))
+		if (ncol(out) == 4){
+			names(out) <- c('code', 'term', 'hierarchy', 'category')
+			out <- data.table(out)
+			out[category == -2, category := NA_integer_]	
+		} else {
+			out <- data.table(code = character(0),
+				term = character(0), hierarchy = character(0),
+				category = integer(0))
+		}
 		# Restore NA in original codelist
-    if (nrow(codelist) > 0){
-      codelist[category==-2, category:=NA_integer_]
-    }
-    # Remove category if it didn't exist before
-    if (all(codelist$category==-3)){
-      codelist[, category:=NULL]
-    }
-    
+		if (nrow(codelist) > 0){
+			codelist[category == -2, category := NA_integer_]
+		}
+		# Remove category if it didn't exist before
+		if (all(codelist$category==-3)){
+			codelist[, category:=NULL]
+		}
 		# Restore attributes
 		out <- addAttributesToCodelist(out, metadata)
 		class(out) <- c('codelist', 'data.table', 'data.frame')
@@ -310,7 +330,8 @@ isExpandedCodelist <- function(codelist){
 	# Returns TRUE or FALSE
 	# Argument: codelist to check
 	if (is.codelist(codelist)){
-		if (!(attr(codelist, 'Source') %in% c('HES', 'ONS'))){
+		if (!(attr(codelist, 'Source') %in%
+			SOURCEDICTS[dict %in% c('icd9', 'icd10'), Source])){
 			if (is.null(attr(codelist, 'Expanded'))){
 				return(FALSE)
 			} else if (attr(codelist, 'Expanded')==TRUE){
@@ -331,7 +352,8 @@ isContractedCodelist <- function(codelist){
 	# Returns TRUE or FALSE
 	# Argument: codelist to check
 	if (is.codelist(codelist)){
-		if (attr(codelist, 'Source') %in% c('HES', 'ONS')){
+		if (attr(codelist, 'Source') %in%
+			SOURCEDICTS[dict %in% c('icd9', 'icd10'), Source]){
 			if (is.null(attr(codelist, 'Expanded'))){
 				return(FALSE)
 			} else if (attr(codelist, 'Expanded')==FALSE){
@@ -347,9 +369,9 @@ isContractedCodelist <- function(codelist){
 	}
 }
 
-findICDhead <- function(icdCodes){
+findICDhead <- function(icdCodes, icdheader = 'icdhead'){
 	tmp <- sapply(icdCodes, function(icdCode){
-		CALIBER_DICT[dict=='icdhead' & code==icdCode, term][1]
+		CALIBER_DICT[dict == icdheader & code == icdCode, term][1]
 	})
 	tmp[is.na(tmp)] <- ''
 	tmp

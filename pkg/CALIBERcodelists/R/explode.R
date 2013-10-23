@@ -3,7 +3,7 @@ explode <- function(x = NULL, level = 3,
 	# Returns a Boolean vector for terms which have the same first few
 	# characters as selected terms but which are not currently selected.
 	# Arguments: x - a selection object or something which can be coerced
-  #                    to a selection
+	#                    to a selection
 	#            level - the number of characters of the code which should
 	#                    match
 	#            keep - whether to keep original terms in the result
@@ -22,7 +22,7 @@ explode <- function(x = NULL, level = 3,
 	sel1 <- copy(CALIBER_DICT[selected==TRUE,
 		list(dict, partcode=substr(code, 1, level), sel=TRUE)])
 
-	# ICD-10 codes should also match to the headers
+	# ICD-10 and ICD9 codes should also match to the headers
 	temp <- sel1[dict=='icd10']
 	if (nrow(temp) > 0){
 		temp[, dict:='icdhead']
@@ -31,6 +31,16 @@ explode <- function(x = NULL, level = 3,
 	temp <- sel1[dict=='icdhead']
 	if (nrow(temp) > 0){
 		temp[, dict:='icd10']
+		sel1 <- rbind(sel1, temp)
+	}
+	temp <- sel1[dict=='icd9']
+	if (nrow(temp) > 0){
+		temp[, dict:='icd9head']
+		sel1 <- rbind(sel1, temp)
+	}
+	temp <- sel1[dict=='icd9head']
+	if (nrow(temp) > 0){
+		temp[, dict:='icd9']
 		sel1 <- rbind(sel1, temp)
 	}
 

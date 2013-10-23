@@ -1,4 +1,6 @@
 # Script for replacing source dictionaries used by CALIBERcodelists
+# Note that this does not add ICD-9 terms to CALIBER_DICT because there
+# is no official source.
 library(data.table)
 
 OKtoStart <- menu(c('Start script to create dictionaries', 'Exit'),
@@ -197,8 +199,6 @@ setattr(CALIBER_DICT, 'VERSION_ICD10', icdVersion)
 setattr(CALIBER_DICT, 'VERSION_OPCS', opcsVersion)
 
 #### MAPPINGS READ TO OPCS, ICD9 AND ICD10 ####
-# Note that ICD9 terms are in the mappings but not available for
-# creation of codelists (currently).
 map.read.icd10 <- read.delim(icdMapFilename,
 	sep='|', as.is=TRUE, header=FALSE)
 map.read.icd9 <- read.delim(icd9MapFilename,

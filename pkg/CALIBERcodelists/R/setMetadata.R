@@ -4,9 +4,17 @@ assignmetadata <- function(field, newvalue){
 	# Date must be a date. Not exported; users are
 	# expected to call setMetadata instead.
 	# Arguments: field = which field (string)
-  #            newvalue = new value (string)
+	#            newvalue = new value (string)
 	
-	if (field=='Date'){
+	if (field == 'Source'){
+		# There is no 'Source' row because the master dictionary may
+		# contain codelists under construction for multiple dictionaries.
+		# Instead each dictionary has a separate source.
+		field <- SOURCEDICTS[Source == newvalue, dict]
+		if (length(field) != 1){
+			warning(newvalue %&% ' is not a valid source')
+		}
+	} else if (field=='Date'){
 		newvalue <- sanitizeDate(newvalue)
 	} else if (field=='Version'){
 		newvalue <- as.character(as.numeric(newvalue))
@@ -24,8 +32,8 @@ assignmetadata <- function(field, newvalue){
 setMetadata <- function(codelist=NULL, Name=NULL,
 	Version=NULL, Author=NULL, Date=NULL, Categories=NULL,
 	Source=NULL){
-	# Note that Source cannot currently be updated in META
-	# So ONS codelists need to be edited on export.
+	# META table now contains the source dictionary name for export
+	# in the read, icd9, icd10 and opcs rows.
 	if (is.null(codelist)){
 		# updating metadata in META
 		if (!is.null(Name)){
@@ -40,7 +48,10 @@ setMetadata <- function(codelist=NULL, Name=NULL,
 		}
 		if (!is.null(Date)){
 			assignmetadata("Date", Date)
-		}		
+		}
+		if (!is.null(Source)){
+			assignmetadata("Source", Source)
+		}	
 	} else if (!is.codelist(codelist)){
 		stop("First argument to setMetadata must be NULL or a codelist")
 	} else {
@@ -69,9 +80,9 @@ setMetadata <- function(codelist=NULL, Name=NULL,
 			setattr(codelist, "Date", sanitizeDate(Date))
 		}
 		if (!is.null(Source)){
-			# Currently source can only be changed for ICD-10 codelists
-			if ((Source %in% c('HES', 'ONS')) &
-				(attr(codelist, 'Source') %in% c('HES', 'ONS'))){
+			# The dictionary must be the same as the current dictionary
+			if (identical(SOURCEDICTS[SOURCEDICTS$Source == Source, dict],
+				SOURCEDICTS[SOURCEDICTS$Source == attr(codelist, 'Source'), dict])){
 				setattr(codelist, 'Source', Source)
 			}
 		}

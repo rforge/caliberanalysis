@@ -90,7 +90,9 @@ The spreadsheet must contain groups of columns specifying the text, numbers to g
 
 For text columns:
 \describe{
-\item{text}{the actual text}
+\item{text}{text or an R expression. If the text is of the form
+\code{expression(<R expression>)}, e.g. \code{expression(paste(theta^2))}
+it is interpreted as an R expression, otherwise it is treated as text.}
 \item{fontface}{either 'plain', 'italic', 'bold' or 'bold.italic' (must be in lower case)}
 \item{fontsize}{size of font in points}
 \item{just}{'left', 'right' or 'centre'}
@@ -139,7 +141,9 @@ See \url{http://research.stowers-institute.org/efg/R/Color/Chart/ColorChart.pdf}
 }
 
 \examples{
-mydata <- data.frame(a1text = c('TITLE', 'Plot1', 'Plot2', 'Summary'),
+mydata <- data.frame(a1text = c(
+    'expression(paste("Graph of ", theta))', 'Plot1', 'Plot2',
+    'expression(theta)'),
     a1fontface = c('plain', 'italic', 'bold', 'bold.italic'),
     a1fontsize = c(13, 9, 10, 11),
     a1just = c('centre', 'left', 'right', 'right'),

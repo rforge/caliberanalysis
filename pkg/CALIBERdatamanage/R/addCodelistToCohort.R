@@ -2,7 +2,7 @@ addCodelistToCohort <- function(cohort, varname, data, codelist,
 	categories, entities = 'all', binary = FALSE,
 	limit_years = c(-Inf, 0), idcolname = attr(cohort, 'idcolname'),
 	datecolname = 'eventdate', indexcolname = 'indexdate',
-	overwrite = TRUE, description = NULL){
+	overwrite = TRUE, description = NULL, limit_days = NULL){
 	# Adds to the cohort data.table a column labelled varname
 	# containing the value of a category from a list of anonpatid, medcode.
 	# Currently only for Read codelists.
@@ -19,6 +19,7 @@ addCodelistToCohort <- function(cohort, varname, data, codelist,
 	#            binary = whether to lump all categories together to make a
 	#                          binary variable
 	#            limit_years = earliest and latest year relative to index date
+	#            limit_days = earliest and latest day relative to index date
 	#            overwrite = whether to overwrite this variable if it exists
 	#            description = new description for the variable
 		
@@ -109,10 +110,10 @@ addCodelistToCohort <- function(cohort, varname, data, codelist,
 		# Select any events with medcode in one of the categories
 		out <- addToCohort(cohort, varname, USE, old_varname = 'value',
 			value_choice = function(x) any(istrue(x)),
-			date_priority = 'all', 
+			date_priority = 'all', limit_days = limit_days,
 			limit_years = limit_years, overwrite = overwrite, 
 			idcolname = idcolname, datecolname = datecolname,
-			description = description)
+			indexcolname = indexcolname, description = description)
 		# Convert to binary
 		if (is.ffdf(out)){
 			out[[varname]] <- as.ffdf(istrue(as.ram(out[[varname]])))
@@ -124,10 +125,11 @@ addCodelistToCohort <- function(cohort, varname, data, codelist,
 	} else {
 		# Select events
 		out <- addToCohort(cohort, varname, USE, old_varname = 'category',
-			date_priority = 'all', 
+			date_priority = 'all', limit_days = limit_days,
 			value_choice = categories, limit_years = limit_years,
 			overwrite = overwrite, idcolname = idcolname,
-			datecolname = datecolname, description = description)
+			datecolname = datecolname, indexcolname = indexcolname,
+			description = description)
 	}
 	invisible(out)
 }

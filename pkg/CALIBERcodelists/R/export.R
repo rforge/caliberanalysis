@@ -1,5 +1,5 @@
-exportall <- function(directory=getwd(), varname=NULL, saveMessage=TRUE,
-	icd10_source='hes'){
+exportall <- function(directory = getwd(), varname = NULL,
+	saveMessage = TRUE, icd10_source = 'hes'){
 	# Exports all codelists for dictionaries in use, and checks them
 	# against existing codelists. Saves any messages and the result of
 	# checking in META['message']. Exports to filenames name_gprd.csv,
@@ -16,33 +16,22 @@ exportall <- function(directory=getwd(), varname=NULL, saveMessage=TRUE,
 	#                    the message can be printed on screen but not
 	#                    in the definitive HTML document.
 	#            icd10_source - source name for HES codelist
-	#                    (options are hes or ons)
+	#                    (options are hes or ons). 
 	
-	# Validate source name -- currently for ICD10 only
-	dicts_in_use <- character(0)
-	sourcenames <- character(0)
+	sourcenames <- setdiff(META[item %in% ALLDICTS, value], 'FALSE')
 	
 	if ('icd10' %in% getdictionary()){
-		icd10_source <- unique(tolower(icd10_source))
-		if (!all(icd10_source %in% c('hes', 'ons'))){
-			stop('The only valid ICD-10 source names are hes and ons')
+		sourcenames <- unique(c(sourcenames, icd10_source))
+		if (!all(icd10_source %in% SOURCEDICTS[dict == 'icd10', Source])){
+			stop('ICD-10 source name not valid')
 		}
-		sourcenames <- icd10_source
-		dicts_in_use <- rep('icd10', length(sourcenames))
 	}
-	if ('read' %in% getdictionary()){
-		sourcenames <- c(sourcenames, 'gprd')
-		dicts_in_use <- c(dicts_in_use, 'read')
-	}
-	if ('opcs' %in% getdictionary()){
-		sourcenames <- c(sourcenames, 'opcs')
-		dicts_in_use <- c(dicts_in_use, 'opcs')
-	}	
 	
-	for (i in 1:length(dicts_in_use)){
-		thisdict <- dicts_in_use[i]
+	for (i in 1:length(sourcenames)){
 		# Generate a codelist -- but only if any terms selected
 		sourcename <- sourcenames[i]
+		# Select the dictionary
+		thisdict <- SOURCEDICTS[Source == sourcenames[i], dict]
 		# Use standard naming convention: 
 		# Name (from META) _gprd, _hes, _opcs
 		my <- as.codelist(thisdict)
@@ -60,11 +49,6 @@ exportall <- function(directory=getwd(), varname=NULL, saveMessage=TRUE,
 			} else {
 				# add a _gprd, _hes or _opcs suffix
 				setMetadata(my, Name=varname %&% '_' %&% sourcename)
-			}
-
-			# Correct source metadata
-			if (sourcename == 'ons'){
-				setMetadata(my, Source='ONS')
 			}
 			
 			# Add an extra '/' or '\\' if needed at the end of directory
@@ -122,8 +106,8 @@ nameHasSource <- function(codelist){
 		ifelse(is.null(attr(codelist, 'Name')), '', attr(codelist, 'Name')))
 }
 
-export <- function(codelist, filename=NULL,
-	categories='all', contractIfICD10=TRUE){
+export <- function(codelist, filename = NULL,
+	categories = 'all', contractIfICD10 = TRUE, contractIfICD9 = TRUE){
 	# Exports a codelist to file. All metadata must be stored in the codelist.
 	# Arguments: codelist - coerced to codelist if is.codelist(codelist) is FALSE
 	#            filename - exact filename of file to export to
@@ -131,16 +115,6 @@ export <- function(codelist, filename=NULL,
 	#                    supply a numeric vector of categories (note that this
 	#                    does not affect the category table)
 	#            contractIfICD10 - whether to contract ICD10 codelist
-	
-	# If filename is ONS, convert type of filename to ONS from HES
-	# and change name accordingly (and vice versa)
-	if (grepl('_ons\\.', filename)){
-		setMetadata(codelist, Source='ONS')
-		setMetadata(codelist, Name=sub('_hes$', '_ons', attr(codelist, 'Name')))
-	} else if (grepl('_hes\\.', filename)){
-		setMetadata(codelist, Source='HES')
-		setMetadata(codelist, Name=sub('_ons$', '_hes', attr(codelist, 'Name')))
-	}
 
 	# If filename is null, create a filename from codelist
 	if (is.null(filename)){
@@ -186,29 +160,40 @@ export <- function(codelist, filename=NULL,
 			it should be a numeric vector or "all"')
 	}
 
-	# If it is an ICD10 codelist, it should be compressed
-	if (attr(what, 'Source') %in% c('HES', 'ONS') &
-		contractIfICD10==TRUE){
+	# If it is an ICD10 or ICD9 codelist, it should be compressed
+	if (attr(what, 'Source') %in% SOURCEDICTS[dict == 'icd10', Source] &
+		contractIfICD10 == TRUE){
 		if (!(isContractedCodelist(what))){
 			what <- copy(contractCodelist(what))
 		}
 		setnames(what, 'code', 'icd_code')
 		setnames(what, 'term', 'icd_term')
 		setkey(what, category, icd_code)
-	} else if (attr(what, 'Source')=='GPRD'){
+	} else if (attr(what, 'Source') %in%
+		SOURCEDICTS[dict == 'icd9', Source] &
+		contractIfICD9 == TRUE){
+		if (!(isContractedCodelist(what))){
+			what <- copy(contractCodelist(what))
+		}
+		setnames(what, 'code', 'icd9_code')
+		setnames(what, 'term', 'icd9_term')
+		setkey(what, category, icd9_code)
+	} else if (attr(what, 'Source') %in%
+		SOURCEDICTS[dict == 'read', Source]){
 		setnames(what, 'code', 'readcode')
 		setnames(what, 'term', 'readterm')
 		setkey(what, category, readcode)
-	} else if (attr(what, 'Source')=='OPCS'){
+	} else if (attr(what, 'Source') %in%
+		SOURCEDICTS[dict == 'opcs', Source]){
 		setnames(what, 'code', 'opcs_code')
 		setnames(what, 'term', 'opcs_term')
 		setkey(what, category, opcs_code)
-	} else if (attr(what, 'Source')=='GPRDPROD'){
+	} else if (attr(what, 'Source') %in%
+		SOURCEDICTS[dict == 'product', Source]){
 		setnames(what, 'code', 'multilex')
 		setnames(what, 'term', 'prodname')
 		setkey(what, category, prodcode)
 	}
-	
 	
 	# Output to file
 	if (grepl('.dta$', tolower(filename))){

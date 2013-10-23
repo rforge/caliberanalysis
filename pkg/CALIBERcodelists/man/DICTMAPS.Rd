@@ -54,11 +54,6 @@ testing the examples.
 UK Terminology Centre
 }
 
-\examples{
-# data(CALIBER_DICTMAPS)
-# print(attr(CALIBER_DICTMAPS, 'VERSION'))
-}
-
 \seealso{
-\code{\link{codematch}}
+\code{\link{codematch}}, \code{\link{convert}}
 }

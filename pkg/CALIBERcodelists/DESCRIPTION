@@ -1,8 +1,8 @@
 Package: CALIBERcodelists
 Type: Package
 Title: Generate ICD10, Read and OPCS codelists
-Version: 0.2-2
-Date: 2013-07-09
+Version: 0.2-3
+Date: 2013-10-23
 Author: Anoop Shah
 Maintainer: Anoop Shah <anoop@doctors.org.uk>
 Authors@R: c(person("Anoop Shah", "Developer", role=c("aut", "cre"), email="anoop@doctors.org.uk"), person("Harry Hemingway", "Supervisor", role="ths"), person("Spiros Denaxas", "Contributor", role="ctb"), person("Harriet Forbes", "Contributor", role="ctb"), person("Emily Herrett", "Contributor", role="ctb"), person("Katherine Morley", "Contributor", role="ctb"), person("Mar Pujades", "Contributor", role="ctb"), person("Joshua Wallace", "Contributor", role="ctb"))

@@ -74,7 +74,7 @@ setnames.data.table <- function(x, old, new){
 				'are duplicated'))
 		}
 	}
-	data.table:::setnames(x, old, new)
+	data.table::setnames(x, old, new)
 }
 
 setnames <- function(x, old, new){

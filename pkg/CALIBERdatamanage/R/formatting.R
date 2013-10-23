@@ -146,12 +146,14 @@ formathr <- function(coef, se, df=Inf, dp=NA, pstar=TRUE, ...){
 					dp=dp[i], ...),	collapse=', ') %&%
 			')'
 	}
-	if (pstar){
-		formathr[pvalue < 0.05] <- formathr[pvalue < 0.05] %&% ' *'
-		formathr[pvalue < 0.01] <- formathr[pvalue < 0.01] %&% '*'
-		formathr[pvalue < 0.001] <- formathr[pvalue < 0.001] %&% '*'
-	}
-
+  if (pstar) {
+      formathr[istrue(pvalue < 0.05)] <-
+		formathr[istrue(pvalue < 0.05)] %&% " *"
+      formathr[istrue(pvalue < 0.01)] <-
+		formathr[istrue(pvalue < 0.01)] %&% "*"
+      formathr[istrue(pvalue < 0.001)] <-
+		formathr[istrue(pvalue < 0.001)] %&% "*"
+  }
 	formathr
 }
 
@@ -170,6 +172,15 @@ meansd <- function(x, ...){
 	formatnum(mean(x, na.rm=TRUE), ...) %&% ' (' %&%
 		formatnum(sd(x, na.rm=TRUE), ...) %&% ')'
 }
+
+
+medianiqr <- function(x, sep = '-', ...){
+	# returns a string with median and interquartile range
+	formatnum(median(x, na.rm = TRUE), ...) %&% ' (' %&%
+		formatnum(quantile(x, 0.25, na.rm = TRUE), ...) %&% sep %&%
+		formatnum(quantile(x, 0.75, na.rm = TRUE), ...) %&% ')'
+}
+
 
 "%&%" <- function(a, b) paste(a, b, sep='')
 

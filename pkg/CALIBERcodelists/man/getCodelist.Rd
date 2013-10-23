@@ -23,13 +23,9 @@ The name (not filename) of the codelist
 }
 }
 
-\details{
-
-}
 \value{
 Returns the a \code{\link{codelist}} object if the codelist is found, blank otherwise.
 }
-
 
 \note{
 This is a convenience function to avoid having to remember the exact location of a codelist file.

@@ -190,7 +190,11 @@ multiforest <- function(data = NULL, rowheights = 1.1,
     data$text <- as.character(data$text)
     data$text[is.na(data$text)] <- ''
     for (i in 1:nrow(data)){
-			grobs[[i]] <- textGrob(data$text[i],
+    	thislabel <- data$text[i]
+    	if (grepl('^expression\\(.*\\)$', thislabel)){
+    		thislabel <- eval(parse(text = thislabel))
+    	}
+			grobs[[i]] <- textGrob(thislabel,
 				x = switch(data$just[i], left=0, right=1, center=0.5, centre=0.5),
 				just=data$just[i], 
 				gp=gpar(fontface=data$fontface[i], fontsize=data$fontsize[i]))

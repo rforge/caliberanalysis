@@ -10,13 +10,14 @@ Compare two codelists
 Compares one codelist against another, or compares a codelist against the selection in the master dictionary. Returns a list of differences and a set of instructions for updating the master dictionary from the older codelist to the newer one. 
 }
 \usage{
-compare(oldlist, newlist = NULL, expandICD10 = TRUE)
+compare(oldlist, newlist = NULL, expandICD10 = TRUE, expandICD9 = TRUE)
 \method{print}{codelistComparison}(x, ...)
 }
 \arguments{
 \item{oldlist}{The first codelist for the comparison, ideally the older codelist. If the master dictionary is to be considered as \code{oldlist}, it can be supplied as the argument by coercing it to a codelist using e.g. \code{oldlist = as.codelist('read')} (replacing 'read' by 'icd10' or 'opcs' as appropriate).}
 \item{newlist}{The second codelist to compare against, or NULL to compare against the master dictionary.}
 \item{expandICD10}{TRUE or FALSE, whether to ensure that ICD-10 codelists are in the 'Expanded' form before doing the comparison. The codelists should both be in the same form before comparison, and the expanded form might give a more informative comparison. See \code{\link{expandCodelist}}.}
+\item{expandICD9}{TRUE or FALSE, whether to ensure that ICD-9 codelists are in the 'Expanded' form before doing the comparison.}
 \item{x}{a \code{codelistComparison} object as returned by the \code{compare} function.}
 \item{\dots}{not used}
 }

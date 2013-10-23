@@ -41,8 +41,8 @@ Government Licence. The program code is licensed under GPL-3.
 \tabular{ll}{
 Package: \tab CALIBERcodelists\cr
 Type: \tab Package\cr
-Version: \tab 0.2-2\cr
-Date: \tab 2013-07-09\cr
+Version: \tab 0.2-3\cr
+Date: \tab 2013-10-23\cr
 License: \tab GPL-3\cr
 }
 
@@ -118,12 +118,14 @@ Storage of metadata for codelist under development: \code{\link{META}}
 
 \examples{
 library(CALIBERcodelists)
-setdictionary('read','icd10')
+setdictionary('read', 'icd10')
 assigncat(2, 'SA|Stable angina', termhas('angina') \%AND\% 
     NOT(termhas('vincent|herpangina|abdominal|ludwig')))
-assigncat(3, 'USA|Unstable angina', termhas('unstable|crescendo'), cats_to_convert=2)
-assigncat(1, 'Hx|History of angina', termhas('history|h/o'), cats_to_convert=2:3)
-assigncat(0, 'Excluded', termhas('^fh|no fh'), cats_to_convert=1:3)
+assigncat(3, 'USA|Unstable angina', termhas('unstable|crescendo'),
+    cats_to_convert = 2)
+assigncat(1, 'Hx|History of angina', termhas('history|h/o'),
+    cats_to_convert = 2:3)
+assigncat(0, 'Excluded', termhas('^fh|no fh'), cats_to_convert = 1:3)
 print(as.codelist('read'))
 print(as.codelist('icd10'))
 }

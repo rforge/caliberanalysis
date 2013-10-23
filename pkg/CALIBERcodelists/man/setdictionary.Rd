@@ -17,19 +17,23 @@ in META but does not over-write any information that is there already.
 }
 
 \usage{
-setdictionary(dictName1 = NULL, dictName2 = NULL, dictName3 = NULL)
+setdictionary(dictName1 = NULL, dictName2 = NULL, dictName3 = NULL,
+    dictName4 = NULL)
 getdictionary()
 }
 
 \arguments{
   \item{dictName1}{
-Either a codelist or a dictionary name, one of "icd10", "opcs" or "read", or a vector of two or more of these dictionary names, or leave empty to clear the categories but not alter which dictionaries are  in use.
+Either a codelist or a dictionary name, one of "icd9", "icd10", "opcs" or "read", or a vector of two or more of these dictionary names, or leave empty to clear the categories but not alter which dictionaries are  in use.
 }
   \item{dictName2}{
-Either a codelist or a dictionary name, one of "icd10", "opcs" or "read".
+Either a codelist or a dictionary name, one of "icd9", "icd10", "opcs" or "read".
 }
   \item{dictName3}{
-Either a codelist or a dictionary name, one of "icd10", "opcs" or "read".
+Either a codelist or a dictionary name, one of "icd9", "icd10", "opcs" or "read".
+}
+  \item{dictName4}{
+Either a codelist or a dictionary name, one of "icd9", "icd10", "opcs" or "read".
 }
 }
 

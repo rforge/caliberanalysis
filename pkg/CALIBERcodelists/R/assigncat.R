@@ -129,11 +129,12 @@ showAssigncat <- function(category, dictionary, codes, showRprompt=FALSE){
 		prompt <- ''
 	}
 	
-	# Use icd10 for ICD10 and ICD headers
+	# Use icd10 for ICD10 and ICD headers; use icd9 for ICD9
 	paste(sapply(listofcodes, function(z){
 		prompt %&% 'assigncat(' %&% category %&% ', dictionary="' %&%
-			ifelse(dictionary=='icdhead', 'icd10', dictionary) %&%
-			'", codes=' %&% z %&% ')'
+		ifelse(dictionary == 'icdhead', 'icd10',
+		ifelse(dictionary == 'icd9head', 'icd9', dictionary)) %&%
+		'", codes=' %&% z %&% ')'
 	}), collapse = '\n')
 }
 

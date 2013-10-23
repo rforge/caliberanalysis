@@ -13,11 +13,11 @@ codelist <- function(x=NULL, ...){
 	loadDICT()
 	
 	if (is.null(x)){
-		if (length(getdictionary())==1){
+		if (length(getdictionary()) == 1){
 			x <- getdictionary()
 		} else {
-			x <- select.list(c('read', 'icd10', 'opcs'), multiple=FALSE,
-				title='Which dictionary to extract codes from?')
+			x <- select.list(ALLDICTS, multiple=FALSE,
+				title = 'Which dictionary to extract codes from?')
 		}
 		cat('\nExtracting codelist from ' %&% x %&%
 			' with non-missing categories.\n')
@@ -172,8 +172,8 @@ selectionToCodelist <- function(x, category=1,
 	x <- addAttributesToCodelist(x, metadata)
 	class(x) <- c('codelist', 'data.table', 'data.frame')
 	
-	# Expand if ICD-10 codelist
-	if (getDict=='icd10'){
+	# Expand if ICD-9 or ICD-10 codelist
+	if (getDict %in% c('icd9', 'icd10')){
 		if (!(isExpandedCodelist(x))){
 			x <- copy(expandCodelist(x))
 		}
@@ -232,8 +232,10 @@ tableToCodelist <- function(x, noisy = FALSE){
 	newnames <- names(x)
 	newnames <- stdNames('readcode',
 		'^Read|^READ|^read', 'code|Code|CODE', newnames)
+	newnames <- stdNames('icd9_code',
+		'^Icd9|^ICD9|^icd9', 'code|Code|CODE', newnames)
 	newnames <- stdNames('icd_code',
-		'^Icd|^ICD|^icd', 'code|Code|CODE', newnames)
+		'^Icd[^9]|^ICD[^9]|^icd[^9]', 'code|Code|CODE', newnames)
 	newnames <- stdNames('opcs_code',
 		'^Opcs|^OPCS|^opcs', 'code|Code|CODE', newnames)
 	newnames <- stdNames('prodcode',
@@ -241,8 +243,10 @@ tableToCodelist <- function(x, noisy = FALSE){
 
 	newnames <- stdNames('readterm',
 		'^Read|^READ|^read', 'term|Term|TERM', newnames)
+	newnames <- stdNames('icd9_term',
+		'^Icd9|^ICD9|^icd9', 'term|Term|TERM', newnames)
 	newnames <- stdNames('icd_term',
-		'^Icd|^ICD|^icd', 'term|Term|TERM', newnames)
+		'^Icd[^9]|^ICD[^9]|^icd[^9]', 'term|Term|TERM', newnames)
 	newnames <- stdNames('opcs_term',
 		'^Opcs|^OPCS|^opcs', 'term|Term|TERM', newnames)
 	newnames <- stdNames('prodname',
@@ -254,6 +258,8 @@ tableToCodelist <- function(x, noisy = FALSE){
 		'^Med[Cc]ode|^MEDCODE', '', newnames)
 	newnames <- stdNames('readcode',
 		'^READ$|^[Rr]ead$', '', newnames)
+	newnames <- stdNames('icd9_code',
+		'^ICD9$|^[Ii]cd9$', '', newnames)
 	newnames <- stdNames('icd_code',
 		'^ICD$|^[Ii]cd$', '', newnames)
 	newnames <- stdNames('opcs_code',
@@ -280,9 +286,10 @@ tableToCodelist <- function(x, noisy = FALSE){
 		# try to guess the category name. Exclude column names which
 		# are commonly found in codelists.
 		catname <- setdiff(names(x), c('medcode', 'readcode', 'events',
-			'readterm', 'description', 'shortname', 'clin_events', 'termlc',
-			'ref_events', 'test_events', 'immun_events', 'metadata',
-			'icd_code', 'icd_term', 'opcs_code', 'opcs_term',
+			'readterm', 'description', 'shortname', 'clin_events',
+			'termlc', 'ref_events', 'test_events', 'immun_events',
+			'metadata', 'icd', 'icd_code', 'icd_term', 'icd9_code',
+			'icd9_term', 'opcs_code', 'opcs_term',
 			'code', 'term', 'db_date', 'lc_readterm', "prodcode",
 			"multilex", "events", "prodname", "drugsubstance",
 			"strength", "formulation", "route", "bnfcode", "bnf",
@@ -377,6 +384,12 @@ tableToCodelist <- function(x, noisy = FALSE){
 		if ('readterm' %in% names(x)){
 			setnames(x, 'readterm', 'term')
 		}
+	} else if ('icd9_code' %in% names(x)){
+		metadata$Source <- 'ONSOLD'
+		if ('icd9_term' %in% names(x)){
+			setnames(x, 'icd9_term', 'term')
+		}
+		setnames(x, 'icd9_code', 'code')
 	} else if ('icd_code' %in% names(x)){
 		metadata$Source <- 'HES'
 		if ('icd_term' %in% names(x)){
@@ -404,17 +417,19 @@ tableToCodelist <- function(x, noisy = FALSE){
 	if (metadata$Source==''){	
 		if ('dict' %in% names(x)){
 			# If there is a 'dict' column and all terms come from the same dict:
-			getDict <- unique(sub('icdhead', 'icd10', unique(x$dict)))
+			getDict <- unique(sub('icdhead', 'icd10',
+				sub('icd9head', 'icd9', unique(x$dict))))
 			if (length(getDict)==1){
+				# Default source
 				metadata$Source <- switch(getDict,
-					read='GPRD', opcs='OPCS', icd10='HES')
+					read='GPRD', opcs='OPCS', icd10='HES', icd9='ONSOLD')
 			} else {
 				stop('Terms come from more than one dictionary')
 			}
 		}	else if (length(getdictionary())==1){
 			# If only one dictionary is in use:
 			metadata$Source <- switch(getdictionary(),
-				read='GPRD', opcs='OPCS', icd10='HES')
+				read='GPRD', opcs='OPCS', icd10='HES', icd9='ONSOLD')
 		} else {
 			stop('Unable to determine source dictionary')
 		}
@@ -422,7 +437,8 @@ tableToCodelist <- function(x, noisy = FALSE){
 
 	#### CHECK CODES AGAINST MASTER CALIBER_DICTONARY ####
 	# (except for product codelists)
-	if (metadata$Source=='GPRD'){
+	if (metadata$Source %in%
+		SOURCEDICTS[dict == 'read', Source]){
 		TEMP <- CALIBER_DICT[dict=='read',
 			list(medcode, .corrCode=code, .corrTerm=term)]
 		setkey(TEMP, medcode)
@@ -452,13 +468,15 @@ tableToCodelist <- function(x, noisy = FALSE){
 		if (!('term' %in% names(x))){
 			x[, term:=TEMP[x][, .corrTerm]]
 		}
-	} else if (metadata$Source=='HES'){
+	} else if (metadata$Source %in%
+		SOURCEDICTS[dict %in% c('icd9', 'icd10'), Source]){
 		if (!(isExpandedCodelist(x))){
-			setattr(x, 'Source', 'HES')
+			setattr(x, 'Source', metadata$Source)
 			class(x) <- c('codelist', 'data.table', 'data.frame')
 			x <- copy(expandCodelist(x))
 		}
-	} else if (metadata$Source=='OPCS'){
+	} else if (metadata$Source %in%
+			SOURCEDICTS[dict == 'opcs', Source]){
 		TEMP <- CALIBER_DICT[dict=='opcs', list(code,
 			.corrCode=code, .corrTerm=term)]
 		setkey(TEMP, code)
@@ -483,7 +501,8 @@ tableToCodelist <- function(x, noisy = FALSE){
 	}
 
 	# Remove any missing codes, and check for duplicate categories
-	if (metadata$Source == 'GPRD'){
+	if (metadata$Source %in%
+		SOURCEDICTS[dict == 'read', Source]){
 		x <- copy(x[!is.na(medcode) & 
 			!duplicated(x[, list(medcode, category)])])
 		# Check for any remaining duplicate codes (which must be in
@@ -678,7 +697,10 @@ extractMetadataFromMETA <- function(dictName){
 	out <- list()
 	out$Name <- META[item=='Name'][, value]
 	out$Version <- META[item=='Version'][,value]
-	out$Source <- switch(dictName, read='GPRD', icd10='HES', opcs='OPCS')
+	# Default source name
+	out$Source <- switch(dictName, read='GPRD', icd10='HES', opcs='OPCS',
+		icd9='ONSOLD')
+	# Special source name
 	out$Author <- META[item=='Author'][,value]
 	out$Date <- META[item=='Date'][,value]
 	out$Timestamp <- format(Sys.time(), '%H.%m %d-%b-%y')
@@ -780,7 +802,7 @@ splitCategory <- function(categorystrings){
 	}
 }
 
-subset.codelist <- function(x, subset, select, ...){
+subset.codelist <- function(x, subset, select){
 	# S3 method for subsetting a codelist
 	# Arguments: x - codelist
 	#            subset - a logical expression for rows to keep,
@@ -797,16 +819,19 @@ subset.codelist <- function(x, subset, select, ...){
 	
 	if (missing(select)){
 		# keep all columns
+		select <- colnames(x)
 		asCodelist <- TRUE
 	} else {
 		if (all(c('code', 'term', 'category') %in% select)){
 			asCodelist <- TRUE
 		}
-		if (metadata$Source=='GPRD'){
+		if (SOURCEDICTS$dict[metadata$Source ==
+			SOURCEDICTS$Source] == 'read'){
 			if (!('medcode' %in% select)){
 				asCodelist <- FALSE
 			}			
-		} else if (metadata$Source=='GPRDPROD'){
+		} else if (SOURCEDICTS$dict[metadata$Source ==
+			SOURCEDICTS$Source] == 'product'){
 			if (!('prodcode' %in% select)){
 				asCodelist <- FALSE
 			}
@@ -823,19 +848,21 @@ subset.codelist <- function(x, subset, select, ...){
 		includeRow[is.na(includeRow)] <- FALSE
 	}
 	
-	out <- data.table:::subset.data.table(x, includeRow, select, ...)
-	if ('data.table' %in% class(out)){
+	out <- x[includeRow, select, with = FALSE]
+	
+	if (is.data.table(out)){
 		out <- addAttributesToCodelist(out, metadata)
-		if (asCodelist==TRUE){
+		if (asCodelist == TRUE){
 			# Restore codelist class
-			class(out) <- c('codelist', 'data.table', 'data.frame')
+			setattr(out, 'class', c('codelist', 'data.table',
+				'data.frame'))
 		}
 	}
 	return(copy(out))
 }
 
 getSourceDict <- function(codelist){
-	# Returns the source dictionary
-	switch(attr(codelist, 'Source'), GPRD='read',
-		HES='icd10', ONS='icd10', OPCS='opcs', GPRDPROD='product')
+	# Returns the source dictionary of a codelist
+	# Uses the SOURCEDICTS data.table
+	SOURCEDICTS[Source == attr(codelist, 'Source'), dict]
 }

@@ -565,7 +565,7 @@ iAssignMetadata <- function(which, description){
 iSetDictionary <- function(){
 	# Initialise the dictionaries interactively
 	useCodelist <- FALSE
-	response <- select.list(c('read', 'icd10', 'opcs',
+	response <- select.list(c(ALLDICTS,
 		'Initialise using an existing codelist'), multiple=TRUE,
 		title='Preparing to reset categories. Which source dictionaries to use?',
 		graphics=FALSE)

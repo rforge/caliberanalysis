@@ -15,7 +15,8 @@ Terms with category 0 or negative categories are not exported.
 }
 
 \usage{
-export(codelist, filename, categories = 'all', contractIfICD10 = TRUE)
+export(codelist, filename = NULL, categories = 'all',
+    contractIfICD10 = TRUE, contractIfICD9 = TRUE)
 exportall(directory = getwd(), varname = NULL, saveMessage = TRUE,
     icd10_source = 'hes')
 }
@@ -32,6 +33,9 @@ Which categories to export, either the character string 'all' or a numeric vecto
 }
   \item{contractIfICD10}{
 Whether to represent 4-character ICD-10 codes which have the same 3-character prefix using the prefix only. This is recommended because it means that codelists are shorter and easier to understand.
+}
+  \item{contractIfICD9}{
+Whether to represent 4-character ICD-9 codes which have the same 3-character prefix using the prefix only. This is recommended because it means that codelists are shorter and easier to understand.
 }
   \item{icd10_source}{
 Suffix for ICD-10 source name: hes or ons. Either a single string or the vector \code{c('hes', 'ons')} if both are to be exported.

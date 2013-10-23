@@ -17,7 +17,7 @@ codematch <- function(regexpr,
 	loadDICT()
 	loadDICTMAPS()
 
-	if (length(regexpr) > 1){
+	if (exact == FALSE & length(regexpr) > 1){
 		# concatenate regular expressions
 		regexpr <- paste('(' %&% regexpr %&% ')', collapse = '|')
 	}
@@ -33,7 +33,7 @@ codematch <- function(regexpr,
 			length(dictionary))
 	}
 	
-	if (!(dictionary %in% c(ALLDICTS, 'icd9'))){
+	if (!(dictionary %in% ALLDICTS)){
 		stop('Dictionary is ' %&% dictionary %&% ' but should be one of ' %&%
 			paste(ALLDICTS, collapse=', '))
 	}
@@ -44,68 +44,76 @@ codematch <- function(regexpr,
 			opcs=c('A', 'D', 'G', 'E', 'T'))
 	}
 	
-	if (dictionary=='icd10'){
+	if (dictionary %in% c('icd9', 'icd10')){
+		dicthead <- ifelse(dictionary == 'icd10', 'icdhead', 'icd9head')
 		if (exact){
-			out <- CALIBER_DICT[, dict %in% c('icd10', 'icdhead') & code==regexpr]
+			out <- CALIBER_DICT[, dict %in% c(dictionary, dicthead) &
+				code %in% regexpr]
 		} else {
-			out <- CALIBER_DICT[, dict %in% c('icd10', 'icdhead') & grepl(regexpr, code)]
+			out <- CALIBER_DICT[, dict %in% c(dictionary, dicthead) &
+				grepl(regexpr, code)]
 		}
-		if (META['read'][, value]=='TRUE'){
-			icdcodes <- CALIBER_DICT[out, code]
+		icdcodes <- CALIBER_DICT[out, code]
+		# Link to Read terms
+		if (META['read'][, value] != 'FALSE'){
 			tempMedcodes <- unique(
-				CALIBER_DICTMAPS[(dict =='icd10') &
+				CALIBER_DICTMAPS[(dict == dictionary) &
 					(code %in% icdcodes) &
 					(map_stat %in% mapStatus), medcode])
-			out[CALIBER_DICT[, dict=='read' & medcode %in% tempMedcodes]] <- TRUE
+			out[CALIBER_DICT[, dict == 'read' &
+				medcode %in% tempMedcodes]] <- TRUE
 		}
-	} else if (dictionary=='opcs'){
+		# Link to other ICD dictionary
+		if (dictionary == 'icd9' & META['icd10'][, value] != 'FALSE'){
+			loadICDMAPS()
+			# Include ICD-10 terms linked to the current ICD-9 term
+			setkey(CALIBER_GEM, icd9)
+			icd10codes <- CALIBER_GEM[J(icdcodes)][use == TRUE &
+				from9to10 == FALSE, icd10]
+			out[CALIBER_DICT[, dict %in% c('icd10', 'icdhead') & code %in%
+				icd10codes]] <- TRUE
+		}
+		if (dictionary == 'icd10' & META['icd9'][, value] != 'FALSE'){
+			loadICDMAPS()
+			# Include ICD-9 terms linked to the current ICD-10 term
+			setkey(CALIBER_GEM, icd10)
+			icd9codes <- CALIBER_GEM[J(icdcodes)][use == TRUE &
+				from9to10 == FALSE, icd9]
+			out[CALIBER_DICT[, dict %in% c('icd9', 'icd9head') & code %in%
+				icd9codes]] <- TRUE
+		}
+	} else if (dictionary == 'opcs'){
 		if (exact){
-			out <- CALIBER_DICT[, dict=='opcs' & code==regexpr]
+			out <- CALIBER_DICT[, dict=='opcs' & code %in% regexpr]
 		} else {
 			out <- CALIBER_DICT[, dict=='opcs' & grepl(regexpr, code)]
 		}
-		if (META['read'][, value]=='TRUE'){
+		if (META['read'][, value] != 'FALSE'){
 			opcscodes <- CALIBER_DICT[out, code]
 			tempMedcodes <- unique(
 				CALIBER_DICTMAPS[(dict == 'opcs') &
 					(code %in% opcscodes) &
 					(map_stat %in% mapStatus), medcode])
-			out[CALIBER_DICT[, dict=='read' & medcode %in% tempMedcodes]] <- TRUE
+			out[CALIBER_DICT[, dict=='read' &
+				medcode %in% tempMedcodes]] <- TRUE
 		}	
-	} else if (dictionary=='read'){
+	} else if (dictionary == 'read'){
 		if (exact){
-			out <- CALIBER_DICT[, dict=='read' & regexpr==code]
+			out <- CALIBER_DICT[, dict=='read' & regexpr %in% code]
 		} else {
 			out <- CALIBER_DICT[, dict=='read' & grepl(regexpr, code)]
 		}
 		# out should be a vector
 		medcodes <- CALIBER_DICT[out, medcode]
-		if (META['icd10'][, value]=='TRUE'){
-			tempICDcodes <- unique(
-				CALIBER_DICTMAPS[(dict == 'icd10') & (medcode %in% medcodes) &
-					(map_stat %in% mapStatus), code])
-			out[CALIBER_DICT$dict=='icd10' & CALIBER_DICT$code %in% tempICDcodes] <- TRUE
-		}
-		if (META['opcs'][, value]=='TRUE'){
-			tempOPCScodes <- unique(
-				CALIBER_DICTMAPS[(dict == 'opcs') & (medcode %in% medcodes) &
-					(map_stat %in% mapStatus), code])
-			out[CALIBER_DICT$dict=='opcs' & CALIBER_DICT$code %in% tempOPCScodes] <- TRUE
-		}
-	} else if (dictionary=='icd9'){
-		if (exact){
-			out <- CALIBER_DICTMAPS[, dict == 'icd9' & code==regexpr]
-		} else {
-			out <- CALIBER_DICTMAPS[, dict == 'icd9' & grepl(regexpr, code)]
-		}
-		# can only select Read terms
-		if (META['read'][, value]=='TRUE'){
-			icdcodes <- unique(CALIBER_DICTMAPS[out, code])
-			tempMedcodes <- unique(
-				CALIBER_DICTMAPS[(dict =='icd9') &
-						(code %in% icdcodes) &
-						(map_stat %in% mapStatus), medcode])
-			out <- CALIBER_DICT[, dict=='read' & medcode %in% tempMedcodes]
+		for (mapto in c('icd9', 'icd10', 'opcs')){
+			if (META[item == mapto][, value] != 'FALSE'){
+				tempcodes <- unique(
+					CALIBER_DICTMAPS[(dict == mapto) &
+						(medcode %in% medcodes) &
+						(map_stat %in% mapStatus), code])
+				out[CALIBER_DICT$dict == mapto &
+					CALIBER_DICT$code %in% tempcodes] <- TRUE
+			}
 		}
 	}
 	class(out) <- 'selection'

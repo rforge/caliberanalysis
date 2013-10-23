@@ -50,9 +50,9 @@ National Institute for Health Research.</p>
 <p>The goal of CALIBER is to provide evidence across different stages of translation, from discovery,
 through evaluation to implementation where electronic health records provide new scientific opportunities.</p>
 
-Download R packages here:
+<p>Download R packages here:
 <a href="http://r-forge.r-project.org/R/?group_id=1598">
-http://r-forge.r-project.org/R/?group_id=1598</a>
+http://r-forge.r-project.org/R/?group_id=1598</a></p>
 
 <hr/>
 

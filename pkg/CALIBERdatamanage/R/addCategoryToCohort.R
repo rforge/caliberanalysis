@@ -2,7 +2,7 @@ addCategoryToCohort <- function(cohort, varname, data,
 	old_varname = 'category', categories, binary = FALSE,
 	limit_years = c(-Inf, 0), idcolname = attr(cohort, 'idcolname'),
 	datecolname = 'eventdate', indexcolname = 'indexdate',
-	overwrite = TRUE, description = NULL){
+	overwrite = TRUE, description = NULL, limit_days = NULL){
 	# Adds to the cohort data.table a column labelled varname
 	# containing the value of a category or TRUE/FALSE for whether
 	# any relevant categories are included.
@@ -18,6 +18,7 @@ addCategoryToCohort <- function(cohort, varname, data,
 	#            binary = whether to lump all categories together to make a
 	#                          binary variable
 	#            limit_years = earliest and latest year relative to index date
+	#            limit_days = earliest and latest day relative to index date
 	#            overwrite = whether to overwrite this variable if it exists
 	#            description = new description for the variable
 
@@ -27,12 +28,18 @@ addCategoryToCohort <- function(cohort, varname, data,
 		description <- paste(
 			gsub('\n|\t| +', ' ', capture.output(print(thecall))), collapse = ' ')
 	}
+
+	# If categories are numeric but the data column is factor, change the
+	# categories into a vector of factor level names
+	if (is.factor(data[[old_varname]]) & is.numeric(categories)){
+		categories <- levels(data[[old_varname]])[categories]
+	}
 	
 	if (binary){
 		# Select any events with one of the categories
 		out <- addToCohort(cohort, varname, data, old_varname = old_varname,
 			value_choice = function(x) {istrue(any(x %in% categories))},
-			date_priority = 'all',
+			date_priority = 'all', limit_days = limit_days,
 			limit_years = limit_years, idcolname = idcolname,
 			datecolname = datecolname, indexcolname = indexcolname,
 			overwrite = overwrite, description = description)
@@ -48,9 +55,10 @@ addCategoryToCohort <- function(cohort, varname, data,
 		# Select events
 		out <- addToCohort(cohort, varname, data, old_varname = old_varname,
 			value_choice = categories, date_priority = 'all',
-			limit_years = limit_years, idcolname = idcolname,
-			datecolname = datecolname, indexcolname = indexcolname,
-			overwrite = overwrite, description = description)
+			limit_days = limit_days, limit_years = limit_years,
+			idcolname = idcolname, datecolname = datecolname,
+			indexcolname = indexcolname, overwrite = overwrite,
+			description = description)
 	}
 	invisible(out)
 }

@@ -4,7 +4,7 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 	limit_years = c(-Inf, 0), date_varname = NULL,
 	idcolname = attr(cohort, 'idcolname'),
 	datecolname = 'eventdate', indexcolname = 'indexdate',
-	overwrite = FALSE, description = NULL){
+	overwrite = FALSE, description = NULL, limit_days = NULL){
 	# Adds to the x data.table a column labelled varname
 	# containing the value of a category from a list of ID,
 	# category, eventdate.
@@ -26,7 +26,11 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 	#            date_priority = if multiple records for a patient, which
 	#                          record(s) to use based on date
 	#            limit_years = a vector of length 2 for the time limits
-	#                          (inclusive) in years before or after index date
+	#                          (inclusive) in years before or after index date.
+	#                          If NULL, it is calculated as limit_days / 365.25
+	#            limit_days = a vector of length 2 for the time limits
+	#                          (inclusive) in days before or after index date.
+	#                          Takes priority over limit_years if both are supplied.
 	#            date_varname = optional name for date variable for the date
 	#                          of the event from which the category was drawn.
 	#                          Not valid if date_priority is 'any'
@@ -78,11 +82,17 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 			'in priority order'))
 	}
 
-	limit_years <- sort(unique(limit_years))
-	if (length(limit_years)!=2){
-		stop('limit_years should be a numeric vector of length 2')
+	if (is.null(limit_days)){
+		if (length(limit_years) != 2){
+			stop('limit_years should be a numeric vector of length 2')
+		}
+		limit_days <- limit_years * 365.25
 	}
-	
+	limit_days <- sort(unique(limit_days))
+	if (length(limit_days) != 2){
+		stop('limit_days should be a numeric vector of length 2')
+	}
+
 	if (!is.data.table(data)){
 		DATA <- as.data.table(as.data.frame(data))
 	} else {
@@ -105,9 +115,9 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 
 	#### Identifying events of interest ####
 	DATA[, indexdate := x[DATA][, indexcolname, with = FALSE]]
-	DATA[, yearsdiff := as.numeric(.eventdate - indexdate)/365.25]
+	DATA[, daysdiff := as.numeric(.eventdate - indexdate)]
 	DATA[, include := istrue(!is.na(.eventdate) &
-		yearsdiff >= limit_years[1] & yearsdiff <= limit_years[2])]
+		daysdiff >= limit_days[1] & daysdiff <= limit_days[2])]
 	if (date_priority == 'first'){
 		DATA[include == TRUE, include := (.eventdate == min(.eventdate)),
 			by = .id]
@@ -132,13 +142,13 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 	}
 	
 	#### Updating cohort table ####
-	x[, .transferChosen:=Y[x][, .chosen]]
-	x[, .transferDate:=Y[x][, .eventdate]]
+	x[, .transferChosen := Y[x][, .chosen]]
+	x[, .transferDate := Y[x][, .eventdate]]
 	
 	if (varname %in% names(x) & overwrite == FALSE){
 		# update existing variable if missing
 		update <- is.na(x[[varname]])
-		x[update == TRUE, eval(parse(text=paste(
+		x[update == TRUE, eval(parse(text = paste(
 			varname, ':= .transferChosen', sep = '')))]
 		if (!is.null(date_varname) & date_priority != 'all'){
 			x[update == TRUE, eval(parse(text = paste(
@@ -174,6 +184,15 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 		modifyDescription(cohort, varname, description)
 	} else {
 		modifyDescription(x, varname, description)
+	}
+
+	#### Add description for date (if any) ####
+	if (!is.null(date_varname)){
+		if (is.ffdf(cohort)){
+			modifyDescription(cohort, date_varname, 'date of ' %&% varname)
+		} else {
+			modifyDescription(x, date_varname, 'date of ' %&% varname)
+		}
 	}
 
 	#### Summary message ####

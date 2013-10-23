@@ -14,11 +14,13 @@ browseSelectionNotDICT <- function(x, spreadsheet=NULL){
 Please delete terms you want to exclude, then save the spreadsheet with the same name.')
 		
 	# include medcode and events columns
-	write.csv(CALIBER_DICT[x==TRUE & dict %in% getdictionary(),
+	write.csv(CALIBER_DICT[x == TRUE & dict %in% getdictionary(),
 		list(dict, medcode,
-		code=ifelse(dict=='read', 'Read ' %&% code, code),
-		term, events, include=TRUE)][
-		order(dict, code)], file=tempdir() %&% '/browsedict.csv', row.names=FALSE)
+		code = ifelse(dict == 'read', 'Read ' %&% code, 
+		ifelse(dict == 'icd9', 'ICD9 ' %&% code, code)),
+		term, events, include = TRUE)][
+		order(dict, code)], file=tempdir() %&% '/browsedict.csv',
+		row.names = FALSE)
 	
 	NEW <- browseLoad(spreadsheet)
 	if (is.null(NEW)){
@@ -207,9 +209,9 @@ it with the same filename. Remove codes by setting the category to 0.\n')
 		i <- 1
 		
 		for (thecat in newCatList){
-			for (theDict in c(ALLDICTS, 'icdhead')){
-				changed <- newCat==thecat & newCat!=oldCat &
-					CALIBER_DICT[, dict]==theDict
+			for (theDict in c(ALLDICTS, 'icdhead', 'icd9head')){
+				changed <- newCat == thecat & newCat != oldCat &
+					CALIBER_DICT[, dict] == theDict
 				if (sum(changed) > 0){
 					# Command to change categories
 					out[i] <- '\n' %&% showAssigncat(thecat, theDict,
@@ -309,7 +311,7 @@ browseLoad <- function(sprog='soffice'){
 		# reload, and ignore blank lines
 		if (!is.null(reload)){
 			reload <- reload[!is.na(reload$code) | !is.na(reload$term),]
-			reload[, code:=sub('Read ', '', code)]
+			reload[, code:=sub('ICD9 |Read ', '', code)]
 		}
 		return(reload)
 	} else {

@@ -22,7 +22,7 @@ as.codelist(x = NULL, \dots)
 is.codelist(x)
 
 \method{print}{codelist}(x, \dots)
-\method{subset}{codelist}(x, subset, select, \dots)
+\method{subset}{codelist}(x, subset, select)
 }
 
 \arguments{
@@ -81,9 +81,7 @@ mi_contract
 
 # Convert to Read codes
 mi_gprd1 <- convert(mi, 'read')
-# (note that the toDictionary argument is optional because ICD-10 codelists can
-# only be converted to Read, not OPCS)
-mi_gprd2 <- convert(mi_contract)
+mi_gprd2 <- convert(mi_contract, 'read')
 
 # Show that the GPRD codelists are the same whether from expanded
 # or contracted ICD-10 lists
@@ -94,6 +92,6 @@ af_opcs <- codelist(data.frame(OPCS.CODES=c('K621', 'K622', 'K623')))
 af_opcs
 
 # Combine two codelists
-af_comb <- merge(af_gprd, convert(af_opcs))
+af_comb <- merge(af_gprd, convert(af_opcs, 'read'))
 af_comb
 }

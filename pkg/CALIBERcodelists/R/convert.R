@@ -1,46 +1,47 @@
 # Function to convert a selection or codelist from
 # one dictionary to another, using the mappings
 
-convert <- function(x, toDictionary=NULL, fromDictionary=NULL, ...){
+convert <- function(x, toDictionary = NULL, fromDictionary = NULL, ...){
 	# Converts a codelist or selection from one dictionary to
-	# another. If the codelist is in ICD-10 or OPCS format,
-	# it is assumed that it is to be converted to Read, so
-	# toDictionary is optional. fromDictionary and toDictionary
-	# must be supplied when using selections.
+	# another. toDictionary must be supplied when using selections.
+
+	# Possible conversions:
+	# NHS mapping: Read -- ICD9, Read -- ICD10, Read -- OPCS
+	# US GEM:      ICD9CM -- ICD10CM
 
 	# If codelist, fromDictionary is determined by the
-	# codelist
-	
-	# Ensure that dictionaries and mappings 
-	# are loaded before running this function
-	loadDICT()
-	loadDICTMAPS()
+	# codelist.
 	
 	if (is.codelist(x)){
 		fromDictionary <- getSourceDict(x)	
 	}
-
-	if (is.null(fromDictionary)){
-		if (toDictionary %in% c('icd10', 'opcs')){
-			fromDictionary <- 'read'
-		}
-	}	
-	
 	if (is.null(toDictionary)){
-		if (fromDictionary %in% c('icd10', 'opcs')){
-			toDictionary <- 'read'
-		}
+		toDictionary <- ALLDICTS[menu(ALLDICTS,
+			title = 'Which dictionary to convert to?')]
 	}
-
-	if (is.null(fromDictionary) | is.null(toDictionary)){
-		stop('Unable to work out which dictionaries are being converted to and from')
+	if (is.null(fromDictionary)){
+		fromDictionary <- ALLDICTS[menu(ALLDICTS,
+			title = 'Which dictionary to convert from?')]
 	}
-	# Exactly one dictionary must be Read
-	if (xor(fromDictionary=='read', toDictionary=='read')){
-		message('Converting from ' %&% fromDictionary %&% ' to ' %&% toDictionary)
+	
+	# Ensure that dictionaries and mappings 
+	# are loaded before running this function
+	loadDICT()
+	if (fromDictionary == 'read' & toDictionary %in%
+		c('icd9', 'icd10', 'opcs')){
+		loadDICTMAPS()
+	} else if (toDictionary == 'read' & fromDictionary %in%
+		c('icd9', 'icd10', 'opcs')){
+		loadDICTMAPS()
+	} else if (toDictionary == 'icd10' & fromDictionary == 'icd9'){
+		loadICDMAPS()
+	} else if (fromDictionary == 'icd10' & toDictionary == 'icd9'){
+		loadICDMAPS()	
 	} else {
-		stop('Exactly one of fromDictionary or toDictionary must be Read')
+		stop('No mapping available for ' %&% fromDictionary %&%
+			' to ' %&% toDictionary)
 	}
+	
 	if (is.codelist(x)){
 		return(convertCodelist(x, toDictionary, fromDictionary, ...))
 	} else if (is.selection(x)){
@@ -51,13 +52,15 @@ convert <- function(x, toDictionary=NULL, fromDictionary=NULL, ...){
 }
 
 convertCodelist <- function(x, toDictionary, fromDictionary, 
-	mapStatus = NULL){
+	mapStatus = NULL, toSource = NULL){
 	# Converts a codelist from one dictionary to another
 	# The attributes and categories are carried over from one
 	# codelist to the other.
 	metadata <- extractMetadataFromCodelist(x)
-	metadata$Source <- switch(toDictionary, 
-		read='GPRD', icd10='HES', opcs='OPCS')
+	if (is.null(toSource)){
+		toSource <- SOURCEDICTS[dict == toDictionary, Source][1]
+	}
+	metadata$Source <- toSource
 	cats <- unique(x$category)
 	out <- rbindlist(lapply(cats, function(z){
 		if (fromDictionary=='read'){
@@ -77,8 +80,16 @@ convertCodelist <- function(x, toDictionary, fromDictionary,
 				} else {
 					data.table(icd_code=character(0), category=integer(0))
 				}
+			} else if (toDictionary=='icd9'){
+				newCodes <- convertMedcodes(
+					x[category==z, medcode], 'icd9', mapStatus)
+				if (length(newCodes) > 0){
+					data.table(icd9_code=newCodes, category=z)
+				} else {
+					data.table(icd9_code=character(0), category=integer(0))
+				}
 			}
-		} else {
+		} else if (toDictionary == 'read'){
 			newMedcodes <- convertToMedcodes(
 				x[category==z, code], fromDictionary, mapStatus)
 			if (length(newMedcodes) > 0){
@@ -86,6 +97,25 @@ convertCodelist <- function(x, toDictionary, fromDictionary,
 			} else {
 				data.table(medcode=integer(0), category=integer(0))
 			}
+		} else if (toDictionary == 'icd10' & fromDictionary == 'icd9'){
+			# Note that from9to10 refers to the mapping for an individual
+			# patient's codes, but for codelists the mapping is the opposite
+			# way around
+			newCodes <- CALIBER_GEM[icd9 %in% x[category==z, code] &
+				use == TRUE & from9to10 == FALSE, icd10]
+			if (length(newCodes) > 0){
+				data.table(icd_code=newCodes, category=z)
+			} else {
+				data.table(icd_code=character(0), category=integer(0))
+			}		
+		} else if (toDictionary == 'icd9' & fromDictionary == 'icd10'){
+			newCodes <- CALIBER_GEM[icd10 %in% x[category==z, code] & 
+				use == TRUE & from9to10 == FALSE, icd9]
+			if (length(newCodes) > 0){
+				data.table(icd9_code=newCodes, category=z)
+			} else {
+				data.table(icd9_code=character(0), category=integer(0))
+			}	
 		}
 	}))
 	if (nrow(out)==0){
@@ -125,7 +155,8 @@ convertMedcodes <- function(medcodes,
 		mapStatus <- c('A', 'D', 'E', 'T')
 	}
 	if (toDictionary=='icd10'){
-		CALIBER_DICTMAPS[dict %in% c('icd10', 'icdhead') & map_stat %in% mapStatus &
+		CALIBER_DICTMAPS[dict %in% c('icd10', 'icdhead') &
+			map_stat %in% mapStatus &
 		 	!grepl('D$|A$', code) & medcode %in% medcodes, code]
 	} else if (toDictionary=='opcs') {
 		CALIBER_DICTMAPS[dict == 'opcs' & map_stat %in% mapStatus &

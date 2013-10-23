@@ -71,7 +71,7 @@ extractCodes <- function(data, codelist, enttypes = NULL,
 		# Loop through categories, grepping ICD codes
 		allcats <- unique(as.integer(mycodelist$category))
 		for (i in allcats){
-			regexpr <- paste(mycodelist[category == i,
+			regexpr <- paste(mycodelist[as.integer(category) == i,
 				paste('^', code, sep = '')], collapse = '|')
 			if ('parallel' %in% loadedNamespaces()){
 				# Use parallel grep
@@ -100,6 +100,11 @@ extractCodes <- function(data, codelist, enttypes = NULL,
 	if (attr(codelist, 'Source') %in% c('ONS', 'OPCS', 'HES')){
 		# Restore original order of tomatch
 		setkey(tomatch, order)
+
+		# Convert category back into a factor
+		tomatch[, category := factor(category,
+			levels = 1:length(mylabels), labels = mylabels)]
+
 		# Extract subset of ffdf or data.table
 		if (is.ffdf(data)){
 			keep <- ff(!is.na(tomatch$category))
@@ -112,10 +117,10 @@ extractCodes <- function(data, codelist, enttypes = NULL,
 			out[, varname := tomatch[!is.na(category), category],
 				with = FALSE]
 		}
+
 	} else {
 		# GPRD / GPRDPROD
 		# Extract the subset with medcodes or prodcodes
-		# of interest (need to do something else for ICD codes)
 		if (is.ffdf(data)){
 			mycodelist <- as.ffdf(as.data.frame(mycodelist))
 		}

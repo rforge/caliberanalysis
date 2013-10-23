@@ -20,7 +20,7 @@ is.cohort(x)
 
 \method{print}{cohort}(x, \dots)
 \method{summary}{cohort}(object, \dots)
-\method{subset}{cohort}(x, subset, select, \dots)
+\method{subset}{cohort}(x, subset, select)
 \method{merge}{cohort}(x, y, \dots)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -63,6 +63,7 @@ The \code{print} method displays the description table and the data itself, in t
 The \code{subset} method returns a cohort object which contains a subset of the original cohort.
 
 The \code{merge} method returns a merged cohort containing x and y merged on the ID column.
+Both cohort objects must have the same ID column, otherwise they cannot be merged.
 }
 
 \author{
@@ -75,8 +76,18 @@ Anoop Shah
 }
 
 \examples{
+# data.table cohort
 COHORT <- cohort(data.table(anonpatid = 1:3, indexdate = as.IDate(c("2012-1-3", 
 	"2012-1-2", "2010-1-9"))))
+COHORT2 <- cohort(data.table(anonpatid = 1:3, disease = c(TRUE, FALSE, TRUE)))
 is.cohort(COHORT)
 subset(COHORT, anonpatid == 2)
+summary(COHORT)
+merge(COHORT, COHORT2)
+
+COHORT <- as.ffdf(COHORT)
+COHORT2 <- as.ffdf(COHORT2)
+is.cohort(COHORT)
+subset(COHORT, COHORT$anonpatid == 2)
+merge(COHORT, COHORT2)
 }

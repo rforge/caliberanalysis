@@ -83,11 +83,12 @@ print(mycodelist)
 print(as.codelist('read'))
 
 ## Assigning category using a selection
-assigncat(2, 'hcm|hypertrophic cardiomyopathy', termhas('hyper*cardiomyopath'))
+assigncat(2, 'hcm|hypertrophic cardiomyopathy',
+    termhas('hyper*cardiomyopath'))
 
 ## Assigning category using Read codes
 assigncat(3, 'hcm|hypertrophic cardiomyopathy',
-  dictionary='read', codes=c('12CJ.00', '12CR.00'))
+    dictionary='read', codes=c('12CJ.00', '12CR.00'))
 
 ## Show the selection
 print(as.codelist())

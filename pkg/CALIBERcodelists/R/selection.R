@@ -80,6 +80,10 @@ printSelection <- function(x, ...){
 		cat('\nRead terms:\n')
 		printTerms(CALIBER_DICT[x & dict=='read', list(medcode, code, term, events)])
 	}
+	if ('icd9' %in% whichdicts){
+		cat('\nICD-9 terms:\n')
+		printTerms(CALIBER_DICT[x & dict=='icd9', list(code, term)])
+	}
 	if ('icd10' %in% whichdicts){
 		cat('\nICD-10 terms:\n')
 		printTerms(CALIBER_DICT[x & dict=='icd10', list(code, term)])

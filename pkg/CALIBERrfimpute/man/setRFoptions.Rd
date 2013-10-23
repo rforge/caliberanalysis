@@ -11,7 +11,8 @@ A convenience function to set global options for number of trees or number of no
 
 \usage{
 setRFoptions(ntree_cat = NULL, ntree_cont = NULL,
-	nodesize_cat = NULL, nodesize_cont = NULL)
+    nodesize_cat = NULL, nodesize_cont = NULL,
+    maxnodes_cat = NULL, maxnodes_cont = NULL)
 }
 
 
@@ -30,6 +31,14 @@ A higher value can be used on larger datasets in order to save time.
   \item{nodesize_cont}{
 minimum node size for trees for imputing continuous variables, default = 5.
 A higher value can be used on larger datasets in order to save time.
+}
+  \item{maxnodes_cat}{
+maximum number of nodes in trees for imputing categorical variables.
+By default the size limit is set by the number of observations and nodesize_cat.
+}
+  \item{maxnodes_cont}{
+maximum number of nodes in trees for imputing continuous variables.
+By default the size limit is set by the number of observations and nodesize_cont.
 }
 }
 

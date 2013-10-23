@@ -18,12 +18,11 @@ convert(x, toDictionary = NULL, fromDictionary = NULL, ...)
   \item{x}{
 a \code{\link{codelist}} or \code{\link{selection}} object.
 }
+  \item{toDictionary}{
+dictionary to convert to.
+}
   \item{fromDictionary}{
 dictionary to convert from, optional if it is obvious (e.g. if x is a codelist).
-}
-  \item{toDictionary}{
-dictionary to convert to, optional if it is obvious (e.g. if x is an ICD-10 codelist,
-it can only be converted to Read).
 }
   \item{\dots}{
 other arguments, e.g. mapStatus (see \code{\link{codematch}}).
@@ -51,6 +50,13 @@ ICD-10 terms are for diagnoses and OPCS are procedures.
 \examples{
 mihes <- codelist(data.frame(icd_code='I21'))
 mihes
-migprd <- convert(mihes)
+migprd <- convert(mihes, 'read')
 migprd
+
+# Conversion to and from ICD-9
+anginaicd10 <- codelist(data.frame(icd_code='I20'))
+anginaicd9 <- convert(anginaicd10, 'icd9')
+anginaicd9
+convert(anginaicd9, 'read')
+convert(anginaicd9, 'icd10')
 }

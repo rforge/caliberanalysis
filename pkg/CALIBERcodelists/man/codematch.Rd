@@ -27,26 +27,26 @@ If \code{regexpr} is a vector, the results are combined using OR. This is an eas
 One of 'icd10', 'icd9', 'opcs' or 'read'. If not given, and if only one dictionary is in use, this dictionary is taken as the set of codes to match.
 }
   \item{mapStatus}{
-Character vector stating which terms are acceptable to include according to the match characteristics. \code{D} is the default map, \code{A} is the alternative map, \code{E} is an exact match, and \code{G} is a map where the OPCS or ICD-10 term is more general than the Read term. \code{T} is not supplied by the NHS but is a mapping between identical terms (non-case-sensitive). \code{R} is for a term which must be ruled out before allocating a specified ICD-10 term, for example myocardial infarction must be ruled out in order to code to the ICD-10 term for essential hypertension, but myocardial infarction is not a map for essential hypertension. The default \code{mapStatus} is A, D, E or T when searching Read codes, and A, D, G, E or T when searching ICD-10 or OPCS codes.
+This applies to maps to/from Read only. Character vector stating which terms are acceptable to include according to the match characteristics. \code{D} is the default map, \code{A} is the alternative map, \code{E} is an exact match, and \code{G} is a map where the OPCS or ICD-10 term is more general than the Read term. \code{T} is not supplied by the NHS but is a mapping between identical terms (non-case-sensitive). \code{R} is for a term which must be ruled out before allocating a specified ICD-10 term, for example myocardial infarction must be ruled out in order to code to the ICD-10 term for essential hypertension, but myocardial infarction is not a map for essential hypertension. The default \code{mapStatus} is A, D, E or T when searching Read codes, and A, D, G, E or T when searching ICD-10 or OPCS codes.
 }
   \item{exact}{
 Whether the \code{regexpr} should be treated as a code for exact matching or a regular expression.
 }
 }
 
-\note{
-If dictionary is 'icd9', only the linked Read terms are returned, as the ICD-9 terms themselves are not included in the master dictionary. These maps are only present in CALIBERlookups 0.1-3 or later.
-}
 
 \details{
-The maps are provided in the NHS Read Clinical Terms Version 3, and are in the \code{\link{CALIBER_DICTMAPS}} table.
+The maps to/from Read are provided in the NHS Read Clinical Terms Version 3, and are in the \code{\link{CALIBER_DICTMAPS}} table. The mapping between ICD-9 and ICD-10 is provided by the U.S. national Center for health Statistics and is in the \code{\link{CALIBER_GEM}} table.
 }
+
 \value{
 A \code{\link{selection}} object.
 }
+
 \references{
-NHS Information Centre 
+UK Terminology Centre, National Center for Health Statistics (NCHS/CDC)
 }
+
 \author{
 Anoop Shah
 }
@@ -58,10 +58,15 @@ To convert codelists from one dictionary to another: \code{\link{convert}}
 }
 
 \examples{
-## Selecting Read terms linked to ICD-10 terms for myocardial infarction
+# Selecting Read terms linked to ICD-10 terms for myocardial infarction
 setdictionary('read')
 print(codematch('I2[123]', 'icd10'))
 
 # Look for `exact' matches and identical terms only.
 print(codematch('I2[123]', 'icd10', mapStatus=c('E', 'T')))
+
+# Selecting ICD-9 terms and linked ICD-10 terms
+setdictionary('icd9', 'icd10')
+print(codematch('^41', 'icd9'))
+print(codematch('I20', 'icd10'))
 }

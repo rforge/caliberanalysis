@@ -92,12 +92,12 @@ extractCodes(TESTFFDF, mycodelist)
 extractCodes(TESTDT, mycodelist)
 
 # Trial using OPCS data
-mycodelist <- data.table(code = c('K.123', 'K.234'), category = c(1, 3))
+mycodelist <- data.table(code = c('K.123', 'K.234'), category = c(2, 3))
 setattr(mycodelist, 'class', c('codelist', 'data.table', 'data.frame'))
 setattr(mycodelist, 'Name', 'test_codelist_opcs')
 setattr(mycodelist, 'Source', 'OPCS')
 setattr(mycodelist, 'Categories',
-    data.table(category = c(1, 3), shortname = c('This', 'That')))
+    data.table(category = c(2, 3), shortname = c('This', 'That')))
 
 mydata <- data.frame(opcs = c('K.123', 'K234', 'K000'), anonpatid = 1:3)
 TESTFFDF <- as.ffdf(mydata)

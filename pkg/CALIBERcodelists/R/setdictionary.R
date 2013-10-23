@@ -1,9 +1,10 @@
-setdictionary <- function(dictName1=NULL, dictName2=NULL, dictName3=NULL){
+setdictionary <- function(dictName1 = NULL, dictName2 = NULL,
+	dictName3 = NULL, dictName4 = NULL){
 	# Clear the categories in CALIBER_DICT and specify the subset of
 	# dictionaries to use for code selection. If the character vectors
-	# VERSION_READ, VERSION_ICD10, VERSION_OPCS are available, they are
-	# used to produce the text on screen. The default is that all
-	# dictionaries are selected.
+	# VERSION_READ, VERSION_ICD10, VERSION_ICD9, VERSION_OPCS are
+	# available, they are used to produce the text on screen. The
+	# default is that all dictionaries are selected.
 	# Invisibly returns a character vector of the dictionaries selected.
 	# Arguments: dictionary names, either as a vector or as separate
 	#            arguments for convenience.
@@ -28,6 +29,7 @@ setdictionary <- function(dictName1=NULL, dictName2=NULL, dictName3=NULL){
 	codelist1 <- NULL
 	codelist2 <- NULL
 	codelist3 <- NULL
+	codelist4 <- NULL
 	getsource <- function(mycodelist){
 		getSourceDict(mycodelist)
 	}
@@ -50,7 +52,13 @@ setdictionary <- function(dictName1=NULL, dictName2=NULL, dictName3=NULL){
 		rm(dictName3)
 		dictName3 <- tmp
 	}
-		
+	if (is.codelist(dictName4)) {
+		codelist4 <- copy(dictName4)
+		tmp <- getsource(dictName4)
+		rm(dictName4)
+		dictName4 <- tmp
+	}
+			
 	if (!is.null(dictName1)){
 		# Specify which dictionary to use for code selection
 		whichdictionary <- unique(c(dictName1, dictName2, dictName3))
@@ -78,6 +86,9 @@ setdictionary <- function(dictName1=NULL, dictName2=NULL, dictName3=NULL){
 		if ('icd10' %in% whichdictionary){
 			cat(attr(CALIBER_DICT, 'VERSION_ICD10'), '\n')
 		}
+		if ('icd9' %in% whichdictionary){
+			cat(attr(CALIBER_DICT, 'VERSION_ICD9'), '\n')
+		}
 	}
 	
 	# Now add codelists (if any)
@@ -99,8 +110,6 @@ getdictionary <- function(){
 	tmp <- META[item %in% ALLDICTS][value=='TRUE', item]
 	tmp
 }
-
-
 
 codelistToDict <- function(codelist){
 	# Updates CALIBER_DICT with the terms in a codelist

@@ -11,7 +11,8 @@ method = 'rfcont'.
 }
 
 \usage{
-mice.impute.rfcont(y, ry, x, ntree_cont, nodesize_cont, ...)
+mice.impute.rfcont(y, ry, x, ntree_cont = NULL,
+    nodesize_cont = NULL, maxnodes_cont = NULL, ...)
 }
 
 \arguments{
@@ -31,6 +32,9 @@ number of trees, default = 10. A global option can be set by calling setRFoption
 minimum size of nodes, default = 5.
 A global option can be set by calling setRFoptions(nodesize_cont=XX).
 Smaller values of nodesize create finer, more precise trees but makes the program slower.
+}
+  \item{maxnodes_cont}{
+maximum number of nodes, default NULL. If NULL the number of nodes is determined by number of observations and nodesize_cont.
 }
   \item{\dots}{
 other arguments to pass to randomForest.
@@ -82,7 +86,7 @@ mydata <- simdata(100)
 
 # Describe data
 cat('\nSimulated multivariate normal data:\n')
-print(data.frame(mean=colMeans(mydata), sd=sapply(mydata, sd)))
+print(data.frame(mean = colMeans(mydata), sd = sapply(mydata, sd)))
 
 # Apply missingness pattern
 mymardata <- makemar(mydata)
@@ -95,13 +99,13 @@ print(summary(lm(y ~ x1 + x2 + x3, data=mydata)))
 
 cat('\nMICE using normal-based linear regression:\n')
 print(summary(pool(with(mice(mymardata,
-	method='norm'), lm(y ~ x1 + x2 + x3)))))
+    method = 'norm'), lm(y ~ x1 + x2 + x3)))))
 
 # Set options for Random Forest
-setRFoptions(ntree_cont=10)
+setRFoptions(ntree_cont = 10)
 
 cat('\nMICE using Random Forest:\n')
 print(summary(pool(with(mice(mymardata,
-	method='rfcont'), lm(y ~ x1 + x2 + x3)))))
+    method = 'rfcont'), lm(y ~ x1 + x2 + x3)))))
 }
 

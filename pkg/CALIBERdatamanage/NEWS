@@ -1,4 +1,39 @@
 =================================================
+CALIBERdatamanage Version 0.1-6
+(fifth version on R-Forge)
+=================================================
+
+BUG FIXES:
+
+- extractCodes extracts all codes rather than only
+  codes of interest when using ICD-10 codes, because
+  of an error in the way categories are handled in
+  mycodelist
+- formathr no longer causes errors if se is missing
+- date columns added to cohort description (addToCohort)
+
+=================================================
+CALIBERdatamanage Version 0.1-5
+(fourth version on R-Forge)
+=================================================
+
+CHANGES:
+
+- merge.cohort() now requires that both cohorts
+  have the same ID column name.
+- addToCohort, addCodelistToCohort and addCategoryToCohort
+  have an additional argument limit_days for
+  specifying time limits in days instead of years.
+
+BUG FIXES:
+
+- the idcolname attribute in cohort sometimes has
+  a name, which it does not need, which means that
+  it is not regarded as identical to an idcolname
+  attribute in another cohort with the same value
+  but no name. 
+
+=================================================
 CALIBERdatamanage Version 0.1-4
 (third version on R-Forge)
 =================================================

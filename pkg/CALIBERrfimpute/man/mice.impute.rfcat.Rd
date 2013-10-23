@@ -11,7 +11,8 @@ method = 'rfcat'.
 }
 
 \usage{
-mice.impute.rfcat(y, ry, x, ntree_cat, nodesize_cat, ...)
+mice.impute.rfcat(y, ry, x, ntree_cat = NULL,
+    nodesize_cat = NULL, maxnodes_cat = NULL, ...)
 }
 
 \arguments{
@@ -31,6 +32,9 @@ number of trees, default = 10. A global option can be set by calling setRFoption
 minimum size of nodes, default = 1.
 A global option can be set by calling setRFoptions(nodesize_cat=XX).
 Smaller values of nodesize create finer, more precise trees but makes the program slower.
+}
+  \item{maxnodes_cat}{
+maximum number of nodes, default NULL. If NULL the number of nodes is determined by number of observations and nodesize_cat.
 }
   \item{\dots}{
 other arguments to pass to randomForest.
@@ -72,7 +76,7 @@ correct.
 
 \examples{
 set.seed(1)
-mydata <- simdata(100, x2binary=TRUE)
+mydata <- simdata(100, x2binary = TRUE)
 mymardata <- makemar(mydata)
 
 cat('\nNumber of missing values:\n')
@@ -80,16 +84,22 @@ print(sapply(mymardata, function(x){sum(is.na(x))}))
 
 # Analyse data
 cat('\nFull data analysis:\n')
-print(summary(lm(y ~ x1 + x2 + x3, data=mydata)))
+print(summary(lm(y ~ x1 + x2 + x3, data = mydata)))
 
 cat('\nMICE normal and logistic:\n')
 print(summary(pool(with(mice(mymardata,
-	method=c('', 'norm', 'logreg', '', '')), lm(y ~ x1 + x2 + x3)))))
+    method = c('', 'norm', 'logreg', '', '')), lm(y ~ x1 + x2 + x3)))))
 
 # Set options for Random Forest
-setRFoptions(ntree_cat=10)
+setRFoptions(ntree_cat = 10)
 
 cat('\nMICE using Random Forest:\n')
 print(summary(pool(with(mice(mymardata,
-	method=c('', 'rfcont', 'rfcat', '', '')), lm(y ~ x1 + x2 + x3)))))
+    method = c('', 'rfcont', 'rfcat', '', '')), lm(y ~ x1 + x2 + x3)))))
+
+cat('\nDataset with unobserved levels of a factor\n')
+data3 <- data.frame(x1 = 1:100, x2 = factor(c(rep('A', 25),
+    rep('B', 25), rep('C', 25), rep('D', 25))))
+data3$x2[data3$x2 == 'D'] <- NA
+mice(data3, method = c('', 'rfcat'))
 }

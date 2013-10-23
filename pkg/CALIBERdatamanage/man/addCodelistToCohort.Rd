@@ -21,7 +21,7 @@ addCodelistToCohort(cohort, varname, data, codelist,
     categories, entities = 'all', binary = FALSE,
     limit_years = c(-Inf, 0),  idcolname = attr(cohort, 'idcolname'),
     datecolname = 'eventdate', indexcolname = 'indexdate',
-    overwrite = TRUE, description = NULL)
+    overwrite = TRUE, description = NULL, limit_days = NULL)
 }
 
 \arguments{
@@ -67,6 +67,10 @@ whether to overwrite this variable if it exists
 }
   \item{description}{
 description for the new variable. Defaults to the function call which generated this variable.
+}
+  \item{limit_days}{
+a vector of length 2 for the time limits, which over-rules limit_years if both are supplied.
+A year is considered to be 365.25 days.
 }
 }
 

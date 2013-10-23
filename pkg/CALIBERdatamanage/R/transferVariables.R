@@ -30,12 +30,12 @@ transferVariables <- function(fromdata, todata, varnames,
 	# Recycle description if multiple columns are transferred
 	description <- rep(description,
 		length(varnames))[1:length(varnames)]
+	names(description) <- varnames
 
 	#### Key column ####
 	if (is.null(by)){
 		if (is.cohort(todata) & is.cohort(fromdata)){
-			if (identical(attr(todata, 'idcolname'),
-				attr(fromdata, 'idcolname'))){
+			if (attr(todata, 'idcolname') == attr(fromdata, 'idcolname')){
 				by = attr(todata, 'idcolname')	
 			} else {
 				stop('fromdata and todata have different idcolname')
@@ -118,3 +118,4 @@ transferVariables <- function(fromdata, todata, varnames,
 
 	invisible(todata)
 }
+

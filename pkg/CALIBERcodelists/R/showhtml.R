@@ -29,6 +29,9 @@ showhtml <- function(show_not_selected = TRUE){
 	catTableForContents[category==-1, shortname:='Not selected']
 	catTableForContents[category==-1,
 		description:='Not selected but code shares the first 3 characters with an included term']
+	catTableForContents[category==0, shortname:='Excluded']
+	catTableForContents[category==0,
+		description:='Terms initially selected then excluded']
 	catTableForContents[, description:='<a href="#cat' %&%
 		category %&% '">' %&% sanitizehtml(description) %&% '</a>']
 	for (thecat in catTableForContents$category){

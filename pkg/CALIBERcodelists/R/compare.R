@@ -1,4 +1,5 @@
-compare <- function(oldlist, newlist=NULL, expandICD10=TRUE){
+compare <- function(oldlist, newlist = NULL, expandICD10 = TRUE,
+	expandICD9 = TRUE){
 	# Returns a character vector describing the differences between
 	# oldlist and newlist, or between oldlist and the current selection
 	# in CALIBER_DICT. This is always called by the export function
@@ -15,6 +16,8 @@ compare <- function(oldlist, newlist=NULL, expandICD10=TRUE){
 	#                      in the expanded format (i.e. with individual
 	#                      4-character codes rather than 3-character
 	#                      headings.
+	#            expandICD9 - whether ICD9 codelists should be compared
+	#                      in the expanded format
 
 	if (!is.codelist(oldlist)){
 		stop('Argument 1 (oldlist) must be a codelist')
@@ -30,29 +33,33 @@ compare <- function(oldlist, newlist=NULL, expandICD10=TRUE){
 		}
 	}
 	
-	# Ensure that ICD10 codelists are expanded if necessary
-	if (sourceDict=='icd10' & expandICD10==TRUE){
+	# Ensure that ICD9 and ICD10 codelists are expanded if necessary
+	if ((sourceDict == 'icd10' & expandICD10 == TRUE) |
+		(sourceDict == 'icd9' & expandICD9 == TRUE)){
 		if (!isExpandedCodelist(newlist)){
 			newlist <- copy(expandCodelist(newlist))
 		}
 		if (!isExpandedCodelist(oldlist)){
 			oldlist <- expandCodelist(oldlist)
 		}
-	}	
+	}
 
 	if (sourceDict=='read'){
 		newl <- copy(newlist[, list(medcode, code, category, term)])
-		oldl <- copy(oldlist[, list(medcode, code_old=code, cat_old=category, term_old=term)])
+		oldl <- copy(oldlist[, list(medcode, code_old = code,
+			cat_old = category, term_old = term)])
 		setkey(newl, medcode)
 		setkey(oldl, medcode)
 	} else if (sourceDict=='product'){
 		newl <- copy(newlist[, list(prodcode, code, category, term)])
-		oldl <- copy(oldlist[, list(prodcode, code_old=code, cat_old=category, term_old=term)])
+		oldl <- copy(oldlist[, list(prodcode, code_old = code,
+			cat_old = category, term_old = term)])
 		setkey(newl, prodcode)
 		setkey(oldl, prodcode)
 	} else {
 		newl <- copy(newlist[, list(code, category, term)])
-		oldl <- copy(oldlist[, list(code, code_old=code, cat_old=category, term_old=term)])
+		oldl <- copy(oldlist[, list(code, code_old = code,
+			cat_old = category, term_old = term)])
 		# Need to add a code_old column to match Read codelists
 		# (although as matching is done by code it is the same as code)
 		setkey(newl, code)

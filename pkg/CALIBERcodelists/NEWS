@@ -1,4 +1,27 @@
 ==================================================
+Changes in CALIBERcodelists version 0.2-3
+(fourth version on R-Forge)
+==================================================
+
+NEED TO DEBUG THIS _ ESPECIALLY THE CONVERT FUNCTIONS
+CONVERTING FROM ONE DICTIONARY TO ANOTHER (USING ICD9)
+WHEN OK UPLOAD TO R-FORGE
+
+NEW FEATURES
+
+- Allow setMetadata to set data source HES/ONS in META
+- Add a decode() function to return the term from a 
+  medcode, Read code, ICD10 or OPCS code
+- Add the ICD9-CM dictionary and ICD9-ICD10 mapping
+
+BUG FIXES
+
+- codematch allows a vector of codes to match with
+  exact = FALSE (previously only worked with exact = TRUE)
+- Excluded category now has a description in the table
+  of contents in HTML document
+
+==================================================
 Changes in CALIBERcodelists version 0.2-2
 (third version on R-Forge)
 ==================================================

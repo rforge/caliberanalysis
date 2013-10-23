@@ -52,7 +52,6 @@ setDictKey <- function(){
 	}
 }
 
-
 loadDICTMAPS <- function(){
 	# Load the dictionary mappings
 	if (!exists('CALIBER_DICTMAPS')){
@@ -72,11 +71,6 @@ loadDICTMAPS <- function(){
 			warning('No CALIBER_DICTMAPS available. Using sample mappings.')
 			assign('CALIBER_DICTMAPS', SAMPLE_DICTMAPS, envir=.GlobalEnv)
 		}
-		data('CALIBER_DICTMAPS', envir = .GlobalEnv)
-		if (!exists('CALIBER_DICTMAPS')){
-			warning('No CALIBER_DICTMAPS available. Using sample mapping.')
-			assign('CALIBER_DICTMAPS', SAMPLE_DICTMAPS, envir=.GlobalEnv)
-		}	
 	} else {
 		# Check is a data.table, and check column names
 		if (!identical(sort(names(CALIBER_DICTMAPS)),
@@ -88,3 +82,35 @@ this object and try again.')
 		}		
 	}
 }
+
+loadICDMAPS <- function(){
+	# Load the ICD-9 to ICD-10 General Equivalence Mappings
+	if (!exists('CALIBER_GEM')){
+		# Try to load the CALIBERlookups package if installed
+		if (identical(find.package('CALIBERlookups', quiet=TRUE),
+			character(0))){
+			message('Searching for mappings in ' %&% getwd() %&% '/data')
+		} else {
+			# Load the CALIBERlookups package, but do not 'require' it
+			# explicity so that R CMD check does not report an error -
+			# the CALIBERlookups package will not be available
+			# to external users.
+			eval(parse(text="require('CALIBERlookups', quietly=TRUE)"))
+		}
+		data('CALIBER_GEM', envir = .GlobalEnv)
+		if (!exists('CALIBER_GEM')){
+			warning('No CALIBER_GEM available. Using sample mappings.')
+			assign('CALIBER_GEM', SAMPLE_GEM, envir=.GlobalEnv)
+		}
+	} else {
+		# Check is a data.table, and check column names
+		if (!identical(sort(names(CALIBER_GEM)),
+			c("approximate", "choice_list", "combination", "from9to10", "icd10",
+			"icd10cm", "icd9", "icd9cm", "no_map", "scenario", "use"))){
+			stop('There is a CALIBER_GEM object in the global environment
+but it does not seem to be the ICD General Equivalence Mapping. Please remove
+this object and try again.')
+		}		
+	}
+}
+

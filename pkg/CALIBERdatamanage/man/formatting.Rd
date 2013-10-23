@@ -108,6 +108,9 @@ formathr(0.8, 0.3, latex = FALSE)
 # "2.23 (1.24, 4.01) **"
 formathr(0.8, 0.3, latex = TRUE)
 # "$2.23$ ($1.24$, $4.01$) **"
+# Missing values should not cause errors
+formathr(c(0.8, 0.8, NA), c(NA, 0.3, 0.3))
+# [1] "2.23 (NA, NA)"        "2.23 (1.24, 4.01) **" "NA (NA, NA)" 
 
 # Formatting confidence intervals
 formatci(c(2.4343, 4.3245), latex = FALSE)
