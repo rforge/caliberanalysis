@@ -1,0 +1,11 @@
+
+--This line, and those below, will be ignored--
+
+M    pkg/CALIBERcodelists/man/CALIBERcodelists-package.Rd
+M    pkg/CALIBERcodelists/NEWS
+M    pkg/CALIBERcodelists/inst/doc/userguide.pdf
+M    pkg/CALIBERcodelists/R/setMetadata.R
+M    pkg/CALIBERcodelists/R/sysdata.R
+M    pkg/CALIBERcodelists/R/convert.R
+M    pkg/CALIBERcodelists/R/decode.R
+M    pkg/CALIBERcodelists/DESCRIPTION

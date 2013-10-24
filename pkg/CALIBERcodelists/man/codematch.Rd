@@ -52,7 +52,7 @@ Anoop Shah
 }
 
 \seealso{
-\code{\link{medcodeis}},  \code{\link{assigncat}}, \code{\link{dictis}}, \code{\link{explode}}, \code{\link{getdictionary}}, \code{\link{setdictionary}}, \code{\link{termhas}}
+\code{\link{medcodeis}},  \code{\link{assigncat}}, \code{\link{dictis}}, \code{\link{explode}}, \code{\link{decode}}, \code{\link{getdictionary}}, \code{\link{setdictionary}}, \code{\link{termhas}}
 
 To convert codelists from one dictionary to another: \code{\link{convert}}
 }
