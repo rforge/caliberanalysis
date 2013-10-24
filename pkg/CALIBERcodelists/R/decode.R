@@ -2,7 +2,7 @@ decode <- function(codes, dictionary){
 	# returns the term matching a combination of codes and dictionary
 	# (dictionary can be a vector)
 
-	if (dictionary == 'product'){
+	if (dictionary[1] == 'product'){
 		stop('This function cannot currently decode products')
 	}
 

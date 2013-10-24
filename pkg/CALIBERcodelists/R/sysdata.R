@@ -38,7 +38,7 @@ product|GPRDPROD
 
 # This does not work with fread because the text is too long,
 # so need to use a textConnection (it should however work
-# the most recent version of data.table)
+# the most recent version of data.table
 SAMPLE_DICT <- textConnection('
 code|term|dict|events|medcode|termlc
 "A155"|"Tuberculosis of larynx, trachea and bronchus, confirmed"|"icd10"|"tuberculosis of larynx, trachea and bronchus, confirmed"

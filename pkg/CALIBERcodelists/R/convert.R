@@ -154,13 +154,15 @@ convertMedcodes <- function(medcodes,
 	if (is.null(mapStatus)){
 		mapStatus <- c('A', 'D', 'E', 'T')
 	}
-	if (toDictionary=='icd10'){
+	if (toDictionary == 'icd10') {
 		CALIBER_DICTMAPS[dict %in% c('icd10', 'icdhead') &
-			map_stat %in% mapStatus &
-		 	!grepl('D$|A$', code) & medcode %in% medcodes, code]
-	} else if (toDictionary=='opcs') {
-		CALIBER_DICTMAPS[dict == 'opcs' & map_stat %in% mapStatus &
-		 	medcode %in% medcodes, code]		
+			map_stat %in% mapStatus & medcode %in% medcodes, code]
+	} else if (toDictionary == 'icd9') {
+		CALIBER_DICTMAPS[dict %in% c('icd9', 'icd9head') &
+			map_stat %in% mapStatus & medcode %in% medcodes, code]		
+	} else if (toDictionary == 'opcs') {
+		CALIBER_DICTMAPS[dict == 'opcs' &
+			map_stat %in% mapStatus & medcode %in% medcodes, code]
 	}
 }
 

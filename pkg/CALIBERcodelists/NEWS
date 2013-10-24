@@ -1,11 +1,16 @@
 ==================================================
-Changes in CALIBERcodelists version 0.2-3
-(fourth version on R-Forge)
+Changes in CALIBERcodelists version 0.2-4
 ==================================================
 
-NEED TO DEBUG THIS _ ESPECIALLY THE CONVERT FUNCTIONS
-CONVERTING FROM ONE DICTIONARY TO ANOTHER (USING ICD9)
-WHEN OK UPLOAD TO R-FORGE
+BUG FIXES
+
+- Read to ICD-9 conversion now works (a function
+  was omitted from previous version)
+- Bug in setMetadata (setting Source) corrected
+
+==================================================
+Changes in CALIBERcodelists version 0.2-3
+==================================================
 
 NEW FEATURES
 

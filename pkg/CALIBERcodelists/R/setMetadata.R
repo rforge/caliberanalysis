@@ -81,7 +81,8 @@ setMetadata <- function(codelist=NULL, Name=NULL,
 		}
 		if (!is.null(Source)){
 			# The dictionary must be the same as the current dictionary
-			if (identical(SOURCEDICTS[SOURCEDICTS$Source == Source, dict],
+			theSource <- Source
+			if (identical(SOURCEDICTS[SOURCEDICTS$Source == theSource, dict],
 				SOURCEDICTS[SOURCEDICTS$Source == attr(codelist, 'Source'), dict])){
 				setattr(codelist, 'Source', Source)
 			}
