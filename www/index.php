@@ -93,13 +93,17 @@ This R package provides an interface to the program, as well as tools to help ma
 
 <hr/>
 
+<p>
 Link to project summary page:
 <a href="http://r-forge.r-project.org/projects/caliberanalysis/">
 http://r-forge.r-project.org/projects/caliberanalysis/</a>
+</p>
 
+<p>
 Download R packages here:
 <a href="http://r-forge.r-project.org/R/?group_id=1598">
 http://r-forge.r-project.org/R/?group_id=1598</a>
+</p>
 
 </body>
 </html>

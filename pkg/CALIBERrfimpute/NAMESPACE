@@ -1,4 +1,1 @@
 export(mice.impute.rfcont, mice.impute.rfcat, setRFoptions, makemar, simdata)
-
-import(mice, randomForest, mvtnorm)
-
