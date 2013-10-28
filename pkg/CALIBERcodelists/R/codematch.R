@@ -53,7 +53,7 @@ codematch <- function(regexpr,
 			out <- CALIBER_DICT[, dict %in% c(dictionary, dicthead) &
 				grepl(regexpr, code)]
 		}
-		icdcodes <- CALIBER_DICT[out, code]
+		icdcodes <- unique(CALIBER_DICT[out, code])
 		# Link to Read terms
 		if (META['read'][, value] != 'FALSE'){
 			tempMedcodes <- unique(
