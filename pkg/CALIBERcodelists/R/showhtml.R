@@ -45,7 +45,7 @@ showhtml <- function(show_not_selected = TRUE){
 	# title:
 	# Codelists for XXXX
 	# or ICD10 codelist for XXX
-	out[1] <- '<h1>' %&% ifelse(sum(META[ALLDICTS][, value]=='TRUE')==1,
+	out[1] <- '<h1>' %&% ifelse(sum(META[ALLDICTS][, value] != 'FALSE')==1,
 		toupper(META[ALLDICTS][value=='TRUE', item]) %&%
 		' codelist for ', 'Codelists for ') %&% varname %&% '</h1>'
 	out[2] <- '<p>Generated on ' %&% Sys.time() %&%
@@ -66,7 +66,7 @@ showhtml <- function(show_not_selected = TRUE){
 	
 	# warning that ICD-10 numbers may be inaccurate
 	if ('icd10' %in% getdictionary()){
-		out[4] <- out[4] %&% '\n<p><i>Note: The number of terms for ICD-10 includes all 5-character sub-codes and may be greater than the number of terms shown below</i></p>'	
+		out[4] <- out[4] %&% '\n<p><i>Note: The number of terms for ICD-9 and ICD-10 include all 5-character sub-codes and may be greater than the number of terms shown below</i></p>'	
 	}
 	
 	out[5] <- '<h2>Terms included in variable definition</h2>\n'
@@ -129,7 +129,7 @@ htmlCodelistTable <- function(data_to_show, showcat=TRUE,
 	# Whether to put titles for each dictionary
 	moreThanOneDict <- sum(META[ALLDICTS][, value]=='TRUE') > 1
 	
-	if (META['read'][, value]=='TRUE'){
+	if (META['read'][, value] != 'FALSE'){
 		# Table of Read terms
 		if (moreThanOneDict){
 			out[[1]] <- '<h4>Read terms</h4>'	
@@ -145,7 +145,7 @@ htmlCodelistTable <- function(data_to_show, showcat=TRUE,
 		}
 	}
 
-	if (META['icd10'][, value]=='TRUE'){
+	if (META['icd10'][, value] != 'FALSE'){
 		# Table of ICD10 terms, contracted and expanded with parent/child terms
 		# highlighted appropriately
 		if (moreThanOneDict){
@@ -156,7 +156,7 @@ htmlCodelistTable <- function(data_to_show, showcat=TRUE,
 			out[[5]] <- '<p>(no terms)</p>'
 		} else {
 			temp <- mytable[dict == 'icd10']
-			setattr(temp, 'Source', 'HES')
+			setattr(temp, 'Source', SOURCEDICTS[dict == 'icd10', Source][1])
 			temp[, category:=thisCategory]
 			temp <- expandCodelist(temp)[,
 				list(code, term, category, hierarchy)]
@@ -180,18 +180,35 @@ htmlCodelistTable <- function(data_to_show, showcat=TRUE,
 		}
 	}
 
-	if (META['opcs'][, value]=='TRUE'){
-		# Table of OPCS terms
+	if (META['icd9'][, value] != 'FALSE'){
+		# Table of ICD9 terms
 		if (moreThanOneDict){
-			out[[7]] <- '<h4>OPCS terms</h4>'
+			out[[7]] <- '<h4>ICD9 terms</h4>'
 		}
-		if (sum(dict=='opcs')==0){
+
+		if (sum(dict=='icd9')==0){
 			out[[8]] <- '<p>(no terms)</p>'
 		} else {
-			temp <- mytable[dict=='opcs']
-			out[[8]] <- tablestyle %&%
+			temp <- mytable[dict == 'icd9']
+			out[[9]] <- tablestyle %&%
 				htmlTableFragment(as.list(names(temp)), header=TRUE)
-			out[[9]] <- paste(htmlTableFragment(temp),
+			out[[10]] <- paste(htmlTableFragment(temp),
+				collapse='\n') %&% '\n</table>'
+		}
+	}
+
+	if (META['opcs'][, value] != 'FALSE'){
+		# Table of OPCS terms
+		if (moreThanOneDict){
+			out[[10]] <- '<h4>OPCS terms</h4>'
+		}
+		if (sum(dict=='opcs')==0){
+			out[[11]] <- '<p>(no terms)</p>'
+		} else {
+			temp <- mytable[dict=='opcs']
+			out[[11]] <- tablestyle %&%
+				htmlTableFragment(as.list(names(temp)), header=TRUE)
+			out[[12]] <- paste(htmlTableFragment(temp),
 				collapse='\n') %&% '\n</table>'
 		}
 	}

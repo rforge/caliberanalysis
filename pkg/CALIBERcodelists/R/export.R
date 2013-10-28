@@ -17,21 +17,29 @@ exportall <- function(directory = getwd(), varname = NULL,
 	#                    in the definitive HTML document.
 	#            icd10_source - source name for HES codelist
 	#                    (options are hes or ons). 
-	
-	sourcenames <- setdiff(META[item %in% ALLDICTS, value], 'FALSE')
-	
-	if ('icd10' %in% getdictionary()){
-		sourcenames <- unique(c(sourcenames, icd10_source))
-		if (!all(icd10_source %in% SOURCEDICTS[dict == 'icd10', Source])){
-			stop('ICD-10 source name not valid')
+
+	Sourcenames <- META[item %in% ALLDICTS & value != 'FALSE', value]	
+	dictnames <- META[item %in% ALLDICTS & value != 'FALSE', item]
+	# Replace any source names 'TRUE' with the default
+	# source for that dictionary
+	for (i in 1:length(Sourcenames)){
+		if (Sourcenames[i] == 'TRUE'){
+			Sourcenames[i] <- SOURCEDICTS[dict == dictnames[i], Source][1]
 		}
 	}
 	
-	for (i in 1:length(sourcenames)){
+	if ('icd10' %in% getdictionary()){
+		if (!all(icd10_source %in% SOURCEDICTS[dict == 'icd10', Source])){
+			stop('ICD-10 source name not valid')
+		}
+		Sourcenames <- unique(c(Sourcenames, icd10_source))
+	}
+	
+	for (i in 1:length(Sourcenames)){
 		# Generate a codelist -- but only if any terms selected
-		sourcename <- sourcenames[i]
+		sourcename <- tolower(Sourcenames[i])
 		# Select the dictionary
-		thisdict <- SOURCEDICTS[Source == sourcenames[i], dict]
+		thisdict <- SOURCEDICTS[Source == Sourcenames[i], dict]
 		# Use standard naming convention: 
 		# Name (from META) _gprd, _hes, _opcs
 		my <- as.codelist(thisdict)

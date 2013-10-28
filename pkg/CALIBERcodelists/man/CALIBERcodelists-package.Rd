@@ -42,7 +42,7 @@ Government Licence. The program code is licensed under GPL-3.
 Package: \tab CALIBERcodelists\cr
 Type: \tab Package\cr
 Version: \tab 0.2-4\cr
-Date: \tab 2013-10-24\cr
+Date: \tab 2013-10-25\cr
 License: \tab GPL-3\cr
 }
 
