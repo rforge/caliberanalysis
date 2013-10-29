@@ -359,7 +359,12 @@ tableToCodelist <- function(x, noisy = FALSE){
 	# Add category table
 	if (is.null(metadata$Categories)){
 		metadata$Categories <- categories
-	}	
+	}
+	
+	# metadata$Source cannot be NULL
+	if (is.null(metadata$Source)){
+		metadata$Source <- ''
+	}
 
 	# Standardise column names
 	if (all(c('prodcode', 'prodname', 'multilex') %in% names(x))){
@@ -367,11 +372,15 @@ tableToCodelist <- function(x, noisy = FALSE){
 		# multilex == code (column renamed 'multilex' on export)
 		# prodname == term (column renamed on export)
 		# (prodcode is prodcode)
-		metadata$Source <- 'GPRDPROD'
+		if (!(metadata$Source %in% SOURCEDICTS[dict == 'product', Source])){
+			metadata$Source <- 'GPRDPROD'
+		}
 		setnames(x, 'multilex', 'code')
 		setnames(x, 'prodname', 'term')
 	} else if ('readcode' %in% names(x)){
-		metadata$Source <- 'GPRD'
+		if (!(metadata$Source %in% SOURCEDICTS[dict == 'read', Source])){
+			metadata$Source <- 'GPRD'
+		}
 		setnames(x, 'readcode', 'code')
 		# Obtain medcodes if there are none
 		if (!('medcode' %in% names(x))){
@@ -385,25 +394,33 @@ tableToCodelist <- function(x, noisy = FALSE){
 			setnames(x, 'readterm', 'term')
 		}
 	} else if ('icd9_code' %in% names(x)){
-		metadata$Source <- 'ONSOLD'
+		if (!(metadata$Source %in% SOURCEDICTS[dict == 'icd9', Source])){
+			metadata$Source <- 'ONSOLD'
+		}
 		if ('icd9_term' %in% names(x)){
 			setnames(x, 'icd9_term', 'term')
 		}
 		setnames(x, 'icd9_code', 'code')
 	} else if ('icd_code' %in% names(x)){
-		metadata$Source <- 'HES'
+		if (!(metadata$Source %in% SOURCEDICTS[dict == 'icd10', Source])){
+			metadata$Source <- 'ONS'
+		}
 		if ('icd_term' %in% names(x)){
 			setnames(x, 'icd_term', 'term')
 		}
 		setnames(x, 'icd_code', 'code')
 	} else if ('opcs_code' %in% names(x)){
-		metadata$Source <- 'OPCS'
+		if (!(metadata$Source %in% SOURCEDICTS[dict == 'opcs', Source])){
+			metadata$Source <- 'OPCS'
+		}
 		if ('opcs_term' %in% names(x)){
 			setnames(x, 'opcs_term', 'term')
 		}
 		setnames(x, 'opcs_code', 'code')
 	} else if ('medcode' %in% names(x)){
-		metadata$Source <- 'GPRD'
+		if (!(metadata$Source %in% SOURCEDICTS[dict == 'read', Source])){
+			metadata$Source <- 'GPRD'
+		}
 		if ('readterm' %in% names(x)){
 			setnames(x, 'readterm', 'term')
 		}

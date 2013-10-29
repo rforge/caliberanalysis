@@ -1,4 +1,13 @@
 ==================================================
+Changes in CALIBERcodelists version 0.2-5
+==================================================
+
+BUG FIXES
+
+- Source of imported codelists was ignored, corrected
+  in as.codelist()
+
+==================================================
 Changes in CALIBERcodelists version 0.2-4
 ==================================================
 
