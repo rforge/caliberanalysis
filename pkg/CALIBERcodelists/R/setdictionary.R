@@ -64,7 +64,9 @@ setdictionary <- function(dictName1 = NULL, dictName2 = NULL,
 		whichdictionary <- unique(c(dictName1, dictName2, dictName3,
 			dictName4))
 		# Record which dictionaries are selected in META
-		META[item %in% ALLDICTS, value := 'FALSE']
+		# Dictionaries not currently required switched to FALSE.
+		META[item %in% ALLDICTS & !(item %in% whichdictionary),
+			value := 'FALSE']
 		# Change value to TRUE if it is FALSE but leave it unchanged
 		# if it specifies a data source
 		META[item %in% whichdictionary & value == 'FALSE', value := 'TRUE']
