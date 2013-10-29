@@ -2,11 +2,20 @@
 Changes in CALIBERcodelists version 0.2-4
 ==================================================
 
+CHANGES
+
+- Extract Source information from Rmd file
+- icd10source option removed from export; instead
+  Source for master dictionary export should be set
+  using setMetadata before export
+
 BUG FIXES
 
 - Read to ICD-9 conversion now works (a function
   was omitted from previous version)
 - Bug in setMetadata (setting Source) corrected
+- Allow up to four codelists or dictionary names in
+  setdictionary 
 
 ==================================================
 Changes in CALIBERcodelists version 0.2-3

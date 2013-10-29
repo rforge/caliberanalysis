@@ -43,7 +43,7 @@ process <- function(filename, varname = NULL,
 			assignmetadata(thing, out)
 		}
 	}
-	lapply(list('Name', 'Version', 'Author', 'Date'), searchfor)
+	lapply(list('Name', 'Version', 'Author', 'Date', 'Source'), searchfor)
 
 	# Locate sections of R code
 	startR <- grep('^```\\{r', rmd)

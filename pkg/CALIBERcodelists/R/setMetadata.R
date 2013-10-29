@@ -10,23 +10,37 @@ assignmetadata <- function(field, newvalue){
 		# There is no 'Source' row because the master dictionary may
 		# contain codelists under construction for multiple dictionaries.
 		# Instead each dictionary has a separate source.
-		field <- SOURCEDICTS[Source == newvalue, dict]
-		if (length(field) != 1){
-			warning(newvalue %&% ' is not a valid source')
+
+		# If newvalue is a comma or space separated list, make it
+		# into a vector (and remove commas and spaces)
+		newvalue <- sub('^ *,* *([^, ]*) *,* *$', '\\1',
+			strsplit(newvalue, '[, ]')[[1]])
+		for (eachnewvalue in newvalue){
+			# newvalue may be a vector of sources
+			if (!(eachnewvalue == '')){
+				field <- SOURCEDICTS[Source == eachnewvalue, dict]
+				if (length(field) != 1){
+					warning(eachnewvalue %&% ' is not a valid source')
+				} else {
+					META[item == field, value := eachnewvalue]
+				}
+			}
 		}
-	} else if (field=='Date'){
-		newvalue <- sanitizeDate(newvalue)
-	} else if (field=='Version'){
-		newvalue <- as.character(as.numeric(newvalue))
-		if (is.na(newvalue)){
-			newvalue <- ''
-		}
-	} else if (field %in% c('Author', 'Name')) {
-		newvalue <- as.character(newvalue)
 	} else {
-		stop(field %&% ' is not a valid metadata field')
+		if (field=='Date'){
+			newvalue <- sanitizeDate(newvalue)
+		} else if (field=='Version'){
+			newvalue <- as.character(as.numeric(newvalue))
+			if (is.na(newvalue)){
+				newvalue <- ''
+			}
+		} else if (field %in% c('Author', 'Name')) {
+			newvalue <- as.character(newvalue)
+		} else {
+			stop(field %&% ' is not a valid metadata field')
+		}
+		META[item == field, value := newvalue]
 	}
-	META[item==field, value:=newvalue]
 }
 
 setMetadata <- function(codelist=NULL, Name=NULL,

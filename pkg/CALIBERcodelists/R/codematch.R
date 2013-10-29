@@ -68,8 +68,8 @@ codematch <- function(regexpr,
 			loadICDMAPS()
 			# Include ICD-10 terms linked to the current ICD-9 term
 			setkey(CALIBER_GEM, icd9)
-			icd10codes <- CALIBER_GEM[J(icdcodes)][use == TRUE &
-				from9to10 == FALSE, icd10]
+			icd10codes <- CALIBER_GEM[J(icdcodes), allow.cartesian = TRUE][
+				use == TRUE & from9to10 == FALSE, icd10]
 			out[CALIBER_DICT[, dict %in% c('icd10', 'icdhead') & code %in%
 				icd10codes]] <- TRUE
 		}
@@ -77,8 +77,8 @@ codematch <- function(regexpr,
 			loadICDMAPS()
 			# Include ICD-9 terms linked to the current ICD-10 term
 			setkey(CALIBER_GEM, icd10)
-			icd9codes <- CALIBER_GEM[J(icdcodes)][use == TRUE &
-				from9to10 == FALSE, icd9]
+			icd9codes <- CALIBER_GEM[J(icdcodes), allow.cartesian = TRUE][
+				use == TRUE & from9to10 == FALSE, icd9]
 			out[CALIBER_DICT[, dict %in% c('icd9', 'icd9head') & code %in%
 				icd9codes]] <- TRUE
 		}

@@ -1,5 +1,5 @@
 exportall <- function(directory = getwd(), varname = NULL,
-	saveMessage = TRUE, icd10_source = 'hes'){
+	saveMessage = TRUE){
 	# Exports all codelists for dictionaries in use, and checks them
 	# against existing codelists. Saves any messages and the result of
 	# checking in META['message']. Exports to filenames name_gprd.csv,
@@ -15,8 +15,6 @@ exportall <- function(directory = getwd(), varname = NULL,
 	#                    TRUE so that when called by process() on a Rmd file
 	#                    the message can be printed on screen but not
 	#                    in the definitive HTML document.
-	#            icd10_source - source name for HES codelist
-	#                    (options are hes or ons). 
 
 	Sourcenames <- META[item %in% ALLDICTS & value != 'FALSE', value]	
 	dictnames <- META[item %in% ALLDICTS & value != 'FALSE', item]
@@ -26,13 +24,6 @@ exportall <- function(directory = getwd(), varname = NULL,
 		if (Sourcenames[i] == 'TRUE'){
 			Sourcenames[i] <- SOURCEDICTS[dict == dictnames[i], Source][1]
 		}
-	}
-	
-	if ('icd10' %in% getdictionary()){
-		if (!all(icd10_source %in% SOURCEDICTS[dict == 'icd10', Source])){
-			stop('ICD-10 source name not valid')
-		}
-		Sourcenames <- unique(c(Sourcenames, icd10_source))
 	}
 	
 	for (i in 1:length(Sourcenames)){

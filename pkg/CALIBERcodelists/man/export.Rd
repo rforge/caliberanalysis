@@ -17,8 +17,7 @@ Terms with category 0 or negative categories are not exported.
 \usage{
 export(codelist, filename = NULL, categories = 'all',
     contractIfICD10 = TRUE, contractIfICD9 = TRUE)
-exportall(directory = getwd(), varname = NULL, saveMessage = TRUE,
-    icd10_source = 'hes')
+exportall(directory = getwd(), varname = NULL, saveMessage = TRUE)
 }
 
 \arguments{
@@ -37,9 +36,6 @@ Whether to represent 4-character ICD-10 codes which have the same 3-character pr
   \item{contractIfICD9}{
 Whether to represent 4-character ICD-9 codes which have the same 3-character prefix using the prefix only. This is recommended because it means that codelists are shorter and easier to understand.
 }
-  \item{icd10_source}{
-Suffix for ICD-10 source name: hes or ons. Either a single string or the vector \code{c('hes', 'ons')} if both are to be exported.
-}
   \item{directory}{
 Directory to export to. Uses the current working directory if no directory stated.
 }
@@ -52,7 +48,7 @@ If there already exists a file of the same name as the codelist being exported, 
 
 }
 \details{
-The function \code{exportall} extracts the selected terms from the master dictionary as up to three codelists (GPRD, HES and OPCS), and calls \code{export} to export each of them as a CSV file.
+The function \code{exportall} extracts the selected terms from the master dictionary as up to four codelists (one per dictionary), and calls \code{export} to export each of them as a CSV file.
 
 }
 \value{
@@ -75,6 +71,10 @@ setMetadata(Date = '13 Feb 2013')
 setMetadata(Author = 'An epidemiologist')
 setMetadata(Name = 'pcos')
 setMetadata(Version = 0)
+setMetadata(Source = 'GPRD, HES, OPCS')
+# Another way of setting the Source metadata
+setMetadata(Source = c('GPRD', 'HES', 'OPCS'))
+# Only one source per dictionary
 
 pcos_gprd <- as.codelist('read')
 pcos_opcs <- as.codelist('opcs')

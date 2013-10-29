@@ -16,9 +16,9 @@ setdictionary <- function(dictName1 = NULL, dictName2 = NULL,
 	
 	loadDICT()
 	
-	META[item=='category', value:='']
-	META[item=='shortname', value:='']
-	META[item=='description', value:='']
+	META[item == 'category', value := '']
+	META[item == 'shortname', value := '']
+	META[item == 'description', value := '']
 	cat('\nCALIBERcodelists package, version ' %&%
 		packageVersion('CALIBERcodelists'))
 	cat('\nClearing categories in master dictionary.')
@@ -61,10 +61,13 @@ setdictionary <- function(dictName1 = NULL, dictName2 = NULL,
 			
 	if (!is.null(dictName1)){
 		# Specify which dictionary to use for code selection
-		whichdictionary <- unique(c(dictName1, dictName2, dictName3))
+		whichdictionary <- unique(c(dictName1, dictName2, dictName3,
+			dictName4))
 		# Record which dictionaries are selected in META
-		META[item %in% ALLDICTS, value:='FALSE']
-		META[item %in% whichdictionary, value:='TRUE']
+		META[item %in% ALLDICTS, value := 'FALSE']
+		# Change value to TRUE if it is FALSE but leave it unchanged
+		# if it specifies a data source
+		META[item %in% whichdictionary & value == 'FALSE', value := 'TRUE']
 		if (!all(whichdictionary %in% ALLDICTS)){
 			stop('Dictionary name(s) not valid; they should be in (' %&%
 				paste(ALLDICTS, collapse=', ') %&% ')')
@@ -101,13 +104,16 @@ setdictionary <- function(dictName1 = NULL, dictName2 = NULL,
 	if (!is.null(codelist3)){
 		codelistToDict(codelist3)
 	}
-	
+	if (!is.null(codelist4)){
+		codelistToDict(codelist4)
+	}
+
 	invisible(getdictionary())
 }
 
 getdictionary <- function(){
 	# Returns a character vector of the dictionaries in use
-	tmp <- META[item %in% ALLDICTS][value=='TRUE', item]
+	tmp <- META[item %in% ALLDICTS][value != 'FALSE', item]
 	tmp
 }
 

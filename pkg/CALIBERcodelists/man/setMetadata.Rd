@@ -21,11 +21,11 @@ setMetadata(codelist=NULL, Name=NULL, Version=NULL, Author=NULL,
   \item{Author}{a string of author names, or a character vector of names, or a vector of \code{person} objects.}
   \item{Date}{a Date object or character string representing the date on which the codelist was created.}
   \item{Categories}{the categories table, in the form of a data.table with columns \code{category} (number), \code{shortname} (brief definition) and \code{description} (full definition)}
-  \item{Source}{a string representing the data source. It is only possible to set this for a codelist, not for the master dictionary. Currently the only options are 'GPRD' for Read codelists, 'HES' or 'ONS' for ICD-10 codelists and 'OPCS' for OPCS codelists.}
+  \item{Source}{a string representing the data source. For the master dictionary, it can be a space or comma separated list or a vector of strings if multiple dictionaries are in use (but only one distinct source per dictionary). Options are 'GPRD' for Read codelists, 'HES' or 'ONS' for ICD-10 codelists, 'OPCS' for OPCS codelists, and 'ONSOLD' for ICD-9 codelists. A particular Source can only be associated with a single dictionary at a time (e.g. it is not possible to export a codelist to HES and ONS simultaneously; instead one has to export one version, use SetMetadata to update the source and then export the other). The allowable Source / dictionary combinations are hard-coded in the \code{SOURCEDICTS} data.table (in the \code{sysdata.R} source file of the package).}
 }
 
 \details{
-If using R Markdown, the metadata can be drawn from a table outside the R code itself, meaning that you only have to write this information in one place for it to be in the HTML document and the codelists. The fields "Author", "Date", "Name" and "Version" can be supplied in the Rmd file in the format \code{item | value} on a single line (e.g. \code{Version | 1}). 
+If using R Markdown, the metadata can be drawn from a table outside the R code itself, meaning that you only have to write this information in one place for it to be in the HTML document and the codelists. The fields "Author", "Date", "Name", "Source" and "Version" can be supplied in the Rmd file in the format \code{item | value} on a single line (e.g. \code{Version | 1}). 
 }
 
 \value{

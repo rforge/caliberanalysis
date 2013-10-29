@@ -695,14 +695,15 @@ extractMetadataFromMETA <- function(dictName){
 	# Returns a list of codelist metadata from the META data.table
 	# Argument: dictionary name ('read', 'icd10' or 'opcs')
 	out <- list()
-	out$Name <- META[item=='Name'][, value]
-	out$Version <- META[item=='Version'][,value]
-	# Default source name
-	out$Source <- switch(dictName, read='GPRD', icd10='HES', opcs='OPCS',
-		icd9='ONSOLD')
-	# Special source name
-	out$Author <- META[item=='Author'][,value]
-	out$Date <- META[item=='Date'][,value]
+	out$Name <- META[item == 'Name'][, value]
+	out$Version <- META[item == 'Version'][, value]
+	out$Source <- META[item == dictName][, value]
+	# If no source specified, use default
+	if (out$Source == 'TRUE'){
+		out$Source <- SOURCEDICTS[dict == dictName, Source][1]
+	}
+	out$Author <- META[item == 'Author'][,value]
+	out$Date <- META[item == 'Date'][,value]
 	out$Timestamp <- format(Sys.time(), '%H.%m %d-%b-%y')
 	out$Categories <- retrieveCategories()
 	
