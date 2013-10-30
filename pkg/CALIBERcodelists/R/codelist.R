@@ -395,7 +395,7 @@ tableToCodelist <- function(x, noisy = FALSE){
 		}
 	} else if ('icd9_code' %in% names(x)){
 		if (!(metadata$Source %in% SOURCEDICTS[dict == 'icd9', Source])){
-			metadata$Source <- 'ONSOLD'
+			metadata$Source <- 'ONSICD9'
 		}
 		if ('icd9_term' %in% names(x)){
 			setnames(x, 'icd9_term', 'term')
@@ -439,14 +439,14 @@ tableToCodelist <- function(x, noisy = FALSE){
 			if (length(getDict)==1){
 				# Default source
 				metadata$Source <- switch(getDict,
-					read='GPRD', opcs='OPCS', icd10='HES', icd9='ONSOLD')
+					read='GPRD', opcs='OPCS', icd10='HES', icd9='ONSICD9')
 			} else {
 				stop('Terms come from more than one dictionary')
 			}
 		}	else if (length(getdictionary())==1){
 			# If only one dictionary is in use:
 			metadata$Source <- switch(getdictionary(),
-				read='GPRD', opcs='OPCS', icd10='HES', icd9='ONSOLD')
+				read='GPRD', opcs='OPCS', icd10='HES', icd9='ONSICD9')
 		} else {
 			stop('Unable to determine source dictionary')
 		}

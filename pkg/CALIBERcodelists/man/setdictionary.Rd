@@ -18,7 +18,7 @@ in META but does not over-write any information that is there already.
 
 \usage{
 setdictionary(dictName1 = NULL, dictName2 = NULL, dictName3 = NULL,
-    dictName4 = NULL)
+    dictName4 = NULL, reset = TRUE)
 getdictionary()
 }
 
@@ -34,6 +34,9 @@ Either a codelist or a dictionary name, one of "icd9", "icd10", "opcs" or "read"
 }
   \item{dictName4}{
 Either a codelist or a dictionary name, one of "icd9", "icd10", "opcs" or "read".
+}
+  \item{reset}{
+TRUE or FALSE, whether to  reset the categories in the master dictionary
 }
 }
 

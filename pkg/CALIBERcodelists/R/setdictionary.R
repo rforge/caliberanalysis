@@ -1,5 +1,5 @@
 setdictionary <- function(dictName1 = NULL, dictName2 = NULL,
-	dictName3 = NULL, dictName4 = NULL){
+	dictName3 = NULL, dictName4 = NULL, reset = TRUE){
 	# Clear the categories in CALIBER_DICT and specify the subset of
 	# dictionaries to use for code selection. If the character vectors
 	# VERSION_READ, VERSION_ICD10, VERSION_ICD9, VERSION_OPCS are
@@ -16,13 +16,15 @@ setdictionary <- function(dictName1 = NULL, dictName2 = NULL,
 	
 	loadDICT()
 	
-	META[item == 'category', value := '']
-	META[item == 'shortname', value := '']
-	META[item == 'description', value := '']
-	cat('\nCALIBERcodelists package, version ' %&%
-		packageVersion('CALIBERcodelists'))
-	cat('\nClearing categories in master dictionary.')
-	CALIBER_DICT[, category:=NA_integer_]
+	if (reset == TRUE){
+		META[item == 'category', value := '']
+		META[item == 'shortname', value := '']
+		META[item == 'description', value := '']
+		cat('\nCALIBERcodelists package, version ' %&%
+			packageVersion('CALIBERcodelists'))
+		cat('\nClearing categories in master dictionary.')
+		CALIBER_DICT[, category:=NA_integer_]
+	}
 	# Reset the key if necessary
 	setDictKey()
 

@@ -28,7 +28,7 @@ setkey(META, item)
 # used for more than one data source. 
 SOURCEDICTS <- fread('
 dict|Source
-icd9|ONSOLD
+icd9|ONSICD9
 icd10|HES
 icd10|ONS
 opcs|OPCS
