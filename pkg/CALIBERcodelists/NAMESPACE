@@ -1,6 +1,6 @@
 export(browseSelection, browseCodelist, exploreCodes)
 export(getdictionary, setdictionary, setMetadata)
-export(as.codelist, codelist, print.codelist, is.codelist, subset.codelist)
+export(as.codelist, codelist, print.codelist, is.codelist)
 export(expandCodelist, contractCodelist, convert, compare, print.codelistComparison, merge.codelist)
 export(codematch, dictis, termhas, explode, medcodeis, decode)
 export(process, showhtml, export, exportall)

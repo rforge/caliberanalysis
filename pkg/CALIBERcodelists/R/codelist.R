@@ -820,7 +820,7 @@ splitCategory <- function(categorystrings){
 	}
 }
 
-subset.codelist <- function(x, subset, select){
+subset.codelist <- function(x, subset, select, ...){
 	# S3 method for subsetting a codelist
 	# Arguments: x - codelist
 	#            subset - a logical expression for rows to keep,

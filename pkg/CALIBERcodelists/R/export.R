@@ -133,6 +133,9 @@ export <- function(codelist, filename = NULL,
 		' codelist to ' %&% filename %&% '\n')
 	what <- subset(codelist, category > 0)
 
+	# Update the timestamp
+	setattr(what, 'Timestamp', format(Sys.time(), '%H.%m %d-%b-%y'))
+
 	# Check that the codelist name contains the source
 	if (!nameHasSource(what)){
 		setattr(what, 'Name', attr(what, 'Name') %&% '_' %&%

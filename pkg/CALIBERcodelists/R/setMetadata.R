@@ -27,9 +27,9 @@ assignmetadata <- function(field, newvalue){
 			}
 		}
 	} else {
-		if (field=='Date'){
+		if (field == 'Date'){
 			newvalue <- sanitizeDate(newvalue)
-		} else if (field=='Version'){
+		} else if (field == 'Version'){
 			newvalue <- as.character(as.numeric(newvalue))
 			if (is.na(newvalue)){
 				newvalue <- ''
@@ -64,7 +64,7 @@ setMetadata <- function(codelist=NULL, Name=NULL,
 			assignmetadata("Date", Date)
 		}
 		if (!is.null(Source)){
-			assignmetadata("Source", Source)
+			assignmetadata("Source", Source)			
 		}	
 	} else if (!is.codelist(codelist)){
 		stop("First argument to setMetadata must be NULL or a codelist")
@@ -98,6 +98,13 @@ setMetadata <- function(codelist=NULL, Name=NULL,
 			theSource <- Source
 			if (identical(SOURCEDICTS[SOURCEDICTS$Source == theSource, dict],
 				SOURCEDICTS[SOURCEDICTS$Source == attr(codelist, 'Source'), dict])){
+				# Update the suffix of the name if it is a source name
+				theName <- attr(codelist, 'Name')
+				if (grepl('_' %&% tolower(attr(codelist, 'Source')) %&% '$', theName)){
+					theName <- sub('_' %&% tolower(attr(codelist, 'Source')) %&% '$',
+						'_' %&% tolower(theSource), theName)
+					setattr(codelist, 'Name', theName)
+				}
 				setattr(codelist, 'Source', Source)
 			}
 		}
@@ -105,7 +112,7 @@ setMetadata <- function(codelist=NULL, Name=NULL,
 
 	# Updating categories
 	if (!is.null(Categories)){
-		saveCategories(cattable=Categories, codelist=codelist)
+		saveCategories(cattable = Categories, codelist = codelist)
 	}
 	invisible(codelist)
 }

@@ -22,15 +22,15 @@ as.codelist(x = NULL, \dots)
 is.codelist(x)
 
 \method{print}{codelist}(x, \dots)
-\method{subset}{codelist}(x, subset, select)
+\method{subset}{codelist}(x, subset, select, \dots)
 }
 
 \arguments{
   \item{x}{for \code{codelist}, an object to coerce to a codelist; for the \code{print} and \code{subset} methods, a codelist; for \code{is.codelist}, the object to check}
   \item{subset}{a logical vector as long as the number of terms in the codelist, denoting which to select (all rows are selected if it is missing). This is evaluated within the environment of the codelist, so column names do not need to be quoted.}
   \item{select}{Character vector of columns to select. Default is to select all columns. If the code or category columns are not selected, the output of the function is no longer a codelist object.}
-  \item{...}{Other optional arguments: \code{newcategory} is the new category number for converting a selection to a codelist,
-\code{dictionary} is the source dictionary (read, icd10, opcs) to use if a selection contains terms from more than sone dictionary.
+  \item{...}{Other optional arguments to \code{as.codelist}: \code{newcategory} is the new category number for converting a selection to a codelist,
+\code{dictionary} is the source dictionary (read, icd10, opcs) to use if a selection contains terms from more than one dictionary.
 }
 }
 

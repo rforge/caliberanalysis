@@ -2,6 +2,11 @@
 Changes in CALIBERcodelists version 0.2-5
 ==================================================
 
+CHANGES
+
+- Timestamp is always updated on export, and contains
+  the time/date that the file was saved.
+
 BUG FIXES
 
 - Source of imported codelists was ignored, corrected

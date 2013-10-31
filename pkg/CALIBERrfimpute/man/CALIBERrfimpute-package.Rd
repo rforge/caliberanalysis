@@ -25,7 +25,7 @@ Random Forest parameters.
 Package: \tab CALIBERrfimpute\cr
 Type: \tab Package\cr
 Version: \tab 0.1-2\cr
-Date: \tab 2013-09-11\cr
+Date: \tab 2013-10-30\cr
 License: \tab GPL-3\cr
 }
 
