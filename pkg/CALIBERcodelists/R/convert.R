@@ -177,7 +177,12 @@ convertToMedcodes <- function(codes,
 	} else if (fromDictionary=='icd10'){
 		CALIBER_DICTMAPS[dict %in% c('icd10', 'icdhead') &
 		 	map_stat %in% mapStatus &
-		 	!grepl('A$', code) & 
+		 	!grepl('D$|A$', code) & 
+		 	grepl(paste('^' %&% codes, collapse='|'), code), medcode]		
+	} else if (fromDictionary=='icd9'){
+		CALIBER_DICTMAPS[dict %in% c('icd9', 'icd9head') &
+		 	map_stat %in% mapStatus &
+		 	!grepl('D$|A$', code) & 
 		 	grepl(paste('^' %&% codes, collapse='|'), code), medcode]		
 	}
 }

@@ -11,6 +11,7 @@ BUG FIXES
 
 - Source of imported codelists was ignored, corrected
   in as.codelist()
+- convert ICD9 to Read codes did not work, now fixed.
 
 ==================================================
 Changes in CALIBERcodelists version 0.2-4
