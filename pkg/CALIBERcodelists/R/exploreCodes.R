@@ -34,13 +34,6 @@ exploreCodes <- function(spreadsheet='Default',
 	}
 	sink(tempdir() %&% '/interactive.log', split=TRUE)
 	cat('CALIBERcodelists interactive mode\nDate: ', format(Sys.time()), '\n')
-	if (any(!is.na(CALIBER_DICT$category))){
-		iSetDictionary()
-	} else {
-		# blank CALIBER_DICT, so no need for iSetDictionary()
-		cat('\nSource dictionaries currently in use: ',
-			paste(getdictionary(), collapse=','))
-	}
 	
 	wantToExit <- FALSE
 	while (!wantToExit) {
@@ -269,13 +262,18 @@ iCodelistMenu <- function(){
 				newCodelistName <- iAskName(codelistName %&% '_' %&% toDictionary)
 				if (newCodelistName != ''){
 					# Convert dictionary
-					iShow(newCodelistName %&%
-						' <- convert(' %&% codelistName %&%
-						', toDictionary="' %&% toDictionary %&%
-						'", fromDictionary="' %&% fromDictionary %&% '")')
-					temp <- convert(get(codelistName, envir=.GlobalEnv),
-						toDictionary=toDictionary, fromDictionary=fromDictionary)
-					assign(newCodelistName, temp, envir=.GlobalEnv)
+					temp <- NULL
+					try(temp <- convert(get(codelistName, envir=.GlobalEnv),
+						toDictionary=toDictionary, fromDictionary=fromDictionary))
+					if (is.null(temp)){
+						cat('Conversion was unsuccessful.')
+					} else {
+						iShow(newCodelistName %&%
+							' <- convert(' %&% codelistName %&%
+							', toDictionary="' %&% toDictionary %&%
+							'", fromDictionary="' %&% fromDictionary %&% '")')
+						assign(newCodelistName, temp, envir=.GlobalEnv)
+					}
 				}
 			}
     	}
@@ -566,16 +564,17 @@ iSetDictionary <- function(){
 	# Initialise the dictionaries interactively
 	useCodelist <- FALSE
 	response <- select.list(c(ALLDICTS,
-		'Initialise using an existing codelist'), multiple=TRUE,
+		'Initialise master dictionary using an existing codelist'), multiple=TRUE,
 		title='Preparing to reset categories. Which source dictionaries to use?',
 		graphics=FALSE)
 	if (length(response) > 0){
-		if ('Initialise using an existing codelist' %in% response){
+		if ('Initialise master dictionary using an existing codelist' %in% response){
 			codelistName <- iFindCodelist()
 			if (codelistName != ''){
 				useCodelist <- TRUE
 			}
-			response <- setdiff(response, 'Initialise using an existing codelist')
+			response <- setdiff(response,
+				'Initialise master dictionary using an existing codelist')
 		}
 		message('Resetting categories.')
 		if (length(response) > 2){
@@ -628,7 +627,11 @@ iCreateCodelistMenu <- function(allowExitWithoutSave = FALSE){
 		#          Exit to main menu
 		
 		# Introductory message:
-		# number of terms assigned to categories
+		# Which dictionaries are currently in use
+		cat('\nSource dictionaries currently in use: ',
+			paste(getdictionary(), collapse=','))
+
+		# Number of terms assigned to categories
 		codelistText <- paste(getdictionary(), collapse=', ') %&% ' codelist'
 		codelistText <- toupper(substr(codelistText, 1, 1)) %&% substr(codelistText, 2, 100)
 		totalTerms <- nrow(CALIBER_DICT[dict %in% getdictionary() & category>0])
@@ -639,7 +642,7 @@ iCreateCodelistMenu <- function(allowExitWithoutSave = FALSE){
 			cat('\n' %&% codelistText %&% ' under construction contain(s)' , totalTerms, 'terms.')
 		}
     
-		todo <- menu(c('Reset categories and choose dictionaries', #1
+		todo <- menu(c('Reset categories and initialise dictionaries', #1
 			'Create a new selection', #2
 			'Use an existing selection', #3
 			'Assign a selection to a category', #4

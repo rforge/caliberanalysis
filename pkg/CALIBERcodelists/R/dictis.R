@@ -14,7 +14,7 @@ dictis <- function(dictName1, dictName2=NULL, dictName3=NULL){
 		' is not a valid dictionary.\nIt should be in ' %&%
 		paste(ALLDICTS, collapse=', '))
 	} else {
-		as.selection(CALIBER_DICT$dict %in% META[dicts][value=='TRUE'][, item])
+		as.selection(CALIBER_DICT$dict %in% getdictionary())
 	}
 }
 

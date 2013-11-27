@@ -1,4 +1,22 @@
 ==================================================
+Changes in CALIBERcodelists version 0.2-6
+==================================================
+
+BUG FIXES
+
+- Lines containing only a single quote are no longer
+  wrongly considered as categories, when importing
+  from CSV files (e.g. if the file has been edited
+  in Excel)
+- regression in showhtml() -- it didn't print the
+  name of individual dictionaries because it was
+  counting the number of dictionaries in use 
+  incorrectly, now fixed.
+- dictis() had an error in detecting which dictionaries are
+  in use (was querying the META table directly, now
+  corrected to use getdictionary() instead).
+
+==================================================
 Changes in CALIBERcodelists version 0.2-5
 ==================================================
 

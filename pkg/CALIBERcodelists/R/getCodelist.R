@@ -1,9 +1,16 @@
-getCodelist <- function(folder, codelistname){
+getCodelist <- function(folder = NULL, codelistname = NULL){
 	# Finds the latest version of a CALIBER codelist from
 	# a folder
+	if (is.null(codelistname) & !is.null(folder)){
+		# search in the current working directory
+		codelistname <- folder
+		folder <- getwd()
+	} else if (is.null(folder)){
+		folder <- getwd()
+	}
+	# Find all the files in the repository
 	repository <- dir(folder, recursive = TRUE, full.names = TRUE)
-	# Get all versions of the codelist (either exact match
-	# on the name or 
+	# Get all versions of the codelist
 	candidates <- repository[grepl('[\\\\/]' %&% codelistname %&%
 		"\\.codelist\\.[0-9]+\\.(csv|dta)$", repository)]
 	# Extract the version numbers

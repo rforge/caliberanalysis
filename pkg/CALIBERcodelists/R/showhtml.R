@@ -127,7 +127,7 @@ htmlCodelistTable <- function(data_to_show, showcat=TRUE,
 	}
 	
 	# Whether to put titles for each dictionary
-	moreThanOneDict <- sum(META[ALLDICTS][, value]=='TRUE') > 1
+	moreThanOneDict <- sum(META[ALLDICTS][, value] != 'FALSE') > 1
 	
 	if (META['read'][, value] != 'FALSE'){
 		# Table of Read terms

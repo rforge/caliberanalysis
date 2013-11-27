@@ -531,7 +531,8 @@ tableToCodelist <- function(x, noisy = FALSE){
 				 collapse=', ')
 			stop('Medcode ' %&% exampleMedcode %&% ' is in categories ' %&%
 				exampleCategories %&%
-				'.\nIt is not permitted for a term to be in more than one category.')
+				'.\nIt is not permitted for a term to be in more than one category.\n' %&% 
+				'Consider combining some categories and editing afterwards.')
 		}	
 	} else {
 		x <- copy(x[!is.na(code) & !(code=='') & 
@@ -544,7 +545,8 @@ tableToCodelist <- function(x, noisy = FALSE){
 			exampleCategories <- paste(x[code==exampleCode, category], collapse=', ')
 			stop('Code ' %&% exampleCode %&% ' is in categories ' %&%
 				exampleCategories %&%
-				'.\nIt is not permitted for a term to be in more than one category.')
+				'.\nIt is not permitted for a term to be in more than one category.\n' %&% 
+				'Consider combining some categories and editing afterwards.')
 		}
 	}
 
@@ -694,7 +696,7 @@ extractMetadataFromColumn <- function(metadata){
 	if (length(startfrom) > 0){
 		temp <- splitCategory(metadata[
 			intersect(startfrom:length(metadata),
-			which(gsub(' ', '', metadata) != ''))])
+			which(gsub("[' ]", '', metadata) != ''))])
 		# description is not provided in the 'column' metadata format
 		# so set it to be the same as shortname
 		temp$description <- temp$shortname
