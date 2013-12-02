@@ -113,6 +113,8 @@ names(pegasus) <- c('medcode', 'code', 'ev1', 'ev2', 'ev3', 'ev4', 'term', 'db')
 pegasusDate <- pegasus[which.max(as.Date(
 	paste('1', pegasus$db), format='%d %B %Y')), 'db']
 pegasus <- data.table(pegasus)
+# Remove blank terms with zero events
+pegasus <- pegasus[events > 0 | term != '']
 pegasus[, events:=ev1 + ev2 + ev3 + ev4]
 # Note that quotes are doubled because it is
 # a Microsoft VB format file

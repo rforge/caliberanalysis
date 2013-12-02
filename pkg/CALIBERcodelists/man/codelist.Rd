@@ -90,12 +90,4 @@ compare(mi_gprd1, mi_gprd2)
 # Create a codelist from OPCS codes (use an unusual spelling of opcs_code)
 af_opcs <- codelist(data.frame(OPCS.CODES=c('K621', 'K622', 'K623')))
 af_opcs
-
-# Convert OPCS codelist to Read
-af_opcs_read <- convert(af_opcs, 'read')
-af_opcs_read
-
-# Combine two codelists
-af_comb <- merge(af_gprd, af_opcs_read)
-af_comb
 }
