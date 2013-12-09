@@ -4,6 +4,8 @@ Changes in CALIBERcodelists version 0.2-6
 
 BUG FIXES
 
+- Precompile sysdata to try to avoid errors in building
+  Windows version
 - Lines containing only a single quote are no longer
   wrongly considered as categories, when importing
   from CSV files (e.g. if the file has been edited
@@ -12,8 +14,8 @@ BUG FIXES
   name of individual dictionaries because it was
   counting the number of dictionaries in use 
   incorrectly, now fixed.
-- dictis() had an error in detecting which dictionaries are
-  in use (was querying the META table directly, now
+- dictis() had an error in detecting which dictionaries
+  are in use (was querying the META table directly, now
   corrected to use getdictionary() instead).
 
 ==================================================
