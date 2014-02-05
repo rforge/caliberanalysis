@@ -7,7 +7,9 @@ Impute categorical variables using Random Forest within MICE
 
 \description{
 This method can be used to impute categorical variables  (binary or >2 levels) in MICE by specifying
-method = 'rfcat'.
+method = 'rfcat'. It was developed independently from the
+\code{\link[mice]{mice.impute.rf}} algorithm of Doove et al.,
+and differs from it in some respects.
 }
 
 \usage{
@@ -54,7 +56,7 @@ A vector of imputed values of y.
 }
 
 \references{
-[reference to submitted Am J Epid paper]
+Shah AD, Bartlett JW, Carpenter J, Nicholas O, Hemingway H. Comparison of Random Forest and parametric imputation models for imputing missing data using MICE: a CALIBER study. American Journal of Epidemiology 2014. doi: \href{http://dx.doi.org/10.1093/aje/kwt312}{10.1093/aje/kwt312}
 }
 
 \author{
@@ -68,11 +70,14 @@ hazard ratios compared to polytomous regression, but coverage of confidence inte
 correct.
 }
 
-
 \seealso{
-\code{\link{setRFoptions}}, \code{\link{mice.impute.rfcont}}
+\code{\link{setRFoptions}},
+\code{\link{mice.impute.rfcont}},
+\code{\link[mice]{mice}},
+\code{\link[mice]{mice.impute.rf}},
+\code{\link[mice]{mice.impute.cart}},
+\code{\link[randomForest]{randomForest}}
 }
-
 
 \examples{
 set.seed(1)

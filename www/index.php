@@ -39,9 +39,8 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 studies using electronic health records databases.</p>
 
 <p>CALIBER (<a href="http://caliberresearch.org/">http://caliberresearch.org/</a>) is
-led from the Centre for Health Service and Academic Partnership in Translational Electronic
-health record Research (CHAPTER) incorporating the National Institute for Cardiovascular Outcomes
-Research (NICOR). CHAPTER is led from University College London (UCL) and Partners, which include
+led from the <a href="http://www.farrinstitute.org/centre/London/">
+Farr Institute &at; London</a>) at University College London (UCL) and Partners, which include
 UCL, the London School of Hygiene and Tropical Medicine and Queen Mary University of London.
 CALIBER investigators represent a collaboration between epidemiologists, clinicians, statisticians,
 health informaticians and computer scientists with initial funding from the Wellcome Trust and the
@@ -64,6 +63,20 @@ non-parametric prediction method which can handle non-linearities and interactio
 
 <p>The CALIBERrfimpute package contains novel imputation functions using Random Forest within the
 framework of Multivariate Imputation by Chained Equations.</p>
+
+<p>An alternative Random Forest imputation algorithm was developed by Doove et al. and is available in the MICE package; our vignette in CALIBERrfimpute compares the two methods.</p>
+
+<h3>References</h3>
+
+<ol>
+<li>
+Shah AD, Bartlett JW, Carpenter J, Nicholas O, Hemingway H. Comparison of Random Forest and parametric imputation models for imputing missing data using MICE: a CALIBER study. American Journal of Epidemiology 2014. doi: <a href="http://dx.doi.org/10.1093/aje/kwt312">10.1093/aje/kwt312</a>
+</li>
+
+<li>
+Doove LL, van Buuren S, Dusseldorp E. Recursive partitioning for missing data imputation in the presence of interaction effects. Computational Statistics and Data Analysis 2014;72:92--104. doi: <a href = "http://dx.doi.org/10.1016/j.csda.2013.10.025">10.1016/j.csda.2013.10.025</a>
+</li>
+</ol>
 
 <h2>CALIBERcodelists</h2>
 

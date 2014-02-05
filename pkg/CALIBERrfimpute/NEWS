@@ -1,6 +1,19 @@
 =====================================
+Version 0.1-3
+second release on CRAN
+=====================================
+
+CHANGES:
+
+- Aded information and links for the 
+  mice.impute.rf and mice.impute.cart
+  methods in the updated mice package
+- Added reference to published paper
+  describing this method
+
+=====================================
 Version 0.1-2
-planned release to CRAN
+first release to CRAN
 =====================================
 
 CHANGES:
