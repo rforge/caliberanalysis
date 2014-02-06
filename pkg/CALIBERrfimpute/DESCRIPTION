@@ -9,3 +9,4 @@ Description: Functions to impute using Random Forest under Full Conditional Spec
 License: GPL-3
 Depends: mice (>= 2.20)
 Imports: mvtnorm, randomForest
+Suggests: missForest, rpart, survival, xtable
