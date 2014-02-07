@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage[top=2cm,bottom=2.5cm,left=3cm,right=3cm]{geometry}
+%\VignetteIndexEntry{Comparison of parametric and Random Forest MICE in imputation of missing data in survival analysis}
 
 % This is a simulation study, testing various imputation
 % methods in a survival scenario with two fully

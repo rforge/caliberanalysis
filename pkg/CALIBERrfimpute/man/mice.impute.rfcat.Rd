@@ -14,7 +14,7 @@ and differs from it in some respects.
 
 \usage{
 mice.impute.rfcat(y, ry, x, ntree_cat = NULL,
-    nodesize_cat = NULL, maxnodes_cat = NULL, ...)
+    nodesize_cat = NULL, maxnodes_cat = NULL, ntree = NULL, ...)
 }
 
 \arguments{
@@ -28,7 +28,7 @@ a logical vector stating whether y is observed or not.
 a matrix of predictors to impute y.
 }
   \item{ntree_cat}{
-number of trees, default = 10. A global option can be set by calling setRFoptions(ntree_cat=XX).
+number of trees, default = 10. A global option can be set by calling e.g. \code{setRFoptions(ntree_cat=10)}.
 }
   \item{nodesize_cat}{
 minimum size of nodes, default = 1.
@@ -37,6 +37,9 @@ Smaller values of nodesize create finer, more precise trees but makes the progra
 }
   \item{maxnodes_cat}{
 maximum number of nodes, default NULL. If NULL the number of nodes is determined by number of observations and nodesize_cat.
+}
+  \item{ntree}{
+an alternative argument for specifying the number of trees, over-ridden by \code{ntree_cat}. This is for consistency with the \code{mice.impute.rf} function.
 }
   \item{\dots}{
 other arguments to pass to randomForest.

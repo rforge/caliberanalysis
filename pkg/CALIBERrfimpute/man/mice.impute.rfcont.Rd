@@ -14,7 +14,7 @@ and differs from it in drawing imputed values from a normal distribution.
 
 \usage{
 mice.impute.rfcont(y, ry, x, ntree_cont = NULL,
-    nodesize_cont = NULL, maxnodes_cont = NULL, ...)
+    nodesize_cont = NULL, maxnodes_cont = NULL, ntree = NULL, ...)
 }
 
 \arguments{
@@ -28,7 +28,7 @@ a logical vector stating whether y is observed or not.
 a matrix of predictors to impute y.
 }
   \item{ntree_cont}{
-number of trees, default = 10. A global option can be set by calling setRFoptions(ntree_cont=XX).
+number of trees, default = 10. A global option can be set by calling e.g. \code{setRFoptions(ntree_cont=10)}.
 }
   \item{nodesize_cont}{
 minimum size of nodes, default = 5.
@@ -37,6 +37,9 @@ Smaller values of nodesize create finer, more precise trees but makes the progra
 }
   \item{maxnodes_cont}{
 maximum number of nodes, default NULL. If NULL the number of nodes is determined by number of observations and nodesize_cont.
+}
+  \item{ntree}{
+an alternative argument for specifying the number of trees, over-ridden by \code{ntree_cont}. This is for consistency with the \code{mice.impute.rf} function.
 }
   \item{\dots}{
 other arguments to pass to randomForest.
