@@ -356,7 +356,8 @@ if (!exists('REFERENCE_SAMPLESIZE')){
 # Use parallel processing, if available, to create
 # datasets more quickly.
 if ('parallel' %in% loadedNamespaces() &
-	!is.null(getOption('mc.cores'))){
+	!is.null(getOption('mc.cores')) &
+	Sys.info()['sysname'] == 'Linux'){
 	REFERENCE_SAMPLESIZE <- REFERENCE_SAMPLESIZE %/%
 		getOption('mc.cores')
 	simdata <- mclapply(1:getOption('mc.cores'),
