@@ -401,7 +401,7 @@ if (!exists('NIMPS')){
 	NIMPS <- 3
 }
 # Use parallel processing if the 'parallel' package is loaded
-if ('parallel' %in% loadedNamespaces()){
+if ('parallel' %in% loadedNamespaces() & Sys.info()['sysname'] == 'Linux'){
 	cat('Using parallel processing\n')
 	results <- mclapply(1:N, doanalysis)
 } else {
