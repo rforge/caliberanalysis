@@ -40,7 +40,7 @@ studies using electronic health records databases.</p>
 
 <p>CALIBER (<a href="http://caliberresearch.org/">http://caliberresearch.org/</a>) is
 led from the <a href="http://www.farrinstitute.org/centre/London/">
-Farr Institute &at; London</a>) at University College London (UCL) and Partners, which include
+Farr Institute &#64; London</a>) at University College London (UCL) and Partners, which include
 UCL, the London School of Hygiene and Tropical Medicine and Queen Mary University of London.
 CALIBER investigators represent a collaboration between epidemiologists, clinicians, statisticians,
 health informaticians and computer scientists with initial funding from the Wellcome Trust and the
