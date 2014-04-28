@@ -87,6 +87,15 @@ correct.
 
 \examples{
 set.seed(1)
+
+# A small dataset with a single row to be imputed
+mydata <- data.frame(x1 = as.factor(c('this', 'this', NA, 'that')),
+	x2 = 1:4, x3 = as.factor(c('other', 'another', NA, 'another')))
+mice(mydata, method = c('logreg', 'norm', 'logreg'), m = 2, maxit = 2)
+mice(mydata[, 1:2], method = c('rfcat', 'rfcont'), m = 2, maxit = 2)
+mice(mydata, method = c('rfcat', 'rfcont', 'rfcat'), m = 2, maxit = 2)
+
+# A larger simulated dataset
 mydata <- simdata(100, x2binary = TRUE)
 mymardata <- makemar(mydata)
 
