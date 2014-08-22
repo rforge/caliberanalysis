@@ -28,6 +28,11 @@ importDT <- function(filename, datecolnames = NULL,
 			setattr(datafile, eachattr, attr(temp, eachattr)) 
 		}
 			
+	} else if (grepl('\\.gz$|\\.GZ$', filename)) {
+		# fread cannot read gzipped files
+		datafile <- textfileToDT(filename, verbose = verbose,
+			datecolnames = datecolnames, sep = sep,
+			fread = FALSE, nrows = nrows, ...)
 	} else {
 		# Load from text file
 		datafile <- textfileToDT(filename, verbose = verbose,

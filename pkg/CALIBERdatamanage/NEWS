@@ -1,4 +1,65 @@
 =================================================
+CALIBERdatamanage Version 0.1-8
+=================================================
+
+CHANGES:
+
+- No warning if unable to convert text to date (previously
+  this would produce warnings with importDT because
+  the function tries to convert every text column
+  to date).
+- Added decimal.mark as an argument to formatnum, to
+  allow different options for decimal points.
+- New arguments defaultboxcolour and defaultlinecolour
+  for multiforest
+- formatnum no longer gives warnings for missing values
+- When transferring variables between cohorts,
+  the description is also transferred
+- transferVariables now has an option of 
+  removing variables from the dataset they are
+  transferred from
+- importDT can now handle gzipped files (they are imported
+	directly with read.table and fread = FALSE)
+- date column can now be extracted as the value
+  of interest using addToCohort (previously not
+  possible if it had the same name as the event
+  date column)
+
+BUG FIXES:
+
+- Error in extractEntity if all the coded values to
+  be extracted are NA when extracting Scoring Method.
+- Error in extractCodes when extracting drug codelists.
+- Consistent number of decimal places in percentConf
+- Fixed a bug in addToCohort in selecting one row per
+  patient
+- extractCodes now works with product codelists
+
+=================================================
+CALIBERdatamanage Version 0.1-7
+=================================================
+
+TODO:
+
+- Allow date column to be extracted as the value
+  of interest using addToCohort (currently not
+  possible if it has the same name as the event
+  date column)
+- Bug fix: Message for description states 'xx
+  variable is not present' if adding to a ffdf cohort  
+
+CHANGES:
+
+- Allow column names to be included in exportTable
+- Allow zero line position to be modified in multiforest
+
+BUG FIXES:
+
+- Tidied up the text sanitization in exportTable
+- The package depends on xtable (for exportTable) but
+  this was not listed as a dependency.
+
+=================================================
 CALIBERdatamanage Version 0.1-6
 (fifth version on R-Forge)
 =================================================

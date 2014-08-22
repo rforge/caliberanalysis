@@ -88,6 +88,6 @@ merge(COHORT, COHORT2)
 COHORT <- as.ffdf(COHORT)
 COHORT2 <- as.ffdf(COHORT2)
 is.cohort(COHORT)
-subset(COHORT, COHORT$anonpatid == 2)
+subset(COHORT, as.ram(COHORT$anonpatid == 2))
 merge(COHORT, COHORT2)
 }

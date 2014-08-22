@@ -15,8 +15,8 @@ Tools for handling data in the GPRD, HES, ONS and MINAP linked dataset (CALIBER)
 \tabular{ll}{
 Package: \tab CALIBERdatamanage\cr
 Type: \tab Package\cr
-Version: \tab 0.1-6\cr
-Date: \tab 2013-10-23\cr
+Version: \tab 0.1-8\cr
+Date: \tab 2014-08-22\cr
 License: \tab GPL-3\cr
 }
 
@@ -78,10 +78,10 @@ transferVariables(mycohort, mydata, c('indexdate', 'ethnic_hes'))
 print(mydata)
 
 # Now use them to do a calculation on the repeated measures.
-mydata[, temp:=ifelse(ethnic_hes=='White', data1, 2)]
+mydata[, temp:= ifelse(ethnic_hes == 'White', data1, 2)]
 
 # Select a summary measure using addToCohort
-addToCohort(mycohort, 'newvar', data=mydata,
-    old_varname='temp', value_choice=c(2, 1))
+addToCohort(mycohort, 'newvar', data = mydata,
+    old_varname = 'temp', value_choice = c(2, 1))
 print(mycohort)
 }

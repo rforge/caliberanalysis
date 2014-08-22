@@ -105,8 +105,9 @@ summaryTable <- function(template, output = NULL,
 }
 
 
-exportTable <- function(data, filename = NULL, align='l', 
-	include.rownames = FALSE, sanitize.text.function = function(x) x, 
+exportTable <- function(data, filename = NULL, align = 'l', 
+	include.rownames = FALSE, include.colnames = FALSE,
+	sanitize.text.function = 'default', 
 	blank = '$-$', digits = 3, booktabs = FALSE, ...){
 	# Export a LaTeX table to filename
 	# Columns which state multicolumn get converted to multicolumn
@@ -131,14 +132,14 @@ exportTable <- function(data, filename = NULL, align='l',
 	# Convert numeric to character, and LaTeXify
 	for (i in 1:ncol(data)){
 		if (is.numeric(data[,i])){
-			if (all(is.wholenumber(data[,i]), na.rm=TRUE)){
+			if (all(is.wholenumber(data[,i]), na.rm = TRUE)){
 				# don't do any formatting - keep them as whole numbers
 				data[,i] <- as.character(round(data[,i]))
 			} else {
 				data[,i] <- sapply(data[,i], function(x){
 					temp <- '$' %&% sub('e-([[:digit:]]*)', '\\\\times 10^{-\\1}',
-						format(x, scientific=4, nsmall=1, digits=digits)) %&% '$'
-					if (temp=='$Inf$') {temp <- '$\\infty$'}
+						format(x, scientific = 4, nsmall = 1, digits = digits)) %&% '$'
+					if (temp == '$Inf$') {temp <- '$\\infty$'}
 					if (temp %in% c('$NA$', '$NaN$')) {temp <- blank}
 					temp
 				})
@@ -146,27 +147,38 @@ exportTable <- function(data, filename = NULL, align='l',
 		} else {
 			# Sanitize text if not already done so
 			use <- !istrue(substr(data[,i], 1, 1)=='$')
-			data[use,i] <- sanitize(data[use,i])
+			if (sanitize.text.function == 'default'){
+				data[use,i] <- sanitize(data[use,i])
+			}
 		}
+	}
+
+	# Set up sanitize.text.function for xtable
+	if (sanitize.text.function == 'default'){
+		sanitize.text.function <- function(x) {x}
 	}
 	
 	# Alignment
-	if (nchar(align) < (ncol(data) + 1)){
+	if (length(align) < (ncol(data) + 1)){
+		# align must have an additional element for row.names
+		# in the xtable function. We assume align is a vector rather
+		# than a single character vector
+		if (include.rownames == FALSE & length(align) == ncol(data)){	
+			align <- c('l', align)
+		} 
 		# repeat last character if not enough align characters
-		align=paste(c(align, rep(substr(align, nchar(align),
-			nchar(align)), ncol(data))), collapse='')
+		align = c(align, rep(align[length(align)], ncol(data)))
 	}
-	if (nchar(align) > (ncol(data)+1)){
-		# truncate align if too many
-		align <- substr(align, 1, ncol(data)+1)
-	}
-	invisible(capture.output(x <- print(xtable(data, align=align), 
-		floating=FALSE,
-		sanitize.text.function=sanitize.text.function,
-		include.colnames=FALSE,
-		include.rownames=include.rownames,
-		sanitize.rownames.function=sanitize,
-		sanitize.colnames.function=sanitize, ...)))
+	# Truncate align to the correct length
+	align <- align[1:(ncol(data) + 1)]
+
+	invisible(capture.output(x <- print(xtable(data, align = align), 
+		floating = FALSE,
+		sanitize.text.function = sanitize.text.function,
+		include.colnames = include.colnames,
+		include.rownames = include.rownames,
+		sanitize.rownames.function = sanitize,
+		sanitize.colnames.function = sanitize, ...)))
 	# replace MULTI1l with \multicolumn{1}{l} ...
 	# replace MULTI2c with \multicolumn{2}{c} ... (and remove one &)
 	x <- gsub('MULTI1([lrc])([^&]*)', '\\\\multicolumn{1}{\\1}{\\2}', x)
@@ -183,7 +195,7 @@ exportTable <- function(data, filename = NULL, align='l',
 		x <- strsplit(x, '\\\\hline')[[1]]
 		# paste back using \toprule, \midrule etc.
 		x <- x[1] %&% '\\toprule' %&% 
-			paste(x[2:(length(x)-1)], collapse='\\midrule') %&% 
+			paste(x[2:(length(x) - 1)], collapse = '\\midrule') %&% 
 			'\\bottomrule' %&% x[length(x)]
 	}
 	

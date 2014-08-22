@@ -69,9 +69,10 @@ setdictionary <- function(dictName1 = NULL, dictName2 = NULL,
 		# Dictionaries not currently required switched to FALSE.
 		META[item %in% ALLDICTS & !(item %in% whichdictionary),
 			value := 'FALSE']
-		# Change value to TRUE if it is FALSE but leave it unchanged
-		# if it specifies a data source
+		# Change value to TRUE if it is FALSE or blank
+		# but leave it unchanged if it specifies a data source
 		META[item %in% whichdictionary & value == 'FALSE', value := 'TRUE']
+		META[item %in% whichdictionary & value == '', value := 'TRUE']
 		if (!all(whichdictionary %in% ALLDICTS)){
 			stop('Dictionary name(s) not valid; they should be in (' %&%
 				paste(ALLDICTS, collapse=', ') %&% ')')

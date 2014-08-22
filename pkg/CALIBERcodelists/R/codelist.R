@@ -367,7 +367,7 @@ tableToCodelist <- function(x, noisy = FALSE){
 	}
 
 	# Standardise column names
-	if (all(c('prodcode', 'prodname', 'multilex') %in% names(x))){
+	if ('prodcode' %in% colnames(x)){
 		# This is a product codelist
 		# multilex == code (column renamed 'multilex' on export)
 		# prodname == term (column renamed on export)
@@ -375,8 +375,8 @@ tableToCodelist <- function(x, noisy = FALSE){
 		if (!(metadata$Source %in% SOURCEDICTS[dict == 'product', Source])){
 			metadata$Source <- 'GPRDPROD'
 		}
-		setnames(x, 'multilex', 'code')
-		setnames(x, 'prodname', 'term')
+		if ('multilex' %in% colnames(x)) setnames(x, 'multilex', 'code')
+		if ('prodname' %in% colnames(x)) setnames(x, 'prodname', 'term')
 	} else if ('readcode' %in% names(x)){
 		if (!(metadata$Source %in% SOURCEDICTS[dict == 'read', Source])){
 			metadata$Source <- 'GPRD'

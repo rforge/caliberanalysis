@@ -34,7 +34,7 @@ An object with classes \sQuote{cohort} and either \sQuote{data.table} or \sQuote
 and the following attributes:
 \describe{
 \item{idcolname}{ID column name}
-\item{description}{description of the column}
+\item{description}{description of the columns}
 }
 If it is a data.table cohort, the ID column is the leftmost column and all the others are arranged
 alphabetically.

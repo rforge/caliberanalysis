@@ -93,15 +93,25 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 		stop('limit_days should be a numeric vector of length 2')
 	}
 
+	#### Create a data.table DATA containing data of interest ####
 	if (!is.data.table(data)){
 		DATA <- as.data.table(as.data.frame(data))
+		setnames(DATA, old_varname, 'value')
+		setnames(DATA, datecolname, '.eventdate')
 	} else {
-		DATA <- copy(data[, c(idcolname, old_varname, datecolname),
-			with = FALSE])
+		if (old_varname == datecolname){
+			# Event date is the value to be extracted
+			DATA <- copy(data[, c(idcolname, old_varname),
+				with = FALSE])
+			setnames(DATA, old_varname, 'value')
+			DATA[, .eventdate := value]
+		} else {
+			DATA <- copy(data[, c(idcolname, old_varname, datecolname),
+				with = FALSE])
+			setnames(DATA, old_varname, 'value')
+			setnames(DATA, datecolname, '.eventdate')
+		}
 	}
-
-	setnames(DATA, old_varname, 'value')
-	setnames(DATA, datecolname, '.eventdate')
 
 	date_priority <- date_priority[1]
 	if (!(date_priority %in% c('all', 'first', 'last'))){
@@ -128,7 +138,7 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 	DATA[include == TRUE, .chosen := choiceFun(value), by = .id]
 	# Keep only one row per patient
 	DATA[include == TRUE,
-		include := c(TRUE, rep(FALSE, length(include) - 1)), by = .id]
+		include := c(TRUE, rep(FALSE, .N - 1)), by = .id]
 	
 	DATA[, value := NULL]
 	# Keep relevant rows only

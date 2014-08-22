@@ -29,19 +29,20 @@ convertDates.data.table <- function(data, datecolnames,
 	# Doesn't convert columns with blank names
 	# Arguments: data = a data.table
 	#            datecolnames = a vector of column names to convert
-
 	initial <- sapply(data, function(x) class(x)[1])
 	
 	# Update columns by reference
 	# Backquote column names to allow names starting with
 	# numbers to be used. However, empty column names
 	# may not be used.
-	for (col in datecolnames){
-		if (col == ''){
+	for (colname in datecolnames){
+		cat('colname', colname, '\n')
+		if (colname == ''){
 			# this is probably the row number, don't try to convert
 		} else {
-			data[, eval(parse(text = paste('`', col,
-				'`:=textToDate(`', col, '`)', sep = '')))]
+			thecommand <- paste('`', colname,
+				'`:=textToDate(`', colname, '`)', sep = '')
+			data[, eval(parse(text = thecommand))]
 		}
 	}
 

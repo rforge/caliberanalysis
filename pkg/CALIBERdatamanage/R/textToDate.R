@@ -44,7 +44,7 @@ textToDate <- function(x,
 			}
 		
 			if (found == FALSE){
-				warning('Unable to detect date format')
+				# Unable to detect date format
 				datestring
 			}	else { 
 				if ('parallel' %in% loadedNamespaces()) {

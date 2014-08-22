@@ -1,5 +1,5 @@
 transferVariables <- function(fromdata, todata, varnames,
-	by = NULL, description = NULL){
+	by = NULL, description = NULL, drop = FALSE){
 	# A convenience function for transferring variables from one dataset
 	# to another
 	# Arguments: fromdata = a data.table or ffdf from which to get the variables.
@@ -10,6 +10,7 @@ transferVariables <- function(fromdata, todata, varnames,
 	#            description = character vector (one element per variable
 	#                        to be transferred, to give a description of
 	#                        transferred column in todata if it is a cohort)
+  #            drop = whether to delete these columns from fromdata
 
 	#### Ensure description is valid ####	
 	if (!is.null(description)){
@@ -27,10 +28,21 @@ transferVariables <- function(fromdata, todata, varnames,
 			gsub('\n|\t| +', ' ', capture.output(print(thecall))), collapse = ' ')
 	}
 
-	# Recycle description if multiple columns are transferred
+	# Recycle default description if multiple columns are transferred
 	description <- rep(description,
 		length(varnames))[1:length(varnames)]
 	names(description) <- varnames
+
+	# Use description from fromdata if it is a cohort
+	if (is.cohort(fromdata)){
+		for (varname in varnames){
+			desc <- attr(fromdata, 'description')
+			if (varname %in% desc$colname){
+				description[varname] <-
+					desc[desc$colname == varname, ]$description
+			}
+		}
+	}
 
 	#### Key column ####
 	if (is.null(by)){
@@ -113,6 +125,22 @@ transferVariables <- function(fromdata, todata, varnames,
 		} else {
 			warning(paste(varname,
 				' not found in "fromdata" data.table', sep=''))
+		}
+	}
+
+	# Removing columns from fromdata
+	if (drop == TRUE){
+		if (is.data.table(fromdata)){
+			if (is.cohort(fromdata)){
+				# Use removeColumn in order to handle the description table
+				removeColumns(fromdata, varnames)
+			} else {
+				for (varname in varnames){
+					fromdata[, varname := NULL, with = FALSE]
+				}
+			}
+		} else {
+			warning('Variables can only be dropped from data.tables, so drop = TRUE is being ignored.')
 		}
 	}
 

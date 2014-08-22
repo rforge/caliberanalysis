@@ -7,9 +7,9 @@
 # options(CALIBERdatamanage_phantom=TRUE)
 
 formatp <- function(pvalues, minp = 0.0001, 
-	latex=(getOption('xtable.type')=='latex'), ...){
+	latex = (getOption('xtable.type') == 'latex'), ...){
 	# Format p values
-	minptext <- format(minp, scientific=FALSE)
+	minptext <- format(minp, scientific=FALSE, ...)
 		
 	if (is.null(latex)){ latex <- FALSE }
 	if (length(latex) == 0){ latex <- FALSE }
@@ -24,17 +24,20 @@ formatp <- function(pvalues, minp = 0.0001,
 	} else {
 		text[as.numeric(pvalues) < minp] <- '<' %&% minptext
 	}
-	formatnum(text, sigfig=2, scientific=FALSE, latex=latex, ...)
+	formatnum(text, sigfig = 2, scientific = FALSE, latex = latex, ...)
 }
 
-formatci <- function(range, scientific=FALSE, intsep=', ', ...){
-	'(' %&% formatnum(min(range), scientific=scientific, ...) %&%
-		intsep %&% formatnum(max(range), scientific=scientific, ...) %&% ')'
+formatci <- function(range, scientific = FALSE,
+	template = '(\\1, \\2)',  ...){
+	sub('([^_]+)__([^_]+)', template,
+		formatnum(min(range), scientific = scientific, ...) %&%
+		'__' %&% formatnum(max(range), scientific = scientific, ...))
 }
 
-formatnum <- function(numbers, dp=NA, sigfig=3,
-	scientific=TRUE, latex=(getOption('xtable.type')=='latex'),
-	usephantom=getOption('CALIBERdatamanage_phantom'), names = NULL){
+formatnum <- function(numbers, dp = NA, sigfig = 3,
+	scientific = TRUE, latex = (getOption('xtable.type') == 'latex'),
+	usephantom = getOption('CALIBERdatamanage_phantom'), names = NULL,
+	decimal.mark = '.'){
 	# Only convert those that are actually numbers
 	# Can specify either sigfig or decimal places
 
@@ -46,24 +49,27 @@ formatnum <- function(numbers, dp=NA, sigfig=3,
 		# convert % to \%
 		numbers <- sub('%', '\\\\%', sub('\\\\%', '%', numbers))
 	}
-	x <- as.numeric(numbers)
+	suppressWarnings(x <- as.numeric(numbers))
 	convert <- !is.na(x)
 	
 	# if dp is not null, use a fixed number of decimal places
 	if (!is.na(dp)){
-	  text <- sapply(x, formatC, format='f', digits=dp)
+		text <- sapply(x, formatC, format = 'f', digits = dp,
+			decimal.mark = decimal.mark)
 	} else {
     if (is.na(sigfig)){
       sigfig <- 3
     }
 		# use significant figures
 		if (scientific & latex){
-			text <- sapply(x, format, digits=sigfig, scientific=-1)
-
+			text <- sapply(x, format, digits = sigfig, scientific = -1,
+				decimal.mark = decimal.mark)
 		} else if (scientific) {
-			text <- sapply(x, format, digits=sigfig, scientific=-1)
+			text <- sapply(x, format, digits = sigfig, scientific = -1,
+				decimal.mark = decimal.mark)
 		} else {
-			text <- sapply(x, format, digits=sigfig, scientific=FALSE)
+			text <- sapply(x, format, digits = sigfig, scientific = FALSE,
+				decimal.mark = decimal.mark)
 		}
 	}
 	
@@ -78,24 +84,26 @@ formatnum <- function(numbers, dp=NA, sigfig=3,
 			beforeneg[!hasnegative] <- '\\phantom{-}'
 		}
 		# digits before (ignoring negative sign)
-		before <- regexpr('\\.', text %&% '.') - 1 - hasnegative
+		before <- regexpr(decimal.mark, text %&% decimal.mark,
+			fixed = TRUE) - 1 - hasnegative
 		before[!convert] <- 0
     before[grepl('e', text)] <- 0
     after <- pmax(0, nchar(text) - (before + 1 + hasnegative))
 		# whether to add a phantom decimal point after the text
-		addpoint <- (nchar(text)==before)
+		addpoint <- (nchar(text) == before)
 		# add point if numeric and does not have a decimal point
-		text[addpoint & convert] <- text[addpoint & convert] %&% '\\phantom{.}'
+		text[addpoint & convert] <- text[addpoint & convert] %&%
+			'\\phantom{' %&% decimal.mark %&% '}'
 		# create before and after phantoms
 		before <- sapply(before, function(x){
-			paste(rep('\\phantom{0}', max(before)-x), collapse='')
+			paste(rep('\\phantom{0}', max(before) - x), collapse = '')
 		})
     # Don't mess about with exponentials
     before[grepl('e', text)] <- ''
     after[!convert] <- 0
     after[grepl('e', text)] <- 0
 		after <- sapply(after, function(x){
-			paste(rep('\\phantom{0}', max(after)-x), collapse='')
+			paste(rep('\\phantom{0}', max(after) - x), collapse = '')
 		})
 		after[grepl('e', text)] <- ''
 		text <- beforeneg %&% before %&% text %&% after
@@ -127,7 +135,8 @@ formatnum <- function(numbers, dp=NA, sigfig=3,
 	text
 }
 
-formathr <- function(coef, se, df=Inf, dp=NA, pstar=TRUE, ...){
+formathr <- function(coef, se, df = Inf, dp = NA, pstar = TRUE,
+	pvalueci = 0.05, template = '\\1 (\\2, \\3)', ...){
 	# Formats hazard ratios and standard errors for display
 	# Uses the t distribution if appropriate
 	# Replicate df if not given for all observations
@@ -138,32 +147,36 @@ formathr <- function(coef, se, df=Inf, dp=NA, pstar=TRUE, ...){
 		dp <- rep(2, length(coef))
 		dp[coef > 1] <- 1
 	}
-	pvalue <- 2*pt(-abs(coef)/se, df)
-	formathr <- character(length(coef))
+	pvalues <- 2 * pt(-abs(coef) / se, df)
+	out <- character(length(coef))
 	for (i in 1:length(coef)){
-		formathr[i] <- formatnum(exp(coef[i]), dp=dp[i], ...) %&% ' (' %&%
-			paste(formatnum(exp(coef[i] + qt(c(0.025, 0.975), df[i])*se[i]),
-					dp=dp[i], ...),	collapse=', ') %&%
-			')'
+		out[i] <- 	sub('([^_]+)__([^_]+)__([^_]+)', template,
+			formatnum(exp(coef[i]), dp = dp[i], ...) %&% '__' %&%
+			paste(formatnum(exp(coef[i] + qt(c(pvalueci / 2,
+			1 - (pvalueci / 2)), df[i]) * se[i]), dp = dp[i], ...),
+			collapse = '__'))
 	}
-  if (pstar) {
-      formathr[istrue(pvalue < 0.05)] <-
-		formathr[istrue(pvalue < 0.05)] %&% " *"
-      formathr[istrue(pvalue < 0.01)] <-
-		formathr[istrue(pvalue < 0.01)] %&% "*"
-      formathr[istrue(pvalue < 0.001)] <-
-		formathr[istrue(pvalue < 0.001)] %&% "*"
-  }
-	formathr
+	if (pstar) {
+		# 0.05
+		out[istrue(pvalues < pvalueci)] <-
+			out[istrue(pvalues < pvalueci)] %&% " *"
+		# 0.01
+		out[istrue(pvalues < pvalueci / 5)] <-
+			out[istrue(pvalues < pvalueci / 5)] %&% "*"
+		# 0.001
+		out[istrue(pvalues < pvalueci / 50)] <-
+			out[istrue(pvalues < pvalueci / 50)] %&% "*"
+	}
+	out
 }
 
-percentConf <- function(logicalvector, ...){
+percentConf <- function(logicalvector, dp = 1, ...){
 	# returns a string with percentage and confidence interval,
 	# but no percentage sign
 	result <- binom.test(sum(istrue(logicalvector)),
 		sum(!is.na(logicalvector)))
-	formatnum(result$estimate * 100, ...) %&% ' ' %&%
-		formatci(100 * result$conf.int, ...)
+	formatnum(result$estimate * 100, dp = dp, ...) %&% ' ' %&%
+		formatci(100 * result$conf.int, dp = dp, ...)
 }
 
 meansd <- function(x, ...){

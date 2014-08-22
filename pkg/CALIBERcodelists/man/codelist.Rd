@@ -38,15 +38,15 @@ is.codelist(x)
 If \code{x} is null, terms from the currently selected dictionary with a positive category assigned in \code{\link{CALIBER_DICT}} are
 used. If \code{x} is the name of a source dictionary (read, icd10 or opcs), codes from that dictionary with a positive category
 are used. If \code{x} is a filename for a text file or Stata .dta file, it is imported as a codelist. If \code{x} is a
-\code{\link{selection}} object, the selected terms comprise the new codelist with 
+\code{\link{selection}} object, the selected terms comprise the new codelist with category = 1.
 
-The codelist class inherits from data.table so most of the data.table functions are available, but if the data.table is copied or its size is changed,
-the new object may be a data.table rather than a codelist and its attributes may be lost.
+The codelist class inherits from data.table so most of the data.table functions are available, but if the data.table is copied or its size is changed using standard data.table methods,
+the new object may be a plain data.table rather than a codelist and its attributes may be lost.
 
-Therefore a \code{subset} method is provided to enable a new codelist to be generated which is a subset of another codelist.
+Therefore a \code{subset} method for codelists is provided to ensure that a subset of a codelist remains a codelist.
 
 Codelists are data.table objects and are therefore passed by reference, not by value. In order to 
-create a copy of the codelist you must use the \code{copy} function of data.table. If you assign
+create a copy of the codelist you must use the \code{copy} function of data.table. This copies the attributes of the data.table including its class, and ensures that it remains as a data.table. If you assign
 a codelist to a new name, both names will refer to the samy underlying codelist.
 }
 

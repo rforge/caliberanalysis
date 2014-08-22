@@ -46,8 +46,8 @@ extractCodes <- function(data, codelist, enttypes = NULL,
 		setnames(mycodelist, 'medcode', codename)
 		setnames(mycodelist, 'category', varname)
 	} else if (attr(codelist, 'Source') == 'GPRDPROD'){
-		mycodelist <- mycodelist[, list(medcode, category)]
-		# Set name of medcode column to the same as in data
+		mycodelist <- mycodelist[, list(prodcode, category)]
+		# Set name of prodcode column to the same as in data
 		setnames(mycodelist, 'prodcode', codename)
 		setnames(mycodelist, 'category', varname)
 	} else {
@@ -107,7 +107,7 @@ extractCodes <- function(data, codelist, enttypes = NULL,
 
 		# Extract subset of ffdf or data.table
 		if (is.ffdf(data)){
-			keep <- ff(!is.na(tomatch$category))
+			keep <- !is.na(tomatch$category)
 			rownames(data) <- NULL
 			out <- subset(data, keep)
 			eval(parse(text = paste('out$', varname,
@@ -131,10 +131,11 @@ extractCodes <- function(data, codelist, enttypes = NULL,
 				stop('No enttype column in the data.')
 			}
 			if (is.ffdf(out)){
-				keep <- as.ff(as.ram(out$enttype) %in% enttypes)
-				out <- subset(out, keep)
+				myenttype <- as.ffdf(data.frame(.temp = 1, enttype = enttypes))
+				out <- merge(out, myenttype, by = 'enttype')
+				out$.temp <- NULL
 			} else {
-				out <- subset(out, out$enttype %in% enttypes)
+				out <- subset(out, istrue(out$enttype %in% enttypes))
 			}
 		}
 	}

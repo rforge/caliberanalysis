@@ -1,11 +1,37 @@
 ==================================================
+Changes in CALIBERcodelists version 0.2-8
+==================================================
+
+TODO
+
+- Allow metadata to be set using arguments in as.codelist,
+  rather than having to call setMetadata afterwards
+- Change name of product codelists from GPRDPROD to
+  MULTILEX
+- Bug fix needed: remove . in codes in ICD-10 and OPCS codelists
+  Failing to check OPCS codes in tabletocodelist
+
+==================================================
+Changes in CALIBERcodelists version 0.2-7
+==================================================
+
+CHANGES
+
+- export is now an S3 generic function, and calls the
+  function export.codelist for codelist objects.
+
+BUG FIXES
+
+- Product codelists not recognised if the multilex
+  column was names 'code' - corrected.
+- Blank dictionary entries in META not over-written
+
+==================================================
 Changes in CALIBERcodelists version 0.2-6
 ==================================================
 
 BUG FIXES
 
-- Precompile sysdata to try to avoid errors in building
-  Windows version
 - Lines containing only a single quote are no longer
   wrongly considered as categories, when importing
   from CSV files (e.g. if the file has been edited
@@ -14,8 +40,8 @@ BUG FIXES
   name of individual dictionaries because it was
   counting the number of dictionaries in use 
   incorrectly, now fixed.
-- dictis() had an error in detecting which dictionaries
-  are in use (was querying the META table directly, now
+- dictis() had an error in detecting which dictionaries are
+  in use (was querying the META table directly, now
   corrected to use getdictionary() instead).
 
 ==================================================

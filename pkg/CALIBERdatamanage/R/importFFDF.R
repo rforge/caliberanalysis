@@ -1,6 +1,5 @@
 # Imports a text file to FFDF
 # Option to load multiple files, or load a single file
-# chunkwise to allow for missing dates
 importFFDF <- function(filename, datecolnames = NULL,
 	verbose = TRUE,	sep = NULL,	zipname = NULL,
 	nrowcheck = 30,  ...){
@@ -28,14 +27,14 @@ importFFDF <- function(filename, datecolnames = NULL,
 	colnames <- names(temp)
 	colClasses <- sub('IDate', 'Date',
 		sapply(temp, function(x){class(x)[1]}))
-	colClasses[colClasses=='character'] <- 'factor'
+	colClasses[colClasses == 'character'] <- 'factor'
 	# Ignore integer and logical colclasses in case they
 	# need to be converted
-	colClasses[colClasses=='integer'] <- NA
-	colClasses[colClasses=='logical'] <- NA	
+	colClasses[colClasses == 'integer'] <- NA
+	colClasses[colClasses == 'logical'] <- NA	
 	
 	# If all dates are missing, colClass is NA. If some dates
-	# ar missing, colClass is Factor.
+	# are missing, colClass is Factor.
 	fracmissing <- sapply(temp, function(x){
 		sum(is.na(x)) / length(x)
 	})
@@ -65,7 +64,7 @@ importFFDF <- function(filename, datecolnames = NULL,
 				message('Importing ' %&% filename[i])
 			}
 			datafile <- read.csv.ffdf(datafile, filename[i],
-				colClasses=colClasses)
+				colClasses = colClasses)
 		}
 	}
 	

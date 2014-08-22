@@ -105,10 +105,15 @@ nameHasSource <- function(codelist){
 		ifelse(is.null(attr(codelist, 'Name')), '', attr(codelist, 'Name')))
 }
 
-export <- function(codelist, filename = NULL,
+export <- function(x, ...){
+	# S3 generic function definition
+	UseMethod("export")
+}
+
+export.codelist <- function(x, filename = NULL,
 	categories = 'all', contractIfICD10 = TRUE, contractIfICD9 = TRUE){
 	# Exports a codelist to file. All metadata must be stored in the codelist.
-	# Arguments: codelist - coerced to codelist if is.codelist(codelist) is FALSE
+	# Arguments: x - a codelist object
 	#            filename - exact filename of file to export to
 	#            categories - which categories to export; default=all, otherwise
 	#                    supply a numeric vector of categories (note that this
@@ -117,21 +122,21 @@ export <- function(codelist, filename = NULL,
 
 	# If filename is null, create a filename from codelist
 	if (is.null(filename)){
-		filename <- makeCodelistFilename(codelist)
+		filename <- makeCodelistFilename(x)
 	} else if (grepl('[\\\\/]$', filename)){
 		# filename is a directory; so create a filename
-		filename <- filename %&% makeCodelistFilename(codelist)
+		filename <- filename %&% makeCodelistFilename(x)
 	} else {
 		# Check that it conforms to policy
-		if (!filenameAccordingToProtocol(filename, codelist)){
+		if (!filenameAccordingToProtocol(filename, x)){
 			cat('\nNote: CALIBER codelist naming policy would recommend\n' %&%
-				makeCodelistFilename(codelist))
+				makeCodelistFilename(x))
 		}
 	}
 	
-	cat('\nExporting ' %&% attr(codelist, 'Name') %&%
+	cat('\nExporting ' %&% attr(x, 'Name') %&%
 		' codelist to ' %&% filename %&% '\n')
-	what <- subset(codelist, category > 0)
+	what <- subset(x, category > 0)
 
 	# Update the timestamp
 	setattr(what, 'Timestamp', format(Sys.time(), '%H.%m %d-%b-%y'))

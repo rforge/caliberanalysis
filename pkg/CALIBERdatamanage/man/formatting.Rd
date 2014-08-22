@@ -15,11 +15,13 @@ Functions to format numbers for publication, producing either plain text or LaTe
 \usage{
 formatnum(numbers, dp = NA, sigfig = 3, scientific = TRUE,
     latex = (getOption("xtable.type") == "latex"),
-    usephantom = getOption("CALIBERdatamanage_phantom"), names = NULL)
+    usephantom = getOption("CALIBERdatamanage_phantom"), names = NULL,
+    decimal.mark = ".")
 formatp(pvalues, minp = 0.0001,
     latex=(getOption('xtable.type')=='latex'), ...)
-formathr(coef, se, df = Inf, dp = NA, pstar = TRUE, ...)
-formatci(range, scientific = FALSE, intsep = ", ", ...)
+formathr(coef, se, df = Inf, dp = NA, pstar = TRUE,
+    pvalueci = 0.05, template = '\\\\1 (\\\\2, \\\\3)', ...)
+formatci(range, scientific = FALSE, template = '(\\\\1, \\\\2)', ...)
 }
 
 
@@ -51,7 +53,6 @@ numeric vector of P value values to be formatted
   \item{minp}{
 minimum P value to display as an exact value
 }
-
   \item{coef}{
 coefficient (log hazard ratio or log odds ratio)
 }
@@ -62,13 +63,19 @@ standard error of coefficient
 degrees of freedom for t-distribution; Inf to use the Normal distribution
 }
   \item{pstar}{
-TRUE to include stars for significance level: * < 0.05, ** < 0.01, *** < 0.001
+TRUE to include stars for P value: * < 0.05, ** < 0.01, *** < 0.001
 }
   \item{range}{
 numeric vector containing the upper and lower confidence limits
 }
-  \item{intsep}{
-character string for the confidence interval separator; default is comma
+  \item{pvalueci}{
+significance level to be used in the calculation of confidence intervals
+}
+  \item{template}{
+character string template with \\1 and \\2 representing numbers forming the confidence interval (formatci), and \\1, \\2 and \\3 representing the estimate and confidence interval for formathr. 
+}
+  \item{decimal.mark}{
+character to be used for decimal point, default is . 
 }
   \item{\dots}{
 other arguments to be passed to \code{formatnum}
@@ -108,6 +115,8 @@ formathr(0.8, 0.3, latex = FALSE)
 # "2.23 (1.24, 4.01) **"
 formathr(0.8, 0.3, latex = TRUE)
 # "$2.23$ ($1.24$, $4.01$) **"
+formathr(0.8, 0.3, latex = TRUE, template = '\\1; \\1--\\2')
+# "$2.23$; $1.24$--$4.01$ **"
 # Missing values should not cause errors
 formathr(c(0.8, 0.8, NA), c(NA, 0.3, 0.3))
 # [1] "2.23 (NA, NA)"        "2.23 (1.24, 4.01) **" "NA (NA, NA)" 

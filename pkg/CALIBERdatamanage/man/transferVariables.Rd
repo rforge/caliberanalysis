@@ -7,13 +7,13 @@ Transfer variables from one dataset to another
 
 \description{
 Copy variables from one dataset (ffdf or data.table)
-to another. The key column (usually anonpatid) must
+to another. The key column must
 be unique in the data.table being transferred from.
 }
 
 \usage{
 transferVariables(fromdata, todata, varnames,
-    by = NULL, description = NULL)
+    by = NULL, description = NULL, drop = FALSE)
 }
 
 \arguments{
@@ -34,8 +34,13 @@ fromdata or todata.
 character vector containing a description for each new variable,
 recycled as necessary. This is used to update the description
 table if \code{todata} is a cohort object, and is ignored
-otherwise. If NULL, the description is
+otherwise. If NULL, the description is taken from fromdata
+(if it is a cohort), otherwise it defaults to 
 'transferVariable' with date and time.
+}
+  \item{drop}{
+TRUE or FALSE, whether to delete the variables from fromdata
+(default = FALSE). This is only possible if fromdata is a data.table.
 }
 }
 
@@ -64,8 +69,11 @@ mycohort <- data.table(anonpatid=1:2,
     indexdate=as.IDate(c('2010-01-01', '2009-01-01')),
     ethnic_hes=c('Black', 'White'))
 mycohort <- as.cohort(mycohort)
+modifyDescription(mycohort, c('indexdate', 'ethnic_hes'),
+    c('Study entry date', 'Ethnicity as recorded in HES'))
 mydata <- data.table(anonpatid=c(2, 2, 3),
     eventdate=as.IDate(c('2006-01-01', '2008-01-01', '2005-01-01')))
+mycohort2 <- as.cohort(mydata[2:3])
 
 # A common use of this function might be to copy the index dates
 # to a repeated measures file.
@@ -104,4 +112,9 @@ print(mydataffdf)
 # R object is copied, not the underlying flat files.
 mydataffdf <- transferVariables(mycohort, mydataffdf, 'indexdate')
 print(mydataffdf)
+
+# Transferring from cohort to cohort, and dropping in the 
+# source data.table
+transferVariables(mycohort, mycohort2, 'indexdate', drop = TRUE)
+print(mycohort2)
 }

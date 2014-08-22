@@ -18,7 +18,7 @@ nmissing(x, ...)
 percent(logicalvector, dp = 1,
     latex = (getOption("xtable.type") == "latex"))
 npercent(logicalvector, ...)
-percentConf(logicalvector, ...)
+percentConf(logicalvector, dp = 1, ...)
 meansd(x, ...)
 }
 

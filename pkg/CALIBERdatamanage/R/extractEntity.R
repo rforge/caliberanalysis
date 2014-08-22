@@ -76,13 +76,17 @@ extractEntity <- function(data, enttype,
 				'", envir = environment())', sep = '')))
 			temp <- copy(get(lookupname))
 			setkeyv(temp, categorycol)
-			if (stringsAsFactors){
-				factor(vector, levels = 1:max(vector, na.rm = TRUE),
-					labels = temp[J(1:max(vector, na.rm = TRUE)),
-						labelcol, with = FALSE, mult='first'][[labelcol]])
-			} else {
-				temp[J(vector), labelcol, with = FALSE,
-					mult='first'][[labelcol]]
+			if (any(!is.na(vector))){
+				# check that vector is not all missing, as this would cause
+				# an error in max(vector)
+				if (stringsAsFactors){
+					factor(vector, levels = 1:max(vector, na.rm = TRUE),
+						labels = temp[J(1:max(vector, na.rm = TRUE)),
+							labelcol, with = FALSE, mult='first'][[labelcol]])
+				} else {
+					temp[J(vector), labelcol, with = FALSE,
+						mult='first'][[labelcol]]
+				}
 			}
 		} else {
 			stop('CALIBERlookups package unavailable.')

@@ -32,7 +32,7 @@ TRUE or FALSE, whether to produce output in LaTeX format.
 separator if output is a text file.
 }
   \item{\dots}{
-other arguments.
+other arguments to pass to exportTable, e.g. \code{align}
 }
 }
 
@@ -45,6 +45,8 @@ The condition '<text>' means that the column contains entirely text, which shoul
 In the body of the template, the following convention is used:
 
 A period (.) means that the function above is repeated.
+
+The text 'MULTIXy contents', where X is a number betweeen 1 and 9 and y is one of 'c' (centre), 'l' (left) or 'r' (right) puts the contents into a multi-column cell spanning X columns aligned according to y. The required number of columns to the right must be blank.
 
 A function with an opening bracket but no closing bracket means that the variable name in the second column of the row should be used as the argument.
 
@@ -68,20 +70,43 @@ Anoop Shah
 }
 
 \seealso{
-
-
-
+\code{\link{exportTable}}
 }
 
 \examples{
+
 DT <- data.table(a=1:5, b=c(1,1,1,2,2))
+mytemplate <- rbind(c('1', 'DT', '<text>',  'b==1', 'b==2',  ''),
+                    c('0', '',     '',  '"MULTI2c Group"','',''),
+                    c('1', '',     '',      '"One"','"Two"', '"\\\\textbf{All}"'),
+                    c('1', '',     'N obs', '.N',    '.N',   '.N'),
+                    c('0', 'a',    'Mean a','mean(', 'mean(','mean('),
+                    c('1', 'b',    'Mean b','.',     '.',    '.'))
 
-mytemplate <- rbind(c('1', 'DT', '<text>', 'b==1',    'b==2',    ''),
-                    c('1', '',     '',       '"Grp 1"', '"Grp 2"', '"All"'),
-                    c('0', '',     'N obs',  '.N',      '.N',      '.N'),
-                    c('1', 'a',    'Mean a', 'mean(',   'mean(',   'mean('))
+# 'Group' will span two columns and will be centred
 
-summaryTable(mytemplate)
+print(summaryTable(mytemplate))
+#      [,1]     [,2]            [,3]  [,4]           
+# [1,] ""       "MULTI2c Group" ""    ""             
+# [2,] ""       "One"           "Two" "\\textbf{All}"
+# [3,] "N obs"  "3"             "2"   "5"            
+# [4,] "Mean a" "2"             "4.5" "3"            
+# [5,] "Mean b" "1"             "2"   "1.4"          
+
+cat(summaryTable(mytemplate, latex = TRUE, booktabs = TRUE, align = 'l'))
+# % latex table generated in R 3.0.2 by xtable 1.7-1 package
+# % Wed Nov 20 18:43:02 2013
+# \begin{tabular}{llll}
+#    \toprule
+#  & \multicolumn{2}{c}{ Group }  &  \\ 
+#  & One & Two & \textbf{All} \\ 
+#    \midrule
+# N obs & 3 & 2 & 5 \\ 
+#    \midrule
+# Mean a & 2 & 4.5 & 3 \\ 
+# Mean b & 1 & 2 & 1.4 \\ 
+#    \bottomrule
+# \end{tabular}
 
 }
 

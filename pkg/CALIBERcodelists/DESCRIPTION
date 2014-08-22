@@ -1,13 +1,32 @@
 Package: CALIBERcodelists
 Type: Package
 Title: Generate ICD10, Read and OPCS codelists
-Version: 0.2-6
-Date: 2013-11-20
-Author: Anoop Shah
-Maintainer: Anoop Shah <anoop@doctors.org.uk>
-Authors@R: c(person("Anoop Shah", "Developer", role=c("aut", "cre"), email="anoop@doctors.org.uk"), person("Harry Hemingway", "Supervisor", role="ths"), person("Spiros Denaxas", "Contributor", role="ctb"), person("Harriet Forbes", "Contributor", role="ctb"), person("Emily Herrett", "Contributor", role="ctb"), person("Katherine Morley", "Contributor", role="ctb"), person("Mar Pujades", "Contributor", role="ctb"), person("Joshua Wallace", "Contributor", role="ctb"))
+Version: 0.2-7
+Date: 2014-01-20
+Authors@R: c(person("Anoop", "Shah", role=c("aut", "cre"), email="anoop@doctors.org.uk"),
+    person("Harry", "Hemingway", role="ths"),
+    person("Aroon", "Hingorani", role="ths"),
+    person("Owen", "Nicholas", role="ths"),
+    person("Spiros", "Denaxas", role="ctb"),
+    person("Harriet", "Forbes", role="ctb"),
+    person("Emily", "Herrett", role="ctb"),
+    person("Katherine", "Morley", role="ctb"),
+    person("Mar", "Pujades", role="ctb"),
+    person("Joshua", "Wallace", role="ctb"))
 Description: Facilitates the generation, documentation and comparision of codelists for identifying diagnoses, procedures, investigations and other events recorded for patients in CALIBER electronic health record data. The CALIBER programme is funded by the Wellcome Trust (086091/Z/08/Z) and the National Institute for Health Research (NIHR) under its Programme Grants for Applied Research programme (RP-PG-0407-10314). The author is supported by a Wellcome Trust Clinical Research Training Fellowship (0938/30/Z/10/Z).
 License: GPL-3
 Depends: R (>= 2.14.1), data.table, knitr, markdown, foreign
 Enhances: CALIBERlookups
 LazyData: true
+Author: Anoop Shah [aut, cre],
+  Harry Hemingway [ths],
+  Aroon Hingorani [ths],
+  Owen Nicholas [ths],
+  Spiros Denaxas [ctb],
+  Harriet Forbes [ctb],
+  Emily Herrett [ctb],
+  Katherine Morley [ctb],
+  Mar Pujades [ctb],
+  Joshua Wallace [ctb]
+Maintainer: Anoop Shah <anoop@doctors.org.uk>
+

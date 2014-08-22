@@ -151,8 +151,13 @@ print.cohort <- function(x, ...){
 
 summary.cohort <- function(object, ...){
 	# Prints a summary of a cohort
-	cat('Cohort with', nrow(object),
-		'patients; ID column =', attr(object, 'idcolname'), '\n')
+	if (is.data.table(object)){
+		cat('Data.table cohort with ') 
+	} else if (is.ffdf(object)) {
+		cat('FFDF cohort with ')
+	}
+	cat(nrow(object), 'patients; ID column =',
+		attr(object, 'idcolname'), '\n')
 	cat('\nCOLUMN DESCRIPTIONS\n')
 
 	getclass <- function(colnames){
@@ -317,5 +322,4 @@ merge.cohort <- function(x, y, ...){
 		description <- rbind(attr(x, 'description'), attr(y, 'description')))
 	out	
 }
-
 

@@ -16,9 +16,11 @@ multiforest(data = NULL, rowheights = 1.1, colgaps = unit(0.3, "cm"),
     colgaps_cm = NULL, defaultfontface = "plain",
     defaultjust = "left", defaultfontsize = 10,
     defaultgraphwidth = unit(5, "cm"), 
-    defaultboxsize = 0.8, defaultxlab = "Hazard ratio",
+    defaultboxsize = 0.8, defaultboxcolour = "black",
+    defaultlinecolour = "black", defaultxlab = "Hazard ratio",
     xticks = NULL, xtickfontsize = 10, xlabfontsize = 12,
-    xlaboffset = -2.5, zerocolour = "gray", zerolinewidth = 1, ...)
+    xlaboffset = -2.5, zerocolour = "gray", zerolinewidth = 1,
+    zerolineposition = NULL, ...)
 multiforestPNG(data, outfile, border = 0.1, ...)
 multiforestPDF(data, outfile, border = 0.1, ...)
 }
@@ -57,6 +59,12 @@ default width of graph as a unit object, if not specified in data
   \item{defaultboxsize}{
 default box size, between 0 and 1. Set to NULL to set box size to relative inverse variance.
 }
+  \item{defaultboxcolour}{
+default box colour, if not specified in data
+}
+  \item{defaultlinecolour}{
+default line colour, if not specified in data
+}
   \item{defaultxlab}{
 default label for x axis
 }
@@ -77,6 +85,12 @@ colour of zero line (for hazard ratio = 1)
 }
   \item{zerolinewidth}{
 width of zero line
+}
+  \item{zerolineposition}{
+NULL to keep default position (0 on the linear scale, 1 where
+log coefficients are supplied and they are exponentiated in the 
+graph, such as for hazard ratios or odds ratios). Alternatively
+supply the value for plotting.
 }
   \item{\dots}{
 Other arguments to multiforest, read.delim or read.dta.
