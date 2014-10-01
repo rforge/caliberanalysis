@@ -10,7 +10,7 @@ This function uses a codelist to extract a subset of the data, and adds a column
 }
 
 \usage{
-extractCodes(data, codelist, enttypes = NULL,
+extractCodes(data, codelist, categories = NULL, enttypes = NULL,
     codename = switch(attr(codelist, 'Source'),
     GPRD = 'medcode', ONS = 'cod', HES = 'icd', OPCS = 'opcs',
     GPRDPROD = 'prodcode'), 
@@ -23,6 +23,9 @@ data.table or FFDF data frame from which to extract a subset.
 }
   \item{codelist}{
 codelist containing medcodes, ICD-10 codes, OPCS codes or product codes to extract.
+}
+  \item{categories}{
+optional vector of categories to include; NULL to include all  
 }
   \item{enttypes}{
 vector of entity types to extract, NULL to extract all entity types.

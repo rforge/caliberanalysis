@@ -2,23 +2,28 @@
 # Option to load multiple files, or load a single file
 importFFDF <- function(filename, datecolnames = NULL,
 	verbose = TRUE,	sep = NULL,	zipname = NULL,
-	nrowcheck = 30,  ...){
+	nrowcheck = 30, fread = FALSE, ...){
 	# Loads a set of files to FFDF, assuming that
 	# all dates are non-missing (direct date conversion in 
 	# read.csv.ffdf). Direct date conversion based on first
 	# nrowcheck rows.
+
+	# Ensure that unzipped files are deleted after loading
+	istempfile <- rep(FALSE, length(filename))
 	
 	if (!is.null(zipname)){
 		# Unzip and get actual filenames
 		filename <- mapply(getzipfilename, filename, zipname)
+		istempfile <- TRUE
 	} else {
 		for (i in seq_along(filename)){
 			if (grepl('\\.zip$|\\.ZIP$', filename[i])){
 				filename[i] <- getzipfilename(filename[i])
+				istempfile[i] <- TRUE
 			}
 		}
 	}
-	
+		
 	# Use the importDT function to try to find out which
 	# columns have dates
 	temp <- importDT(filename[1], nrows = nrowcheck,
@@ -48,8 +53,8 @@ importFFDF <- function(filename, datecolnames = NULL,
 		message('Importing ' %&% filename[1])
 	}
 	datafile <- read.csv.ffdf(NULL, filename[1],
-		colClasses=colClasses, ...)
-	
+		colClasses = colClasses, ...)
+		
 	# Append ffdf if necessary
 	if (length(filename) > 1){
 		for (i in 2:(length(filename))){
@@ -76,6 +81,12 @@ importFFDF <- function(filename, datecolnames = NULL,
 			sapply(as.data.table(datafile[1, ]),
 				function(x) class(x)[1]))), collapse = '\n'))
 	}
+	
+	# If using temporary files, delete them now
+	for (i in 1:length(filename)){
+		if (istempfile[i]) unlink(filename[i])
+	}
+	
 	# Set row names to NULL to save memory
 	rownames(datafile) <- NULL
 	datafile

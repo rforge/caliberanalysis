@@ -12,7 +12,7 @@ Imports a a text file or multiple files to FFDF, automatically converting dates.
 \usage{
 importFFDF(filename, datecolnames = NULL,
     verbose = TRUE, sep = NULL, zipname = NULL,
-    nrowcheck = 30, ...)
+    nrowcheck = 30, fread = FALSE, ...)
 }
 
 \arguments{
@@ -47,6 +47,9 @@ zipname can be vector of paths to multiple zip files.
 }
   \item{nrowcheck}{
 number of rows checked to determine the data type when loading chunkwise
+  }
+  \item{fread}{
+whether to use data.table's fread function for loading data
   }
   \item{\dots}{
 other arguments to pass to \code{read.delim}

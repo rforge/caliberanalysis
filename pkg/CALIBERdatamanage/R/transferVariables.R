@@ -1,3 +1,11 @@
+transferColumns  <- function(fromdata, todata, varnames,
+	by = NULL, description = NULL, drop = FALSE){
+	# Alias for transferVariables
+	transferVariables(fromdata = fromdata, todata = todata,
+		varnames = varnames, by = by, description = description,
+		drop = drop)
+}
+
 transferVariables <- function(fromdata, todata, varnames,
 	by = NULL, description = NULL, drop = FALSE){
 	# A convenience function for transferring variables from one dataset

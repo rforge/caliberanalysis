@@ -2,7 +2,7 @@
 \alias{addCodelistToCohort}
 
 \title{
-Adds information from categories based on a Read codelist
+Adds information from categories based on a codelist
 }
 
 \description{
@@ -12,16 +12,19 @@ category, eventdate. If a patient has
 more than one record, the category of choice is chosen according to
 an order of priority, or a binary outcome is generated if the patient
 has any records fulfilling the criteria.
-
-Currently this function only works for Read codelists. 
 }
 
 \usage{
 addCodelistToCohort(cohort, varname, data, codelist,
-    categories, entities = 'all', binary = FALSE,
+    categories = NULL, enttypes = NULL,
+    codename = switch(attr(codelist, 'Source'),
+    GPRD = 'medcode', ONS = 'cod', HES = 'icd', OPCS = 'opcs',
+    GPRDPROD = 'prodcode'), binary = FALSE,
     limit_years = c(-Inf, 0),  idcolname = attr(cohort, 'idcolname'),
-    datecolname = 'eventdate', indexcolname = 'indexdate',
-    overwrite = TRUE, description = NULL, limit_days = NULL)
+    datecolname = c('eventdate', 'evdate', 'dod', 'epistart',
+    'admidate'), indexcolname = 'indexdate',
+    overwrite = TRUE, description = NULL, limit_days = NULL,
+    entities = 'all')
 }
 
 \arguments{
@@ -42,9 +45,13 @@ a codelist object or the name of a codelist file for selection of events by medc
 vector of categories to use, in priority order
 (highest priority first). If the result is
 binary, the order of categories does not matter.
+Leave as NULL (default) to include all categories.
 }
-  \item{entities}{
-which entity types to use, default = 'all', or a numeric vector
+  \item{enttypes}{
+numeric vector of entity types to use, default = NULL (use all)
+}
+  \item{codename}{
+name of the column in data containing the relevant medical code
 }
   \item{binary}{
 whether to lump all categories together to make a binary variable
@@ -57,7 +64,8 @@ which selects all events prior to or on the index date.
 name of the patient identifier column in \code{data}
 }
   \item{datecolname}{
-name of the event date column in \code{data}
+name of the event date column in \code{data}. If multiple options are
+given, they are tried in turn to find a column that contains dates.
 }
   \item{indexcolname}{
 name of the index date column in the cohort dataset \code{x}
@@ -71,6 +79,9 @@ description for the new variable. Defaults to the function call which generated 
   \item{limit_days}{
 a vector of length 2 for the time limits, which over-rules limit_years if both are supplied.
 A year is considered to be 365.25 days.
+}
+  \item{entities}{
+deprecated way to specify which entity types to use, use enttypes instead.
 }
 }
 
@@ -102,12 +113,14 @@ newdata <- data.table(anonpatid = c(2, 2, 3, 3, 4, 4, 4),
     "2012-1-3", "2011-1-1", "2011-1-1", "2012-1-5", "2013-1-1", 
     "2011-1-1")), category = rep(2, 7))
 
-# Create a fake codelist
+# Create a sample codelist
 mycodelist <- data.table(medcode = 1:4,
 	code = c('246..00', '22A..00', '229..00', '423..00'),
     term = c('O/E - weight', 'O/E - blood pressure reading',
     	'O/E - height', 'Haemoglobin estimation'), category = c(1, 2, 2, 2))
 setattr(mycodelist, 'Source', 'GPRD')
+setattr(mycodelist, 'Categories', data.table(category = 1:2,
+    shortname = c('Weight', 'Other')))
 class(mycodelist) <- c('codelist', 'data.table', 'data.frame')
 
 # Using data.table, categories 1 or 2 (1 priority)

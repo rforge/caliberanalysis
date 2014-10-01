@@ -1,5 +1,5 @@
-extractCodes <- function(data, codelist, enttypes = NULL,
-	codename = switch(attr(codelist, 'Source'),
+extractCodes <- function(data, codelist, categories = NULL,
+	enttypes = NULL, codename = switch(attr(codelist, 'Source'),
 	GPRD = 'medcode', ONS = 'cod', HES = 'icd', OPCS = 'opcs',
 	GPRDPROD = 'prodcode'), varname = attr(codelist, 'Name')){
 	# Extracts a subset of records with a particular Read, OPCS
@@ -7,6 +7,8 @@ extractCodes <- function(data, codelist, enttypes = NULL,
 
 	# Arguments: data -- ffdf or data.table or data.frame
 	#            codelist -- a Read codelist
+	#            categories -- optional vector of categories to include;
+	#                   NULL to include all
 	#            enttypes -- vector of entity types to extract,
 	#                   NULL to extract all
 	#            varname -- new variable name
@@ -27,8 +29,15 @@ extractCodes <- function(data, codelist, enttypes = NULL,
 	}
 
 	# Prepare codelist
-	mycodelist <- copy(codelist)
-	catlabels <- copy(attr(codelist, 'Categories'))
+	if (!('codelist' %in% class(codelist))){
+		stop('codelist is not a codelist')
+	}
+	if (is.null(categories)){
+		mycodelist <- copy(codelist)
+	} else {
+		mycodelist <- subset(codelist, category %in% categories)
+	}
+	catlabels <- as.data.table(copy(attr(codelist, 'Categories')))
 	setkey(catlabels, category)
 	mylabels <- catlabels[J(1:max(catlabels$category)),
 		][, shortname]

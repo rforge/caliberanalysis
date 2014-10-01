@@ -1,5 +1,6 @@
 \name{transferVariables}
 \alias{transferVariables}
+\alias{transferColumns}
 
 \title{
 Transfer variables from one dataset to another
@@ -13,6 +14,8 @@ be unique in the data.table being transferred from.
 
 \usage{
 transferVariables(fromdata, todata, varnames,
+    by = NULL, description = NULL, drop = FALSE)
+transferColumns(fromdata, todata, varnames,
     by = NULL, description = NULL, drop = FALSE)
 }
 

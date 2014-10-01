@@ -14,6 +14,9 @@ importDT <- function(filename, datecolnames = NULL,
 	# Load Stata dataset or text file or zipped file
 	if (!is.null(zipname) | grepl('\\.zip$|\\.ZIP$', filename)){
 		filename <- getzipfilename(filename, zipname)
+		istempfile <- TRUE
+	} else {
+		istempfile <- FALSE
 	}
 	
 	if (grepl('\\.dta$|\\.DTA$', filename)){
@@ -65,6 +68,10 @@ importDT <- function(filename, datecolnames = NULL,
 		setkeyv(datafile, key)
 	}
 	setattr(datafile, 'filesource', loadmessage)
+	
+	# If using temporary file, delete it now
+	if (istempfile) unlink(filename)
+	
 	datafile
 }
 
@@ -100,7 +107,6 @@ textfileToDT <- function(filename, verbose = TRUE,
 	if (verbose){
 		message(paste('Imported to data.table with', nrow(datafile),
 			'rows and', ncol(datafile), 'columns'))
-		message('Column classes after attempted date conversion:')
 		message(paste(capture.output(print(
 			convertDates(datafile, datecolnames))), collapse = '\n'))
 	} else {

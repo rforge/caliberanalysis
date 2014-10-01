@@ -1,4 +1,21 @@
 =================================================
+CALIBERdatamanage Version 0.1-9
+=================================================
+
+CHANGES:
+
+- Box area instead of box width is now proportional
+  to inverse variance in multiforest
+- removeVariables added as an alias of removeColumns
+- transferColumns added as an alias of transferVariables
+- addCodelistToCohort can use ONS & HES (ICD-10 and OPCS)
+  datasets
+- overwrite is TRUE by default in both addToCohort and
+  addCodelistToCohort (previously inconsistent)
+- summary.cohort produces a neater display
+- importDT and importFFDF clean up their temporary files
+
+=================================================
 CALIBERdatamanage Version 0.1-8
 =================================================
 

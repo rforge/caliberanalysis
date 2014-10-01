@@ -130,15 +130,12 @@ is.cohort <- function(x){
 
 print.cohort <- function(x, ...){
 	# Prints the summary and then the cohort file itself
-	summary.cohort(x)
-	if (is.data.table(x)){
-		setcolorder(x, c(attr(x, 'idcolname'),
-			sort(setdiff(names(x), attr(x, 'idcolname')))))
-	}
+	summary.cohort(x)	
+
 	cat('\nDATA\n')
 	if (is.data.table(x)){
-		# Not using triple colon to access print.data.table, but instead
-		# changing the class temporarily
+		# Changing the class to data.table in order to invoke
+		# print.data.table
 		classes <- class(x)
 		setattr(x, 'class', c('data.table', 'data.frame'))
 		print(x)
@@ -152,13 +149,16 @@ print.cohort <- function(x, ...){
 summary.cohort <- function(object, ...){
 	# Prints a summary of a cohort
 	if (is.data.table(object)){
+		# Order the columns so that ID column is at the
+		# front and others are alphabetical
+		setcolorder(object, c(attr(object, 'idcolname'),
+			sort(setdiff(names(object), attr(object, 'idcolname')))))
 		cat('Data.table cohort with ') 
 	} else if (is.ffdf(object)) {
 		cat('FFDF cohort with ')
 	}
-	cat(nrow(object), 'patients; ID column =',
-		attr(object, 'idcolname'), '\n')
-	cat('\nCOLUMN DESCRIPTIONS\n')
+	cat(nrow(object), 'patients and ' %&% ncol(object) %&%
+		' columns; ID column =', attr(object, 'idcolname'), '\n')
 
 	getclass <- function(colnames){
 		# Get the class of columns in a data.frame, returning
@@ -175,16 +175,27 @@ summary.cohort <- function(object, ...){
 
 	description <- attr(object, 'description')
 	
-	if (is.ffdf(object)){
-		object <- as.data.table(as.data.frame(object[1, ]))
-	}
+	if (!is.null(description)){
+		if (nrow(description) > 0){
+			cat('\nCOLUMN DESCRIPTIONS\n')
+			# Add columns without a description
+			description <- merge(description,
+				data.frame(colname = colnames(object)), by = 'colname',
+				all = TRUE)
+			description$description[is.na(description$description)] <- ''
+			
+			if (is.ffdf(object)){
+				object <- as.data.table(as.data.frame(object[1, ]))
+			}
 
-	cat(paste(description$colname %&% ' (' %&%
-		getclass(description$colname) %&% '): ' %&%
-		truncateChar(description$description,
-		getOption('width') - nchar(description$colname) -
-		nchar(getclass(description$colname)) - 7), collapse='\n'))
-	cat('\n')
+			cat(paste(description$colname %&% ' (' %&%
+				getclass(description$colname) %&% '): ' %&%
+				truncateChar(description$description,
+				getOption('width') - nchar(description$colname) -
+				nchar(getclass(description$colname)) - 7), collapse='\n'))
+			cat('\n')
+		}
+	}
 }
 
 truncateChar <- function(x, maxchar){
@@ -193,8 +204,23 @@ truncateChar <- function(x, maxchar){
 	# truncated terms
 	# Arguments: x - character string to truncate
 	#            maxchar - length to truncate to
-	convert <- nchar(x) > maxchar
-	x[convert] <- substr(x[convert], 1, maxchar-3) %&% '...'
+	
+	# Ensure maxchar is a vector of the same length as x
+	maxchar <- maxchar + rep(0, length(x))
+
+	# Split into individual lines
+	for (i in 1:length(x)){
+		xlines <- strsplit(x[i], '\n')[[1]]
+		if (length(xlines) > 1){
+			nindent <- min(nchar(strsplit(xlines[1], ':')[[1]][1]) + 2,
+				getOption('width') - 20)
+			xlines[2:length(xlines)] <- paste(rep(' ', nindent),
+				collapse = '') %&% xlines[2:length(xlines)]
+		}
+		convert <- nchar(xlines) > maxchar[i]
+		xlines[convert] <- substr(xlines[convert], 1, maxchar[i] - 3) %&% '...'
+		x[i] <- paste(xlines, collapse = '\n')[1]
+	}
 	x
 }
 
@@ -209,7 +235,7 @@ subset.cohort <- function(x, subset, select){
 	
 	# Ensure that as a minimum, code, medcode if GPRD,
 	# term and category are kept. It is only valid as a codelist
-	# if these columns are kept
+	# if these columns are kept test
 	
 	if (missing(select)){
 		select <- colnames(x)
@@ -253,24 +279,6 @@ subset.cohort <- function(x, subset, select){
 	out
 }
 
-removeColumns <- function(x, colnames){
-	# Removes one or more columns from a cohort file and description
-	for (colname in colnames){
-		if (is.data.table(x)){
-			x[, colname := NULL, with = FALSE]
-		} else if (is.ffdf(x)){
-			# <- creates a copy of the object and leads to loss of 
-			# attributes. Hence it is necessary to store these
-			# attributes and restore them afterwards
-			x[[colname]] <- NULL
-		}
-	}
-	DESC <- attr(x, 'description')
-	DESC <- subset(DESC, colname %in% colnames(x))
-	setattr(x, 'description', DESC)
-	# Return the dataset, invisibly
-	invisible(x)
-} 
 
 merge.cohort <- function(x, y, ...){
 	# Merges two cohorts, warning if there are common columns

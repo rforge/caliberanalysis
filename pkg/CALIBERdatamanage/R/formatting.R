@@ -146,6 +146,9 @@ formathr <- function(coef, se, df = Inf, dp = NA, pstar = TRUE,
 	if (is.na(dp)){
 		dp <- rep(2, length(coef))
 		dp[coef > 1] <- 1
+	} else {
+		# Recycle dp vector if necessary
+		dp <- dp + rep(0, length(coef))
 	}
 	pvalues <- 2 * pt(-abs(coef) / se, df)
 	out <- character(length(coef))

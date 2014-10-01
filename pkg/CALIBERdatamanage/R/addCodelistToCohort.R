@@ -1,11 +1,15 @@
 addCodelistToCohort <- function(cohort, varname, data, codelist,
-	categories, entities = 'all', binary = FALSE,
+	categories = NULL, enttypes = NULL,
+	codename = switch(attr(codelist, 'Source'),
+	GPRD = 'medcode', ONS = 'cod', HES = 'icd', OPCS = 'opcs',
+	GPRDPROD = 'prodcode'), binary = FALSE,
 	limit_years = c(-Inf, 0), idcolname = attr(cohort, 'idcolname'),
-	datecolname = 'eventdate', indexcolname = 'indexdate',
-	overwrite = TRUE, description = NULL, limit_days = NULL){
+	datecolname = c('eventdate', 'evdate', 'dod', 'epistart', 'admidate'),
+	indexcolname = 'indexdate', overwrite = TRUE,
+	description = NULL, limit_days = NULL, entities = 'all'){
 	# Adds to the cohort data.table a column labelled varname
 	# containing the value of a category from a list of anonpatid, medcode.
-	# Currently only for Read codelists.
+
 	# Arguments: x = a cohort data.table with indexdate column
 	#            varname = new variable name
 	#            data = data.table containing anonpatid, medcode and eventdate
@@ -14,7 +18,7 @@ addCodelistToCohort <- function(cohort, varname, data, codelist,
 	#            categories = vector of categories to use, in priority order
 	#                          (highest priority first). If the result is
 	#                          binary, the order of categories does not matter.
-	#            entities = which entity types to use, default = 'all',
+	#            enttypes = which entity types to use, default = NULL (all),
 	#                          or a numeric vector
 	#            binary = whether to lump all categories together to make a
 	#                          binary variable
@@ -22,93 +26,49 @@ addCodelistToCohort <- function(cohort, varname, data, codelist,
 	#            limit_days = earliest and latest day relative to index date
 	#            overwrite = whether to overwrite this variable if it exists
 	#            description = new description for the variable
-		
-	#### Get medcodes of interest ####
-	medcodes <- subset(codelist, category %in% categories)[,
-		list(medcode, category)]
+	#            entities = old version of enttypes argument, now deprecated
 
-	#### Extract the relevant subset of events as data.table ####
-	if (is.ffdf(data)){
-		temp <- as.ffdf(medcodes)
-		# remove the category column (this is done on a copy so does
-		# not modify the original)
-		data$category <- NULL
-		temp <- merge(data, temp)
-		if (is.numeric(entities)){
-			if (!('enttype' %in% names(temp))){
-				stop('No enttype column in data')
-			}
-			tempent <- as.ffdf(data.frame(enttype = entities, use = TRUE))
-			temp <- merge(temp, tempent)
-			temp$use <- NULL
-		}
-		USE <- as.data.table(as.data.frame(temp))
-	} else {
-		#### Convert to data.table if necessary ####
-		if (is.data.frame(data)){
-			data <- as.data.table(data)
-		}
-		
-		#### Process the data.table ####
-		if (is.null(key(data))){
-			changeKeyData <- TRUE
-			saveKeyData <- NULL
-			setkey(data, 'medcode')
-		} else if (!identical(key(data), 'medcode')){
-			changeKeyData <- TRUE
-			saveKeyData <- key(data)
-			setkey(data, 'medcode')
-		} else {
-			changeKeyData <- FALSE
-		}
-		
-		# If there is a 'category' column in data, ignore it.
-		tempname <- NULL
-		if ('category' %in% names(data)){
-			tempname <- getNewName(names(data))
-			setnames(data, 'category', tempname)
-		}
-
-		# Merge data with codelist
-		USE <- merge(data, medcodes, by = 'medcode')		
-		if (is.numeric(entities)){
-			if (!('enttype' %in% names(data))){
-				stop('data does not contain an enttype column')
-			}
-			USE <- subset(USE,
-				subset = !is.na(USE[[idcolname]]) & enttype %in% entities,
-				select = c(idcolname, 'medcode', 'category', datecolname))
-		} else if (entities == 'all') {
-			# Merge data with codelist
-			USE <- subset(USE,
-				subset = !is.na(USE[[idcolname]]),
-				select = c(idcolname, 'medcode', 'category', datecolname))
-		} else {
-			stop('entities must be a numeric vector or "all"')
-		}
-		
-		#### Restore original indexes and column name ####
-		if (changeKeyData){
-			setkeyv(data, saveKeyData)
-		}
-		if (!is.null(tempname)){
-			setnames(data, tempname, 'category')
-		}
+	# If categories is NULL, use all the categories in the codelist
+	if (is.null(categories)){
+		categories <- unique(codelist$category)
 	}
+
+	if (!identical(entities, 'all')){
+		warning('The entities argument is deprecated. Use entttpes instead. enttypes = NULL (default) means that any entity types are allowed.')
+		enttypes <- entities
+	}
+	
+	# Find out which date column to use
+	# (e.g. CPRD datasets will contain 'eventdate', HES datasets will
+	# contain epistart etc.)
+	
+	test <- as.data.table(data[1, ])
+	datecols <- sapply(test, function(x){
+		'Date' %in% class(x)
+	})
+	datecolname <- colnames(test)[colnames(test) %in% datecolname & datecols][1]
+	if (length(datecolname) == 0){
+		stop('Unable to identify date column in data')
+	}
+
+	#### Extract entries of interest ####
+	DATA <- as.data.table(extractCodes(data = data, codelist = codelist,
+		categories = categories, enttypes = enttypes,
+		codename = codename, varname = '.category'))
 
 	if (is.null(description)){
 		# Use the function call as the description
 		thecall <- match.call()
-		description <- paste(
-			gsub('\n|\t| +', ' ', capture.output(print(thecall))), collapse = ' ')
+		description <- paste(gsub('\n|\t| +', ' ',
+			capture.output(print(thecall))), collapse = ' ')
 	}
-	
-	#### Now use the USE data.table to get the results ####
+		
+	#### Now get the results ####
 	if (binary){
 		# create a logical vector result
-		USE[, value := istrue(category %in% categories)]
+		DATA[, value := istrue(category %in% categories)]
 		# Select any events with medcode in one of the categories
-		out <- addToCohort(cohort, varname, USE, old_varname = 'value',
+		out <- addToCohort(cohort, varname, DATA, old_varname = 'value',
 			value_choice = function(x) any(istrue(x)),
 			date_priority = 'all', limit_days = limit_days,
 			limit_years = limit_years, overwrite = overwrite, 
@@ -124,7 +84,7 @@ addCodelistToCohort <- function(cohort, varname, data, codelist,
 		}
 	} else {
 		# Select events
-		out <- addToCohort(cohort, varname, USE, old_varname = 'category',
+		out <- addToCohort(cohort, varname, DATA, old_varname = 'category',
 			date_priority = 'all', limit_days = limit_days,
 			value_choice = categories, limit_years = limit_years,
 			overwrite = overwrite, idcolname = idcolname,
