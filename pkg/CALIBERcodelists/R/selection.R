@@ -106,7 +106,8 @@ printTerms <- function(x, ...){
 	termwidth <- max(getOption('width') - 6 - 
 		sum(pmax(nchar(names(temp)), unlist(temp))) - length(temp), 20)
 	x2 <- copy(x)
-	x2[, term:=truncateChar(term, termwidth)]
+	x2[, term := truncateChar(term, termwidth)]
+	setattr(x2, 'class', c('data.table', 'data.frame'))
 	show(x2)
 }
 

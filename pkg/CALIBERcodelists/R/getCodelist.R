@@ -26,9 +26,10 @@ getCodelist <- function(folder = NULL, codelistname = NULL){
 		out2 <- NULL
 		out2 <- try(as.codelist(candidates[version == max(version)][1]))
 		if (!is.null(out2)){
-			if (compare(out1, out2)$same_cattable &
-				compare(out1, out2)$same_terms){
-				if (!compare(out1, out2)$same_attr){
+			comparison <- compare(out1, out2)
+			if (comparison$same_cattable &
+				comparison$same_terms){
+				if (!comparison$same_attr){
 					warning('Two codelists found with same terms but different metadata;\nonly one will be returned.')					
 				}
 			} else {

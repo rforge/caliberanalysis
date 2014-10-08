@@ -43,9 +43,9 @@ assignmetadata <- function(field, newvalue){
 	}
 }
 
-setMetadata <- function(codelist=NULL, Name=NULL,
-	Version=NULL, Author=NULL, Date=NULL, Categories=NULL,
-	Source=NULL){
+setMetadata <- function(codelist = NULL, Name = NULL,
+	Version = NULL, Author = NULL, Date = NULL, Categories = NULL,
+	Source = NULL){
 	# META table now contains the source dictionary name for export
 	# in the read, icd9, icd10 and opcs rows.
 	if (is.null(codelist)){
@@ -100,10 +100,14 @@ setMetadata <- function(codelist=NULL, Name=NULL,
 				SOURCEDICTS[SOURCEDICTS$Source == attr(codelist, 'Source'), dict])){
 				# Update the suffix of the name if it is a source name
 				theName <- attr(codelist, 'Name')
-				if (grepl('_' %&% tolower(attr(codelist, 'Source')) %&% '$', theName)){
-					theName <- sub('_' %&% tolower(attr(codelist, 'Source')) %&% '$',
-						'_' %&% tolower(theSource), theName)
-					setattr(codelist, 'Name', theName)
+				if (!is.null(theName)){
+					if (grepl('_' %&% tolower(attr(codelist, 'Source')) %&%
+						'$', theName)){
+						theName <- sub('_' %&%
+							tolower(attr(codelist, 'Source')) %&% '$',
+							'_' %&% tolower(theSource), theName)
+						setattr(codelist, 'Name', theName)
+					}
 				}
 				setattr(codelist, 'Source', Source)
 			}

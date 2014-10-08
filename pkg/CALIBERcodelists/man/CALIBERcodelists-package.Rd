@@ -4,7 +4,7 @@
 
 \docType{package}
 \title{
-Generate ICD10, Read and OPCS codelists
+Generate ICD, Read and OPCS codelists
 }
 
 \description{
@@ -41,8 +41,8 @@ Government Licence. The program code is licensed under GPL-3.
 \tabular{ll}{
 Package: \tab CALIBERcodelists\cr
 Type: \tab Package\cr
-Version: \tab 0.2-7\cr
-Date: \tab 2014-01-20\cr
+Version: \tab 0.2-8\cr
+Date: \tab 2014-10-06\cr
 License: \tab GPL-3\cr
 }
 

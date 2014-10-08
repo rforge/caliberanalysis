@@ -1,5 +1,6 @@
 \name{export}
 \alias{export}
+\alias{export.codelist}
 \alias{exportall}
 
 \title{
@@ -15,13 +16,14 @@ Terms with category 0 or negative categories are not exported.
 }
 
 \usage{
-export(codelist, filename = NULL, categories = 'all',
+export(x, \dots)
+\method{export}{codelist}(x, filename = NULL, categories = 'all',
     contractIfICD10 = TRUE, contractIfICD9 = TRUE)
 exportall(directory = getwd(), varname = NULL, saveMessage = TRUE)
 }
 
 \arguments{
-  \item{codelist}{
+  \item{x}{
 A codelist object created by \code{\link{as.codelist}}.
 }
   \item{filename}{

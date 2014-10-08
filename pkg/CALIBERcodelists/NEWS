@@ -2,14 +2,18 @@
 Changes in CALIBERcodelists version 0.2-8
 ==================================================
 
-TODO
+CHANGES
 
 - Allow metadata to be set using arguments in as.codelist,
   rather than having to call setMetadata afterwards
-- Change name of product codelists from GPRDPROD to
-  MULTILEX
-- Bug fix needed: remove . in codes in ICD-10 and OPCS codelists
-  Failing to check OPCS codes in tabletocodelist
+- Allow product codelists to be called MULTILEX
+  instead of GPRDPROD
+- Tested with data.table 1.9.4 
+  
+BUG FIXES
+
+- Remove . in codes in ICD-10 and OPCS codelists
+- Ensure that OPCS codes are checked in tabletocodelist
 
 ==================================================
 Changes in CALIBERcodelists version 0.2-7

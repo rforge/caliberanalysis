@@ -66,6 +66,9 @@ compare <- function(oldlist, newlist = NULL, expandICD10 = TRUE,
 		setkey(oldl, code)
 	}
 
+	setattr(oldl, 'class', c('data.table', 'data.frame'))
+	setattr(newl, 'class', c('data.table', 'data.frame'))
+
 	if (nrow(newl)==0){
 		message('No selected terms in new list')
 		comparison <- oldl
@@ -97,10 +100,18 @@ compare <- function(oldlist, newlist = NULL, expandICD10 = TRUE,
 
 	# Comparison of attributes (except timestamp)
 	attrFields <- c('Name', 'Version', 'Date', 'Author')
-	attr_comparison <- data.table(field=attrFields,
-		old=as.character(sapply(attrFields, function(x){attr(oldlist, x)})),
-		new=as.character(sapply(attrFields, function(x){attr(newlist, x)})))
-	attr_comparison[, same:=(old==new)]
+	attr_comparison <- data.table(field = attrFields,
+		old = as.character(sapply(attrFields, function(x){
+			tmp <- as.character(attr(oldlist, x))
+			if (length(tmp) == 0) {tmp <- ''}
+			if (is.na(tmp)) {tmp <- ''}
+		})),
+		new = as.character(sapply(attrFields, function(x){
+			tmp <- as.character(attr(newlist, x))
+			if (length(tmp) == 0) {tmp <- ''}
+			if (is.na(tmp)) {tmp <- ''}
+		})))
+	attr_comparison[, same:= (old == new)]
 	
 	# Comparison of categories in category table
 	oldcats <- copy(attr(oldlist, 'Categories'))

@@ -17,7 +17,8 @@ but they can have categories and associated metadata.
 }
 
 \usage{
-codelist(x = NULL, \dots)
+codelist(x = NULL, Name = NULL, Version = NULL, Author = NULL,
+    Date = NULL, Categories = NULL, Source = NULL, \dots)
 as.codelist(x = NULL, \dots)
 is.codelist(x)
 
@@ -27,6 +28,12 @@ is.codelist(x)
 
 \arguments{
   \item{x}{for \code{codelist}, an object to coerce to a codelist; for the \code{print} and \code{subset} methods, a codelist; for \code{is.codelist}, the object to check}
+  \item{Name}{new name for the codelist. The naming convention is for GPRD (Read) codelists to end in _gprd, ICD-10 codelists to end in _hes, OPCS (procedure) codelists to end in _opcs and GPRD drug codelists to end in _gprddrug.}
+  \item{Version}{Version number, to be supplied as a character string or a number. Versions 0, 0.1, 0.2 \dots should be used for unapproved (development) versions, and versions 1, 2 etc. for approved codelists. The version number is incremented if any terms are added to the codelist or the categories are changed.}
+  \item{Author}{a string of author names, or a character vector of names, or a vector of \code{person} objects.}
+  \item{Date}{a Date object or character string representing the date on which the codelist was created.}
+  \item{Categories}{the categories table, in the form of a data.table with columns \code{category} (number), \code{shortname} (brief definition) and \code{description} (full definition)}
+  \item{Source}{a string representing the data source. For the master dictionary, it can be a space or comma separated list or a vector of strings if multiple dictionaries are in use (but only one distinct source per dictionary). Options are 'GPRD' for Read codelists, 'HES' or 'ONS' for ICD-10 codelists, 'OPCS' for OPCS codelists, and 'ONSICD9' for ICD-9 codelists. A particular Source can only be associated with a single dictionary at a time (e.g. it is not possible to export a codelist to HES and ONS simultaneously; instead one has to export one version, use SetMetadata to update the source and then export the other). The allowable Source / dictionary combinations are hard-coded in the \code{SOURCEDICTS} data.table (in the \code{sysdata.R} source file of the package).}
   \item{subset}{a logical vector as long as the number of terms in the codelist, denoting which to select (all rows are selected if it is missing). This is evaluated within the environment of the codelist, so column names do not need to be quoted.}
   \item{select}{Character vector of columns to select. Default is to select all columns. If the code or category columns are not selected, the output of the function is no longer a codelist object.}
   \item{...}{Other optional arguments to \code{as.codelist}: \code{newcategory} is the new category number for converting a selection to a codelist,

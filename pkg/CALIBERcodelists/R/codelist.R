@@ -2,7 +2,9 @@
 # CODELIST_COLORDER <- c('category', 'code', 'term')
 # medcode last for Read terms, any other columns after
 
-codelist <- function(x=NULL, ...){
+codelist <- function(x = NULL, Name = NULL, Version = NULL,
+	Author = NULL, Date = NULL, Categories = NULL,
+	Source = NULL, ...){
 	# Creates an object of class 'codelist' with metadata
 	# and checks that all terms included in the codelist are in CALIBER_DICT
 	# Arguments: x - a dictionary name (read, opcs, icd10), a
@@ -16,23 +18,23 @@ codelist <- function(x=NULL, ...){
 		if (length(getdictionary()) == 1){
 			x <- getdictionary()
 		} else {
-			x <- select.list(ALLDICTS, multiple=FALSE,
+			x <- select.list(ALLDICTS, multiple = FALSE,
 				title = 'Which dictionary to extract codes from?')
 		}
 		cat('\nExtracting codelist from ' %&% x %&%
 			' with non-missing categories.\n')
-		return(dictToCodelist(x))
+		out <- dictToCodelist(x)
 	} else if (is.selection(x)){
-		return(selectionToCodelist(x, ...))
+		out <- selectionToCodelist(x, ...)
 	} else if (is.codelist(x)){
-		return(x)	
+		out <- x
 	} else if (is.data.frame(x)){
-		return(tableToCodelist(x, ...))
-	} else if (is.character(x) & length(x)==1){
+		out <- tableToCodelist(x, ...)
+	} else if (is.character(x) & length(x) == 1){
 		if (x %in% ALLDICTS){
 			cat('\nExtracting codelist from terms in ' %&% x %&%
 				' with non-missing categories.\n')
-			return(dictToCodelist(x))
+			out <- dictToCodelist(x)
 		} else {
 			temp <- NULL
 			if (grepl('.dta$', x)){
@@ -45,10 +47,32 @@ codelist <- function(x=NULL, ...){
 			if (is.null(temp)){
 				stop('Unable to load codelist from file')
 			} else {
-				return(tableToCodelist(temp))
+				out <- tableToCodelist(temp)
 			}
 		}
 	}
+
+	# Set metadata
+	if (!is.null(Name)){
+		setMetadata(out, Name = Name)
+	}
+	if (!is.null(Version)){
+		setMetadata(out, Version = Version)
+	}
+	if (!is.null(Author)){
+		setMetadata(out, Author = Author)
+	}
+	if (!is.null(Date)){
+		setMetadata(out, Date = Date)
+	}
+	if (!is.null(Categories)){
+		setMetadata(out, Categories = Categories)
+	}
+	if (!is.null(Source)){
+		setMetadata(out, Source = Source)
+	}
+
+	out
 }
 
 importDTA <- function(x){
@@ -191,7 +215,7 @@ tableToCodelist <- function(x, noisy = FALSE){
 	# otherwise on ICD-10 or OPCS code.
 	# Arguments: x - a codelist in the standard format, or a 
 	#                data.frame or data.table
-	if (ncol(x)==0){
+	if (ncol(x) == 0){
 		stop('No columns in table')
 	}
 	
@@ -487,6 +511,8 @@ tableToCodelist <- function(x, noisy = FALSE){
 		}
 	} else if (metadata$Source %in%
 		SOURCEDICTS[dict %in% c('icd9', 'icd10'), Source]){
+		# Clean up codes - remove spaces and .
+		x[, code := gsub('[\\. ]', '', code)]
 		if (!(isExpandedCodelist(x))){
 			setattr(x, 'Source', metadata$Source)
 			class(x) <- c('codelist', 'data.table', 'data.frame')
@@ -494,8 +520,10 @@ tableToCodelist <- function(x, noisy = FALSE){
 		}
 	} else if (metadata$Source %in%
 			SOURCEDICTS[dict == 'opcs', Source]){
-		TEMP <- CALIBER_DICT[dict=='opcs', list(code,
-			.corrCode=code, .corrTerm=term)]
+		TEMP <- CALIBER_DICT[dict == 'opcs', list(code,
+			.corrCode = code, .corrTerm = term)]
+		# Clean up codes - remove spaces and .
+		x[, code := gsub('[\\. ]', '', code)]
 		setkey(TEMP, code)
 		setkey(x, code)
 		x[, .corrCode:=TEMP[x][, .corrCode]]
@@ -596,19 +624,19 @@ print.codelist <- function(x, ...){
 	printCodelist(x, ...)
 }
 
-printCodelist <- function(codelist, ...){
+printCodelist <- function(x, ...){
 	# S3 method for printing codelist objects
-	sourceDict <- getSourceDict(codelist)
+	sourceDict <- getSourceDict(x)
 	if (is.null(sourceDict)){
 		stop('Source attribute is NULL')
 	}
 	cat('Codelist based on', sourceDict, 'dictionary with',
-		tolower(textTotalTerms(nrow(codelist))) %&%	'.\n\n')
-	cat(paste(encodeMetadata(codelist, includeDescription=TRUE),
-		collapse='\n'))
+		tolower(textTotalTerms(nrow(x))) %&%	'.\n\n')
+	cat(paste(encodeMetadata(x, includeDescription = TRUE),
+		collapse = '\n'))
 	cat('\n\nTERMS (sorted by category and code):\n')
-	printTerms(codelist[order(category, code)])
-	invisible(codelist)
+	printTerms(x[order(category, code)])
+	invisible(x)
 }
 
 is.codelist <- function(x){
