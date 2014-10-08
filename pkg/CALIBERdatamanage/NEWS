@@ -1,4 +1,13 @@
 =================================================
+CALIBERdatamanage Version 0.1-10
+=================================================
+
+BUG FIXES:
+
+- Ensure that addToCohort works if there are some
+  missing indexdates
+
+=================================================
 CALIBERdatamanage Version 0.1-9
 =================================================
 

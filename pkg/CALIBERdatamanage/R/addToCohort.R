@@ -43,7 +43,7 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 	if (!is.cohort(cohort)){
 		cohort <- as.cohort(cohort)
 	}
-	
+
 	if (is.ffdf(cohort)){
 		if (varname %in% colnames(cohort)){
 			x <- data.table(.v1 = as.ram(cohort[[idcolname]]),
@@ -137,16 +137,22 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 	}
 	DATA[include == TRUE, .chosen := choiceFun(value), by = .id]
 	# Keep only one row per patient
-	DATA[include == TRUE,
-		include := c(TRUE, rep(FALSE, .N - 1)), by = .id]
-	
+	chooseFirst <- function(n){
+		if (n == 0){
+			logical(0)
+		} else {
+			c(TRUE, rep(FALSE, n - 1))
+		}
+	}
+	DATA[include == TRUE, use := chooseFirst(.N), by = .id]
+	DATA[, use := istrue(use)]
 	DATA[, value := NULL]
+	
 	# Keep relevant rows only
-	Y <- subset(DATA, include == TRUE)
-	Y[, include := NULL]
+	Y <- subset(DATA, use == TRUE)
 	setkey(Y, .id)
 
-	if (!('.chosen' %in% names(Y))){
+	if (!('.chosen' %in% colnames(Y))){
 		warning('value_choice returns all null values')
 		Y[, .chosen := NA]
 	}

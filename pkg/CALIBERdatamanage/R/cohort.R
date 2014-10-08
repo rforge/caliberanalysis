@@ -44,7 +44,7 @@ cohort <- function(x, idcolname = c('patid', 'anonpatid', 'id'),
 		}
 	}
 	# Keep only the entries in description that are relevant to this cohort
-	description <- subset(description, colname %in% names(x))
+	description <- description[description$colname %in% colnames(x), ]
 	description <- description[order(description$colname), ]
 
 	# Change the class to cohort
@@ -65,9 +65,9 @@ purgeDescription <- function(x){
 	if (!is.cohort(x)){
 		warning('This function only works on cohort objects')
 	} else {
-		DESC <- attr(x, 'description')
-		DESC <- subset(DESC, colname %in% colnames(x))
-		setattr(x, 'description', DESC)
+		description <- attr(x, 'description')
+		description <- description[description$colname %in% colnames(x), ]
+		setattr(x, 'description', description)
 		invisible(x)
 	}
 }

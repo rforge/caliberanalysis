@@ -33,7 +33,8 @@ transferVariables <- function(fromdata, todata, varnames,
 	if (is.null(description)){
 		thecall <- match.call()
 		description <- paste(
-			gsub('\n|\t| +', ' ', capture.output(print(thecall))), collapse = ' ')
+			gsub('\n|\t| +', ' ', capture.output(print(thecall))),
+			collapse = ' ')
 	}
 
 	# Recycle default description if multiple columns are transferred
@@ -54,15 +55,20 @@ transferVariables <- function(fromdata, todata, varnames,
 
 	#### Key column ####
 	if (is.null(by)){
-		if (is.cohort(todata) & is.cohort(fromdata)){
-			if (attr(todata, 'idcolname') == attr(fromdata, 'idcolname')){
+		to_has_id <- is.cohort(todata) &
+			!is.null(attr(todata, 'idcolname'))
+		from_has_id <- is.cohort(fromdata) &
+			!is.null(attr(fromdata, 'idcolname'))
+		if (to_has_id & from_has_id){
+			if (identical(attr(todata, 'idcolname'),
+				attr(fromdata, 'idcolname'))){
 				by = attr(todata, 'idcolname')	
 			} else {
 				stop('fromdata and todata have different idcolname')
 			}
-		} else if (is.cohort(todata)){
+		} else if (to_has_id){
 			by = attr(todata, 'idcolname')
-		} else if (is.cohort(fromdata)){
+		} else if (from_has_id){
 			by = attr(fromdata, 'idcolname')
 		}
 	}

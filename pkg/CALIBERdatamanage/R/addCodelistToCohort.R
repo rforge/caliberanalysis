@@ -55,6 +55,8 @@ addCodelistToCohort <- function(cohort, varname, data, codelist,
 	DATA <- as.data.table(extractCodes(data = data, codelist = codelist,
 		categories = categories, enttypes = enttypes,
 		codename = codename, varname = '.category'))
+	# Convert .category from a factor to raw numerical values
+	DATA[, .category := as.numeric(.category)]
 
 	if (is.null(description)){
 		# Use the function call as the description
@@ -66,7 +68,7 @@ addCodelistToCohort <- function(cohort, varname, data, codelist,
 	#### Now get the results ####
 	if (binary){
 		# create a logical vector result
-		DATA[, value := istrue(category %in% categories)]
+		DATA[, value := istrue(.category %in% categories)]
 		# Select any events with medcode in one of the categories
 		out <- addToCohort(cohort, varname, DATA, old_varname = 'value',
 			value_choice = function(x) any(istrue(x)),
@@ -84,7 +86,8 @@ addCodelistToCohort <- function(cohort, varname, data, codelist,
 		}
 	} else {
 		# Select events
-		out <- addToCohort(cohort, varname, DATA, old_varname = 'category',
+		out <- addToCohort(cohort, varname, DATA,
+			old_varname = '.category',
 			date_priority = 'all', limit_days = limit_days,
 			value_choice = categories, limit_years = limit_years,
 			overwrite = overwrite, idcolname = idcolname,
