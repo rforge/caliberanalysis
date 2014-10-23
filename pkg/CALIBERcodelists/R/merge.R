@@ -66,12 +66,12 @@ merge.codelist <- function(x, y=NULL, ...){
 	if (attr(x, 'Source')=='GPRD'){
 		old <- subset(x, medcode %in%
 			setdiff(x$medcode, y$medcode))
-		out <- rbind(old, y)
+		out <- rbind(old, y, fill = TRUE)
 		setkey(out, medcode)
 	} else {
 		old <- subset(x, code %in%
 			setdiff(x$code, y$code))
-		out <- rbind(old, y)
+		out <- rbind(old, y, fill = TRUE)
 		setkey(out, code)
 	}
 

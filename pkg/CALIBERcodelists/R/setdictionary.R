@@ -139,9 +139,8 @@ codelistToDict <- function(codelist){
 		setDictKey()
 		setkey(mylist, dict, code)
 		# Use a temporary variable to allow terms to be added from multiple codelists
-		CALIBER_DICT[, .temp := mylist[CALIBER_DICT]$category]
-		CALIBER_DICT[is.na(category), category := .temp]
-		CALIBER_DICT[, .temp := NULL]
+		temp <- mylist[CALIBER_DICT]$category
+		CALIBER_DICT[is.na(category), category := temp]
 
 		# Now update category definitions
 		newCategories <- attr(codelist, 'Categories')
@@ -179,10 +178,10 @@ codelistToDict <- function(codelist){
 			if (length(temp) == 0){
 				temp <- ''
 			}
-			if (is.na(META[item==field, value])){
-				META[item==field, value:=temp]
-			} else if (META[item==field, value=='']){
-				META[item==field, value:=temp]
+			if (is.na(META[item == field, value])){
+				META[item == field, value := temp]
+			} else if (META[item == field, value == '']){
+				META[item == field, value := temp]
 			}
 		}
 	}

@@ -1,4 +1,20 @@
 ==================================================
+Changes in CALIBERcodelists version 0.2-9
+==================================================
+
+BUG FIXES
+
+- Allow print.codelist to work even when the input
+  is not a valid codelist (revert to print.data.table
+  if any columns are missing)
+- Ensure that codelists can be merged even if they have
+  different numbers of columns (use fill = TRUE).
+- Fixed error in setdictionary: "cannot change value
+  of locked binding for 'CALIBER_DICT'"
+- META loaded incorrectly (Date row missing)
+- showhtml did not work with new version of data.table
+
+==================================================
 Changes in CALIBERcodelists version 0.2-8
 ==================================================
 

@@ -99,14 +99,18 @@ printTerms <- function(x, ...){
 	# Prints the table portion of a codelist, using the maximum
 	# available width
 
-	# Calculate the width without term column
-	temp <- lapply(x[1, setdiff(names(x), 'term'), with=FALSE],
-				 function(z){nchar(as.character(z))})
-	# Calculate the total width without term column
-	termwidth <- max(getOption('width') - 6 - 
-		sum(pmax(nchar(names(temp)), unlist(temp))) - length(temp), 20)
-	x2 <- copy(x)
-	x2[, term := truncateChar(term, termwidth)]
+	if ('term' %in% colnames(x)){
+		# Calculate the width without term column
+		temp <- lapply(x[1, setdiff(colnames(x), 'term'), with=FALSE],
+					 function(z){nchar(as.character(z))})
+		# Calculate the total width without term column
+		termwidth <- max(getOption('width') - 6 - 
+			sum(pmax(nchar(colnames(temp)), unlist(temp))) - length(temp), 20)
+		x2 <- copy(x)
+		x2[, term := truncateChar(term, termwidth)]
+	} else {
+		x2 <- copy(x)
+	}
 	setattr(x2, 'class', c('data.table', 'data.frame'))
 	show(x2)
 }

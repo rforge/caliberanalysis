@@ -103,8 +103,8 @@ showhtml <- function(show_not_selected = TRUE){
 }
 
 
-htmlCodelistTable <- function(data_to_show, showcat=TRUE,
-	tablestyle='<table>\n'){
+htmlCodelistTable <- function(data_to_show, showcat = TRUE,
+	tablestyle = '<table>\n'){
 
 	# Produces a set of htmlTableFragments for all dictionaries in use
 	out <- list()
@@ -116,71 +116,79 @@ htmlCodelistTable <- function(data_to_show, showcat=TRUE,
 	dict <- mytable$dict
 	
 	# All terms in this table should be in the same category
-	thisCategory <- mytable[1, category]
+	thisCategory <- mytable[1][, category]
 	
 	if (showcat){
-		mytableRead <- mytable[, list(code, term, category, events)]
+		if ('events' %in% colnames(mytable)){
+			mytableRead <- mytable[, list(code, term, category, events)]
+		} else {
+			mytableRead <- mytable[, list(code, term, category)]
+		}
 		mytable <- mytable[, list(code, term, category)]
 	} else {
-		mytableRead <- mytable[, list(code, term, events)]		
+		if ('events' %in% colnames(mytable)){
+			mytableRead <- mytable[, list(code, term, events)]
+		} else {
+			mytableRead <- mytable[, list(code, term)]
+		}
 		mytable <- mytable[, list(code, term)]
 	}
 	
 	# Whether to put titles for each dictionary
-	moreThanOneDict <- sum(META[ALLDICTS][, value] != 'FALSE') > 1
+	moreThanOneDict <- sum(META[item %in% ALLDICTS][, value] != 'FALSE') > 1
 	
-	if (META['read'][, value] != 'FALSE'){
+	if (META[item == 'read'][, value] != 'FALSE'){
 		# Table of Read terms
 		if (moreThanOneDict){
 			out[[1]] <- '<h4>Read terms</h4>'	
 		}
-		if (sum(dict=='read')==0){
+		if (sum(dict == 'read') == 0){
 			out[[2]] <- '<p>(no terms)</p>'
 		} else {
-			temp <- mytableRead[dict=='read']
+			temp <- mytableRead[dict == 'read']
 			out[[2]] <- tablestyle %&% 
-				htmlTableFragment(as.list(names(temp)), header=TRUE)
+				htmlTableFragment(as.list(names(temp)), header = TRUE)
 			out[[3]] <- paste(htmlTableFragment(temp),
-				collapse='\n') %&% '\n</table>'
+				collapse = '\n') %&% '\n</table>'
 		}
 	}
 
-	if (META['icd10'][, value] != 'FALSE'){
+	if (META[item == 'icd10'][, value] != 'FALSE'){
 		# Table of ICD10 terms, contracted and expanded with parent/child terms
 		# highlighted appropriately
 		if (moreThanOneDict){
 			out[[4]] <- '<h4>ICD10 terms</h4>'
 		}
 
-		if (sum(dict=='icd10')==0){
+		if (sum(dict == 'icd10') == 0){
 			out[[5]] <- '<p>(no terms)</p>'
 		} else {
 			temp <- mytable[dict == 'icd10']
 			setattr(temp, 'Source', SOURCEDICTS[dict == 'icd10', Source][1])
-			temp[, category:=thisCategory]
+			temp[, category := thisCategory]
 			temp <- expandCodelist(temp)[,
 				list(code, term, category, hierarchy)]
 			if (!showcat){
-				temp[, category:=NULL]
+				temp[, category := NULL]
 			}
 			# rawcode is used for ordering only
-			temp[, rawcode:=code]
+			temp[, rawcode := code]
 			setkey(temp, rawcode)
-			temp[hierarchy=='parent', code:='<b>' %&% code %&% '</b>']
-			temp[hierarchy=='parent', term:='<b>' %&% term %&% '</b>']
-			temp[hierarchy=='child', code:='<i>' %&% code %&% '</i>']
-			temp[hierarchy=='child', term:='<i>' %&% term %&% '</i>']
+			temp[hierarchy == 'parent', code := '<b>' %&% code %&% '</b>']
+			temp[hierarchy == 'parent', term := '<b>' %&% term %&% '</b>']
+			temp[hierarchy == 'child', code := '<i>' %&% code %&% '</i>']
+			temp[hierarchy == 'child', term := '<i>' %&% term %&% '</i>']
 			out[[5]] <- tablestyle %&%
 				htmlTableFragment(
 				as.list(setdiff(names(temp), c('rawcode', 'hierarchy'))),
-				header=TRUE)
+				header = TRUE)
 			out[[6]] <- paste(htmlTableFragment(
-				temp[, setdiff(names(temp), c('rawcode', 'hierarchy')), with=FALSE]),
-				collapse='\n') %&% '\n</table>'
+				temp[, setdiff(names(temp), c('rawcode', 'hierarchy')),
+				with = FALSE]), collapse = '\n') %&% '\n</table>'
 		}
 	}
 
-	if (META['icd9'][, value] != 'FALSE'){
+	if (META[item == 'icd9'][, value] != 'FALSE'){
 		# Table of ICD9 terms
 		if (moreThanOneDict){
 			out[[7]] <- '<h4>ICD9 terms</h4>'
@@ -197,19 +205,19 @@ htmlCodelistTable <- function(data_to_show, showcat=TRUE,
 		}
 	}
 
-	if (META['opcs'][, value] != 'FALSE'){
+	if (META[item == 'opcs'][, value] != 'FALSE'){
 		# Table of OPCS terms
 		if (moreThanOneDict){
 			out[[10]] <- '<h4>OPCS terms</h4>'
 		}
-		if (sum(dict=='opcs')==0){
+		if (sum(dict == 'opcs') == 0){
 			out[[11]] <- '<p>(no terms)</p>'
 		} else {
-			temp <- mytable[dict=='opcs']
+			temp <- mytable[dict == 'opcs']
 			out[[11]] <- tablestyle %&%
-				htmlTableFragment(as.list(names(temp)), header=TRUE)
+				htmlTableFragment(as.list(names(temp)), header = TRUE)
 			out[[12]] <- paste(htmlTableFragment(temp),
-				collapse='\n') %&% '\n</table>'
+				collapse = '\n') %&% '\n</table>'
 		}
 	}
 
@@ -217,8 +225,8 @@ htmlCodelistTable <- function(data_to_show, showcat=TRUE,
 	do.call('paste', out)
 }
 
-htmlTableFragment <- function(data, startrow='<tr>',
-	endrow='</tr>', header=FALSE, sanitizeFUN=sanitizehtml){
+htmlTableFragment <- function(data, startrow = '<tr>',
+	endrow = '</tr>', header = FALSE, sanitizeFUN = sanitizehtml){
 	# A different sanitizeFUN can be specified
 	startrow %&% do.call('paste', lapply(data, function(x){
 		ifelse(header, '<th>', '<td>') %&% sanitizeFUN(x) %&%

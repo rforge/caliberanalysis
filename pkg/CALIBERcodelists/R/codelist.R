@@ -634,8 +634,12 @@ printCodelist <- function(x, ...){
 		tolower(textTotalTerms(nrow(x))) %&%	'.\n\n')
 	cat(paste(encodeMetadata(x, includeDescription = TRUE),
 		collapse = '\n'))
-	cat('\n\nTERMS (sorted by category and code):\n')
-	printTerms(x[order(category, code)])
+	if (all(c('category', 'code') %in% colnames(x))){
+		cat('\n\nTERMS (sorted by category and code):\n')
+		printTerms(x[order(category, code)])
+	} else {
+		printTerms(x)
+	}
 	invisible(x)
 }
 
