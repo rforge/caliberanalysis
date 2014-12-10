@@ -18,7 +18,11 @@ cohort <- function(x, idcolname = c('patid', 'anonpatid', 'id'),
 	}
 
 	# Find ID column
-	idcolname <- idcolname[which(idcolname %in% colnames(out))]
+	if (is.null(attr(x, 'idcolname'))){
+		idcolname <- idcolname[which(idcolname %in% colnames(out))]
+	} else {
+		idcolname <- as.character(attr(x, 'idcolname'))
+	}
 	names(idcolname) <- NULL
 	if (length(idcolname) == 1){
 		setattr(out, 'idcolname', idcolname)
@@ -32,6 +36,18 @@ cohort <- function(x, idcolname = c('patid', 'anonpatid', 'id'),
 	}
 	if (length(unique(out[[idcolname]])) < nrow(out)){
 		stop('ID must be unique')
+	}
+
+	if (is.null(description)){
+		if (!is.null(attr(x, 'var.labels'))){
+			description <- data.frame(colname = colnames(x),
+				description = attr(x, 'var.labels'),
+				stringsAsFactors = FALSE)
+		}
+	}
+
+	if (is.null(description)){
+		description <- attr(x, 'description')
 	}
 
 	if (is.null(description)){
@@ -61,57 +77,6 @@ cohort <- function(x, idcolname = c('patid', 'anonpatid', 'id'),
 	out
 }
 
-purgeDescription <- function(x){
-	if (!is.cohort(x)){
-		warning('This function only works on cohort objects')
-	} else {
-		description <- attr(x, 'description')
-		description <- description[description$colname %in% colnames(x), ]
-		setattr(x, 'description', description)
-		invisible(x)
-	}
-}
-
-modifyDescription <- function(x, colname, description){
-	# Modify the description attribute of a cohort file
-	# Arguments: x = a cohort file
-	#            colname = vector of column names
-	#            description = vector of descriptions
-	if (!is.cohort(x)){
-		stop('x must be a cohort object')
-	}
-
-	# colname and description can be a vector
-	if (length(colname) > 1){
-		todo <- data.frame(colnames = colname, descriptions = description,
-			stringsAsFactors = FALSE)
-		for (i in 1:nrow(todo)){
-			modifyDescription(x, todo$colnames[i], todo$descriptions[i])
-		}
-	} else {
-		.colname <- colname	
-		rm(colname)
-		.description <- description
-		rm(description)
-
-		DESC <- attr(x, 'description')
-		if (.colname %in% DESC$colname){
-			DESC[.colname == DESC$colname, 'description'] <- .description
-		} else {
-			if (!(.colname %in% colnames(x))){
-				warning(.colname %&% ' not a column in x')				
-			}
-			DESC <- copy(rbind(DESC, data.frame(
-				colname = as.character(.colname),
-				description = as.character(.description),
-				stringsAsFactors = FALSE)))
-		}
-		DESC <- DESC[order(DESC$colname), ]
-		setattr(x, 'description', DESC)
-	}
-	invisible(x)
-}
-
 as.cohort <- function(x, ...){
 	if (is.cohort(x)){
 		x
@@ -122,7 +87,11 @@ as.cohort <- function(x, ...){
 
 is.cohort <- function(x){
 	if ('cohort' %in% class(x)){
-		TRUE
+		if (is.null(attr(x, 'idcolname'))){
+			FALSE
+		} else {
+			TRUE
+		}
 	} else {
 		FALSE
 	}
@@ -246,14 +215,14 @@ subset.cohort <- function(x, subset, select){
 	
 	if (is.data.table(x)){
 		if (missing(subset)) {
-				includeRow <- TRUE
-			}	else {
-				expr <- substitute(subset)
-				includeRow <- eval(expr, x, parent.frame())
-				if (!is.logical(includeRow)) 
-					stop("'subset' must evaluate to a Boolean vector")
-				includeRow[is.na(includeRow)] <- FALSE
-			}
+			includeRow <- TRUE
+		}	else {
+			expr <- substitute(subset)
+			includeRow <- eval(expr, x, parent.frame())
+			if (!is.logical(includeRow)) 
+				stop("'subset' must evaluate to a Boolean vector")
+			includeRow[is.na(includeRow)] <- FALSE
+		}
 		out <- x[includeRow, select, with = FALSE]
 	} else if (is.ffdf(x)){
 		# subset.ffdf does not use ...
@@ -273,14 +242,14 @@ subset.cohort <- function(x, subset, select){
 			}
 		}
 	}
-	out <- as.cohort(out, idcolname = attr(x, 'idcolname'),
+	out <- cohort(out, idcolname = attr(x, 'idcolname'),
 		description = attr(x, 'description')) 
 	out <- purgeDescription(out)
 	out
 }
 
 
-merge.cohort <- function(x, y, ...){
+merge.cohort <- function(x, y, by = attr(x, 'idcolname'), ...){
 	# Merges two cohorts, warning if there are common columns
 	# The ID column name must be identical
 	# Combines the descriptions
@@ -295,7 +264,6 @@ merge.cohort <- function(x, y, ...){
 	if (is.data.table(y) & !is.data.table(x)){
 		x <- as.data.table(x)
 	}
-
 	if (attr(x, 'idcolname') != attr(y, 'idcolname')){
 		stop('ID column names in x and y are different')
 	}
@@ -320,7 +288,7 @@ merge.cohort <- function(x, y, ...){
 	}
 	
 	# Perform the merge
-	out <- merge(x, y, by = attr(x, 'idcolname'), ...)
+	out <- merge(x, y, by = by, ...)
 	
 	# Restore original classes
 	setattr(x, 'class', classx)

@@ -16,7 +16,7 @@ addToCohort(cohort, varname, data, old_varname = "value",
     date_priority = c("all", "first", "last"), limit_years = c(-Inf, 0),
     date_varname = NULL,  idcolname = attr(cohort, 'idcolname'),
     datecolname = "eventdate", indexcolname = "indexdate",
-    overwrite = FALSE, description = NULL, limit_days = NULL)
+    overwrite = TRUE, description = NULL, limit_days = NULL)
 }
 
 \arguments{

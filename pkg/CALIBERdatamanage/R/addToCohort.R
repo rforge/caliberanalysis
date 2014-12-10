@@ -4,7 +4,7 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 	limit_years = c(-Inf, 0), date_varname = NULL,
 	idcolname = attr(cohort, 'idcolname'),
 	datecolname = 'eventdate', indexcolname = 'indexdate',
-	overwrite = FALSE, description = NULL, limit_days = NULL){
+	overwrite = TRUE, description = NULL, limit_days = NULL){
 	# Adds to the x data.table a column labelled varname
 	# containing the value of a category from a list of ID,
 	# category, eventdate.
@@ -94,11 +94,19 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 	}
 
 	#### Create a data.table DATA containing data of interest ####
-	if (!is.data.table(data)){
-		DATA <- as.data.table(as.data.frame(data))
-		setnames(DATA, old_varname, 'value')
-		setnames(DATA, datecolname, '.eventdate')
-	} else {
+	if (is.ffdf(data) | (is.data.frame(data) & !is.data.table(data))){
+		if (old_varname == datecolname){
+			DATA <- as.data.table(data[,
+				c(idcolname, old_varname)])
+			setnames(DATA, old_varname, 'value')
+			DATA[, .eventdate := value]
+		} else {
+			DATA <- as.data.table(data[,
+				c(idcolname, old_varname, datecolname)])
+			setnames(DATA, old_varname, 'value')
+			setnames(DATA, datecolname, '.eventdate')
+		}
+	} else if (is.data.table(data)){
 		if (old_varname == datecolname){
 			# Event date is the value to be extracted
 			DATA <- copy(data[, c(idcolname, old_varname),
@@ -111,6 +119,8 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 			setnames(DATA, old_varname, 'value')
 			setnames(DATA, datecolname, '.eventdate')
 		}
+	} else {
+		stop('data is an unknown type of object. It should be a data.table, data.frame or FFDF data frame')
 	}
 
 	date_priority <- date_priority[1]
@@ -129,13 +139,15 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 	DATA[, include := istrue(!is.na(.eventdate) &
 		daysdiff >= limit_days[1] & daysdiff <= limit_days[2])]
 	if (date_priority == 'first'){
-		DATA[include == TRUE, include := (.eventdate == min(.eventdate)),
+		DATA[include == TRUE, keep := (.eventdate == min(.eventdate)),
 			by = .id]
-	} else if (date_priority=='last'){
-		DATA[include == TRUE, include := (.eventdate == max(.eventdate)),
+	} else if (date_priority == 'last'){
+		DATA[include == TRUE, keep := (.eventdate == max(.eventdate)),
 			by = .id]
+	} else {
+		DATA[, keep := include]
 	}
-	DATA[include == TRUE, .chosen := choiceFun(value), by = .id]
+	DATA[keep == TRUE, .chosen := choiceFun(value), by = .id]
 	# Keep only one row per patient
 	chooseFirst <- function(n){
 		if (n == 0){
@@ -144,12 +156,14 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 			c(TRUE, rep(FALSE, n - 1))
 		}
 	}
-	DATA[include == TRUE, use := chooseFirst(.N), by = .id]
+	DATA[keep == TRUE, use := chooseFirst(.N), by = .id]
 	DATA[, use := istrue(use)]
 	DATA[, value := NULL]
+	DATA[, include := NULL]
+	DATA[, keep := NULL]
 	
 	# Keep relevant rows only
-	Y <- subset(DATA, use == TRUE)
+	Y <- DATA[use == TRUE]
 	setkey(Y, .id)
 
 	if (!('.chosen' %in% colnames(Y))){
@@ -161,7 +175,7 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 	x[, .transferChosen := Y[x][, .chosen]]
 	x[, .transferDate := Y[x][, .eventdate]]
 	
-	if (varname %in% names(x) & overwrite == FALSE){
+	if (varname %in% colnames(x) & overwrite == FALSE){
 		# update existing variable if missing
 		update <- is.na(x[[varname]])
 		x[update == TRUE, eval(parse(text = paste(
@@ -172,7 +186,7 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 		}
 	} else {
 		# overwrite variable
-		if (varname %in% names(x)){
+		if (varname %in% colnames(x)){
 			x[, varname := NULL, with = FALSE]
 		}
 		setnames(x, '.transferChosen', varname)
@@ -182,10 +196,10 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 		}		
 	}
 	
-	if ('.transferDate' %in% names(x)){
+	if ('.transferDate' %in% colnames(x)){
 		x[, .transferDate := NULL]
 	}
-	if ('.transferChosen' %in% names(x)){
+	if ('.transferChosen' %in% colnames(x)){
 		x[, .transferChosen := NULL]
 	}
 	

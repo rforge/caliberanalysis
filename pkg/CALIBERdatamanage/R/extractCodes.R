@@ -2,11 +2,11 @@ extractCodes <- function(data, codelist, categories = NULL,
 	enttypes = NULL, codename = switch(attr(codelist, 'Source'),
 	GPRD = 'medcode', ONS = 'cod', HES = 'icd', OPCS = 'opcs',
 	GPRDPROD = 'prodcode'), varname = attr(codelist, 'Name')){
-	# Extracts a subset of records with a particular Read, OPCS
-	# or ICD-10 code.
+	# Extracts a subset of records with particular Read (medcode), OPCS,
+	# ICD-10 or product codes.
 
 	# Arguments: data -- ffdf or data.table or data.frame
-	#            codelist -- a Read codelist
+	#            codelist -- a codelist
 	#            categories -- optional vector of categories to include;
 	#                   NULL to include all
 	#            enttypes -- vector of entity types to extract,
@@ -118,9 +118,8 @@ extractCodes <- function(data, codelist, categories = NULL,
 		if (is.ffdf(data)){
 			keep <- !is.na(tomatch$category)
 			rownames(data) <- NULL
+			data[[varname]] <- as.ff(tomatch$category)
 			out <- subset(data, keep)
-			eval(parse(text = paste('out$', varname,
-				"<- as.ff(tomatch[!is.na(category), category])", sep = '')))
 		} else {
 			out <- subset(data, !is.na(tomatch$category))
 			out[, varname := tomatch[!is.na(category), category],

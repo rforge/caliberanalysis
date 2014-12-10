@@ -21,7 +21,7 @@ is.cohort(x)
 \method{print}{cohort}(x, \dots)
 \method{summary}{cohort}(object, \dots)
 \method{subset}{cohort}(x, subset, select)
-\method{merge}{cohort}(x, y, \dots)
+\method{merge}{cohort}(x, y, by = attr(x, "idcolname"), \dots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -40,6 +40,9 @@ of the cohort data.table, so columns can be referred to directly by name
 }
   \item{select}{
 vector of column names for columns to keep. The ID column is always selected.
+}
+  \item{by}{
+character vector of column names to merge by. Defaults to the ID column of x.
 }
   \item{\dots}{
 additional arguments

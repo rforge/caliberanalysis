@@ -1,4 +1,40 @@
 =================================================
+CALIBERdatamanage Version 0.1-12
+=================================================
+
+CHANGES:
+
+- cohort() uses the variable labels from a Stata
+  datset to create the column descriptions
+- modifyDescription can be used on any matrix,
+  data.frame or data.table
+
+BUG FIXES:
+
+- Corrected error in extractCodes with HES data and
+  FFDF
+- Corrected error in addToCohort which means that
+  it does not work if the column to be extracted
+  is the eventdate column when data is in ffdf format.
+- merge.cohort produced an error when by was specified
+
+=================================================
+CALIBERdatamanage Version 0.1-11
+=================================================
+
+BUG FIXES:
+
+- Ensure that cohort remains a cohort when
+  subsetting
+- is.cohort checks for the existence of the idcolname
+  attribute as well as the cohort class (to overcome
+  situations where data.tables were modified and
+  stripped of attributes but retained the cohort
+  class)
+- Corrected error in addToCohort which caused it
+  to ignore many of the eligible rows in some situations.
+
+=================================================
 CALIBERdatamanage Version 0.1-10
 =================================================
 

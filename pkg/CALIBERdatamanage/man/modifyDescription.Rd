@@ -3,7 +3,7 @@
 \alias{purgeDescription}
 
 \title{
-Modify the description table for a cohort object.
+Modify the description table for a data.frame, ffdf, data.table or matrix object.
 }
 
 \description{
@@ -17,7 +17,7 @@ purgeDescription(x)
 
 \arguments{
   \item{x}{
-a \link{cohort} object (a data.table with one row per patient)
+a data.frame, ffdf, data.table or matrix object.
 }
   \item{colname}{
 vector of column names
@@ -29,7 +29,7 @@ vector of new descriptions
 
 
 \value{
-Both functions invisibly return the modified cohort object and
+Both functions invisibly return the modified object and
 update it by reference.
 }
 
@@ -67,4 +67,11 @@ summary(COHORT)
 # 
 # COLUMN DESCRIPTIONS
 # indexdate (IDate): date when the patient presented
+
+# Description for a matrix object
+a <- matrix(1:4, nrow = 2, ncol = 2)
+colnames(a) <- c('This', 'That')
+a <- modifyDescription(a, 'This', 'This is the first column')
+a <- modifyDescription(a, c('This', 'That'),
+	c('This is the first column', 'That is the second column'))
 }
