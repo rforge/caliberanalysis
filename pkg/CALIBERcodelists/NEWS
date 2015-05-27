@@ -1,3 +1,19 @@
+TODO:
+
+- Ensure that Read codes are interpreted as character
+  not number
+- Provide a way to allow Read codes to be updated
+  / corrected in an existing codelist
+- Trim excess spaces from terms in codelists
+- Ensure there is no error if codelist is empty when
+  using demo(makecodelist)
+- Erase codelist under construction when 
+- Provide a menu-driven way to continue editing an
+  existing codelist (adding categories etc.)
+- Harmonise the commands for editing a codelist and
+  creating a new codelist
+- Allow codelists to use arbitrary dictionaries
+
 ==================================================
 Changes in CALIBERcodelists version 0.2-9
 ==================================================

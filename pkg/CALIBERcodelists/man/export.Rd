@@ -47,7 +47,9 @@ Filename and codename (CALIBER variable name) for the exported codelist. If it i
   \item{saveMessage}{
 If there already exists a file of the same name as the codelist being exported, \code{exportall} compares the code selection in this previous file with the new version being exported. If \code{saveMessage} is TRUE, this comparison is saved in the 'message' field of the META table rather than being printed on screen immediately. When processing a R Markdown file using \code{\link{process}}, this feature is used to prevent the comparison message from being printed in the HTML document, and it is shown on the screen instead after the file has been processed.
 }
-
+  \item{\dots}{
+Arguments for generic export function.
+}
 }
 \details{
 The function \code{exportall} extracts the selected terms from the master dictionary as up to four codelists (one per dictionary), and calls \code{export} to export each of them as a CSV file.
