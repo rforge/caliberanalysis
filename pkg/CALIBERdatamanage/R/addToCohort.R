@@ -88,7 +88,7 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 		}
 		limit_days <- limit_years * 365.25
 	}
-	limit_days <- sort(unique(limit_days))
+	limit_days <- sort(limit_days)
 	if (length(limit_days) != 2){
 		stop('limit_days should be a numeric vector of length 2')
 	}

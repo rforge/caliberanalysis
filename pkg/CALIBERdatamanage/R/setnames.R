@@ -14,18 +14,19 @@ setnames.cohort <- function(x, old, new){
 	}
 	newnames <- copy(colnames(x))	
 	
-	# Update description table
-	DESC <- attr(x, 'description')
-	names(newnames) <- currentnames
-	DESC$colname <- newnames[DESC$colname]
-	# If there are any entries for non-existent columns, delete them.
-	DESC <- DESC[!is.na(DESC$colname), ]
-	setattr(x, 'description', DESC)
-	
-	# Update idcolname
-	oldidcolname <- attr(x, 'idcolname')
-	setattr(x, 'idcolname', newnames[oldidcolname])
-
+	if (is.cohort(x)){
+		# Update description table
+		DESC <- attr(x, 'description')
+		names(newnames) <- currentnames
+		DESC$colname <- newnames[DESC$colname]
+		# If there are any entries for non-existent columns, delete them.
+		DESC <- DESC[!is.na(DESC$colname), ]
+		setattr(x, 'description', DESC)
+		
+		# Update idcolname
+		oldidcolname <- attr(x, 'idcolname')
+		setattr(x, 'idcolname', newnames[oldidcolname])
+	}
 	invisible(x)
 }
 
@@ -33,7 +34,8 @@ setnames.ffdf <- function(x, old, new){
 	# A version of setnames which works on ffdf data.frames
 	# Arguments: x = a ffdf object
 	#            old = old column names or positions, or a
-	#	                 vector of all new column names if new is missing.
+	#	            vector of all new column names if
+	#               new is missing.
 	#            new = new column names
 
 	currentnames <- copy(colnames(x))

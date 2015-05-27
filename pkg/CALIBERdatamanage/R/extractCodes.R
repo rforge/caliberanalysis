@@ -148,6 +148,9 @@ extractCodes <- function(data, codelist, categories = NULL,
 		}
 	}
 
+	# Ensure the output is not considered to be a codelist
+	setattr(out, 'class', setdiff(attr(out, 'class'), 'codelist'))
+
 	# Return the data.table or ffdf
 	out
 }

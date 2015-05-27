@@ -1,8 +1,8 @@
 Package: CALIBERdatamanage
-Title: Data management tools for CALIBER datasets
+Title: Data Management Tools for CALIBER Datasets
 Type: Package
-Version: 0.1-12
-Date: 2014-12-10
+Version: 0.1-13
+Date: 2014-05-27
 Authors@R: c(person("Anoop", "Shah", role=c("aut", "cre"), email="anoop@doctors.org.uk"),
     person("Harry", "Hemingway", role="ths"),
     person("Aroon", "Hingorani", role="ths"),

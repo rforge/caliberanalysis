@@ -121,7 +121,7 @@ multiforest <- function(data = NULL, rowheights = 1.1,
 	xlaboffset = -2.5, zerocolour = 'gray',
 	zerolinewidth = 1, zerolineposition = NULL, ...){
 	defaultnumcols <- 1
-  
+
 	# for interactive mode
 	if (is.null(data)){
 		data <- file.choose()
@@ -255,13 +255,28 @@ multiforest <- function(data = NULL, rowheights = 1.1,
 			data$upper <- data$mean + 1.96*data$se
 			data$lower <- data$mean - 1.96*data$se
 		}
+		
 		# Should we use a log scale?
 		if ('xlog' %in% names(data)){
 			xlog <- as.logical(data$xlog[1])
-		} else {xlog <- TRUE}
+		} else {
+			xlog <- TRUE
+		}
+		# X axis label
 		if ('xlab' %in% names(data)){
-			xlab <- (data$xlab[1])
-		} else {xlab <- defaultxlab}
+			xlab <- data$xlab[1]
+		} else {
+			xlab <- defaultxlab
+		}
+		# X range
+		if ('xrange' %in% names(data)){
+			xrange <- data$xrange[!is.na(data$xrange)]
+			if (length(xrange) == 0){
+				xrange <- NULL
+			}
+		} else {
+			xrange <- NULL
+		}
 		# Which row(s) are the summary?
 		if ('summary' %in% names(data)){
 			data$summary <- as.logical(data$summary)
@@ -288,17 +303,24 @@ multiforest <- function(data = NULL, rowheights = 1.1,
 		# start is the first row with data
 
 		# If ticks are supplied, don't squash the graph
-		if (!is.null(xticks)){
-			if (xlog){
-				xrange <- c(min(log(xticks)), max(log(xticks)))
+		if (is.null(xrange)){
+			if (!is.null(xticks)){
+				if (xlog){
+					xrange <- c(min(log(xticks)), max(log(xticks)))
+				} else {
+					xrange <- c(min(xticks), max(xticks))
+				}
 			} else {
-				xrange <- c(min(xticks), max(xticks))
+				xrange <- c(min(max(min(data$lower, na.rm = TRUE),
+					data$cliplower[1]), 0),
+					max(min(max(data$upper, na.rm = TRUE),
+					data$clipupper[1]), 0))
 			}
 		} else {
-			xrange <- c(min(max(min(data$lower, na.rm = TRUE),
-				data$cliplower[1]), 0),
-				max(min(max(data$upper, na.rm = TRUE),
-				data$clipupper[1]), 0))
+			xrange <- unique(c(min(xrange), max(xrange)))
+			if (length(xrange) == 1){
+				xrange <- c(0, xrange)
+			}
 		}
 		# info is the size of the box, or inverse variance
 		if (!is.null(data$boxsize)) {
@@ -309,7 +331,10 @@ multiforest <- function(data = NULL, rowheights = 1.1,
 		} else {
 			# no boxsize data for this graph
 			if (is.null(defaultboxsize)){
-				data$info <- 1/(cwidth^2)
+				# info = 1 / width of confidence interval
+				# box length is proportional to inverse standard deviation
+				# hence box area is proportional to inverse variance
+				data$info <- 1/cwidth
 				data$info[cwidth == 0] <- NA
 				data$info <- data$info/max(data$info[!data$summary], na.rm = TRUE)
 				data$info[data$summary] <- 1
@@ -375,16 +400,21 @@ multiforest <- function(data = NULL, rowheights = 1.1,
 		}
 		
 		pushViewport(viewport(layout.pos.col = colnumber,
-			layout.pos.row=start:(nrows+1), xscale = xrange))
+			layout.pos.row = start:(nrows + 1), xscale = xrange))
 
 		# zero axis position (default zero if no log scale,
 		# 1 if log scale)
 		if (is.numeric(zerolineposition)){
-			grid.lines(x = unit(zerolineposition, "native"), y = 0:1,
-				gp = gpar(col = zerocolour, lwd=zerolinewidth))
+			if (zerolineposition >= min(xrange) &
+				zerolineposition <= max(xrange)){
+				grid.lines(x = unit(zerolineposition, "native"), y = 0:1,
+					gp = gpar(col = zerocolour, lwd = zerolinewidth))
+			}
 		} else {
-			grid.lines(x = unit(0, "native"), y = 0:1,
-				gp = gpar(col = zerocolour, lwd=zerolinewidth))
+			if (max(xrange) >= 0 & min(xrange) <= 0){
+				grid.lines(x = unit(0, "native"), y = 0:1,
+					gp = gpar(col = zerocolour, lwd = zerolinewidth))
+			}
 		}
 
 		if (xlog) {
@@ -415,7 +445,7 @@ multiforest <- function(data = NULL, rowheights = 1.1,
 			}
 		}
 		grid.text(xlab, y = unit(xlaboffset, "lines"),
-			gp = gpar(fontsize=xlabfontsize,	col = 'black'))
+			gp = gpar(fontsize=xlabfontsize, col = 'black'))
 		popViewport()
 		for (i in 1:nrows) {
 			if (is.na(data$mean[i])) {

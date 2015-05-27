@@ -17,8 +17,8 @@ Also converts cohort objects from data.table cohorts to ffdf cohorts and vice ve
 }
 
 \usage{
-\method{as.data.table}{ffdf}(x, keep.rownames = FALSE)
-\method{as.data.table}{cohort}(x, keep.rownames = FALSE)
+\method{as.data.table}{ffdf}(x, keep.rownames = FALSE, ...)
+\method{as.data.table}{cohort}(x, keep.rownames = FALSE, ...)
 \method{as.ffdf}{data.table}(x, vmode = NULL,
     col_args = list(), ...)
 \method{as.ffdf}{cohort}(x, vmode = NULL,
@@ -40,7 +40,7 @@ optional specification of the vmodes of columns of the data.frame. Either a char
 further arguments; passed to ff
 }
   \item{\dots}{
-further arguments; passed to ffdf for .ff_vector, .ff_matrix and .data.frame methods, ignored for .ffdf identity method
+further arguments: passed to ffdf for .ff_vector, .ff_matrix and .data.frame methods; passed to as.data.table for as.data.table methods; ignored for .ffdf identity method
 }
 }
 

@@ -128,6 +128,7 @@ For graph columns, options which apply to every row:
 \item{summary}{1 if it is the summary row, 0 if not}
 \item{clipupper}{clip if upper CI greater than this}
 \item{cliplower}{clip if lower CI less than this}
+\item{xrange}{range to plot on the x axis (can be a pair or a whole set of numbers or a single number, in which case it is taken as the maximum and zero is taken as the minimum). If not supplied it is derived from \code{xticks} or the data}
 }
 
 For graph columns, the following options apply to the whole graph, and only the first row below the column heading is considered:

@@ -1,4 +1,36 @@
 =================================================
+CALIBERdatamanage Version 0.1-13
+=================================================
+
+CHANGES:
+
+- xrange can be specified for each graph in multiforest
+  input data. If only a single value is specified it
+  is considered to be the maximum.
+
+BUG FIXES:
+
+- ensure that extractCodes does not return a codelist
+- idcolname is considered identical even if it is a
+  named character string in one cohort dataset and
+  unnamed in another (ideally should be unnamed)
+- character vectors converted to factor when using
+  transferVariables
+- summary.cohort and print.cohort use is.cohort to
+  check that the object is a cohort (e.g. that it has
+  valid idcolname)  
+- Do not convert var.labels (from Stata) into description
+  table if it is the wrong length
+- Error when start and end of limit_days are the same
+- 'Cohort' objects with invalid idcolname are stripped
+  of their cohort class attribute by is.cohort
+- All cohort methods use 'is.cohort' to perform a 
+  deeper check whether an object is a valid cohort,
+  rather than relying on the class attribute.
+- Correction to box size calculation in multiforest --
+  box area proportional to inverse variance.
+
+=================================================
 CALIBERdatamanage Version 0.1-12
 =================================================
 

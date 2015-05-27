@@ -60,8 +60,11 @@ transferVariables <- function(fromdata, todata, varnames,
 		from_has_id <- is.cohort(fromdata) &
 			!is.null(attr(fromdata, 'idcolname'))
 		if (to_has_id & from_has_id){
-			if (identical(attr(todata, 'idcolname'),
-				attr(fromdata, 'idcolname'))){
+			to_id <- attr(todata, 'idcolname')
+			from_id <- attr(fromdata, 'idcolname')
+			names(to_id) <- NULL
+			names(from_id) <- NULL
+			if (identical(to_id, from_id)){
 				by = attr(todata, 'idcolname')	
 			} else {
 				stop('fromdata and todata have different idcolname')
@@ -126,6 +129,11 @@ transferVariables <- function(fromdata, todata, varnames,
 			}
 
 			if (is.data.table(todata)){
+				# If from data.table to data.table and it is a character
+				# vector, keep it as character
+				if (is.character(fromdata[[varname]])){
+					out2 <- as.character(out2)
+				}
 				todata[, eval(parse(text = paste('`', varname,
 					'`:= out2', sep = '')))]
 			} else if (is.ffdf(todata)){

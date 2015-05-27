@@ -6,7 +6,8 @@ GEN_SDCtoDate <- function(GEN_SDC){
 	# 2 = A date greater than 31/12/2014
 	# 3 = A date earlier than 01/01/1800
 	# All other values = number of days between the date and the 31/12/2014 offset by 10.
-	# Example:  A value of 4027 decodes to the date 01/01/2004. 4027 – 10 = 4017 days prior to the date 31/12/2014 is the date 01/01/2004
+	# Example:  A value of 4027 decodes to the date 01/01/2004.
+	# 4027 - 10 = 4017 days prior to the date 31/12/2014 = 01/01/2004
 	out <- ifelse(is.na(GEN_SDC), yes = NA, no =
 		ifelse(GEN_SDC > 3,
 			yes = as.numeric(as.Date('2014-12-31')) - GEN_SDC + 10,

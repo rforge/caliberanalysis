@@ -4,7 +4,7 @@
 \docType{package}
 
 \title{
-CALIBER data management tools
+Data Management Tools for CALIBER Datasets
 }
 
 \description{
@@ -15,8 +15,8 @@ Tools for handling data in the GPRD, HES, ONS and MINAP linked dataset (CALIBER)
 \tabular{ll}{
 Package: \tab CALIBERdatamanage\cr
 Type: \tab Package\cr
-Version: \tab 0.1-12\cr
-Date: \tab 2014-12-10\cr
+Version: \tab 0.1-13\cr
+Date: \tab 2015-05-27\cr
 License: \tab GPL-3\cr
 }
 

@@ -28,4 +28,4 @@ S3method(as.ffdf, data.table)
 S3method(as.data.table, cohort)
 S3method(as.ffdf, cohort)
 
-import(grid, ff, ffbase, foreign, data.table, xtable)
+import(grid, ffbase, ff, foreign, data.table, xtable)

@@ -1,14 +1,15 @@
-as.data.table.ffdf <- function(x, keep.rownames = FALSE){
+as.data.table.ffdf <- function(x, keep.rownames = FALSE, ...){
 	# Converts ffdf to data.table
-	as.data.table(as.data.frame(x), keep.rownames = keep.rownames)
+	as.data.table(as.data.frame(x), keep.rownames = keep.rownames, ...)
 }
 
-as.data.table.cohort <- function(x, keep.rownames = FALSE){
+as.data.table.cohort <- function(x, keep.rownames = FALSE, ...){
 	# Converts cohort to data.table
 	if (is.data.table(x)){
 		x
 	} else {
-		out <- as.data.table(as.data.frame(x), keep.rownames = keep.rownames)
+		out <- as.data.table(as.data.frame(x),
+			keep.rownames = keep.rownames, ...)
 		setattr(out, 'idcolname', attr(x, 'idcolname'))
 		setkeyv(out, attr(x, 'idcolname'))
 		setattr(out, 'description', attr(x, 'description'))

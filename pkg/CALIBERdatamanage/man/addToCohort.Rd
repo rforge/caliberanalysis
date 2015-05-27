@@ -111,7 +111,7 @@ print(COHORT)
 # Data in data.table
 newdata <- data.table(anonpatid = c(2, 2, 3, 3, 4, 4, 4), 
     value = c(1, 2, 1, 3, 1, 2, NA), eventdate = as.IDate(c("2000-1-1", 
-    "2012-1-3", "2011-1-1", "2011-1-1", "2012-1-5", "2013-1-1", 
+    "2012-1-2", "2011-1-1", "2011-1-1", "2012-1-5", "2013-1-1", 
     "2011-1-1")))
 addToCohort(COHORT, "newvar", newdata, "value", value_choice = c(3, 
     1, 2))
@@ -122,6 +122,12 @@ removeColumns(COHORT, 'newvar')
 newffdf <- as.ffdf(newdata)
 addToCohort(COHORT, "newvar", newffdf, "value", value_choice = c(3, 
     1, 2))
+print(COHORT)
+
+# Exact date matches only
+removeColumns(COHORT, 'newvar')
+addToCohort(COHORT, "newvar", newffdf, "value", value_choice = c(3, 
+    1, 2), limit_days = c(0, 0))
 print(COHORT)
 
 # Additional data for patient 1, missing data for patient 2

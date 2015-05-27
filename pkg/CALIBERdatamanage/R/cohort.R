@@ -40,9 +40,11 @@ cohort <- function(x, idcolname = c('patid', 'anonpatid', 'id'),
 
 	if (is.null(description)){
 		if (!is.null(attr(x, 'var.labels'))){
-			description <- data.frame(colname = colnames(x),
-				description = attr(x, 'var.labels'),
-				stringsAsFactors = FALSE)
+			if (length(attr(x, 'var.labels')) == ncol(x)){
+				description <- data.frame(colname = colnames(x),
+					description = attr(x, 'var.labels'),
+					stringsAsFactors = FALSE)
+			}
 		}
 	}
 
@@ -88,9 +90,17 @@ as.cohort <- function(x, ...){
 is.cohort <- function(x){
 	if ('cohort' %in% class(x)){
 		if (is.null(attr(x, 'idcolname'))){
+			# If there is no ID column it is not a cohort
+			setattr(x, 'class', setdiff(class(x), 'cohort'))
 			FALSE
 		} else {
-			TRUE
+			if (attr(x, 'idcolname') %in% colnames(x)){
+				TRUE
+			} else {
+				# If the ID column is not included it is not a cohort
+				setattr(x, 'class', setdiff(class(x), 'cohort'))
+				FALSE
+			}
 		}
 	} else {
 		FALSE
@@ -98,71 +108,83 @@ is.cohort <- function(x){
 }
 
 print.cohort <- function(x, ...){
-	# Prints the summary and then the cohort file itself
-	summary.cohort(x)	
-
-	cat('\nDATA\n')
-	if (is.data.table(x)){
-		# Changing the class to data.table in order to invoke
-		# print.data.table
-		classes <- class(x)
-		setattr(x, 'class', c('data.table', 'data.frame'))
+	if (!(is.cohort(x))){
+		# Remove cohort class designation
+		setattr(x, 'class', setdiff(class(x), 'cohort'))
 		print(x)
-		# Restore original classes
-		setattr(x, 'class', classes)
-	} else if (is.ffdf(x)){
-		ff::print.ffdf(x)
+	} else {		
+		# Prints the summary and then the cohort file itself
+		summary.cohort(x)	
+
+		cat('\nDATA\n')
+		if (is.data.table(x)){
+			# Changing the class to data.table in order to invoke
+			# print.data.table
+			classes <- class(x)
+			setattr(x, 'class', c('data.table', 'data.frame'))
+			print(x)
+			# Restore original classes
+			setattr(x, 'class', classes)
+		} else if (is.ffdf(x)){
+			ff::print.ffdf(x)
+		}
 	}
 }
 
 summary.cohort <- function(object, ...){
-	# Prints a summary of a cohort
-	if (is.data.table(object)){
-		# Order the columns so that ID column is at the
-		# front and others are alphabetical
-		setcolorder(object, c(attr(object, 'idcolname'),
-			sort(setdiff(names(object), attr(object, 'idcolname')))))
-		cat('Data.table cohort with ') 
-	} else if (is.ffdf(object)) {
-		cat('FFDF cohort with ')
-	}
-	cat(nrow(object), 'patients and ' %&% ncol(object) %&%
-		' columns; ID column =', attr(object, 'idcolname'), '\n')
-
-	getclass <- function(colnames){
-		# Get the class of columns in a data.frame, returning
-		# NULL if the column does not exist
-		trygetclass <- function(z){
-			if (z %in% colnames(object)){
-				class(object[[z]])[1]
-			} else {
-				'NULL'
-			}
+	if (!(is.cohort(object))){
+		# Remove cohort class designation
+		setattr(object, 'class', setdiff(class(object), 'cohort'))
+		summary(object)
+	} else {
+		# Prints a summary of a cohort
+		if (is.data.table(object)){
+			# Order the columns so that ID column is at the
+			# front and others are alphabetical
+			setcolorder(object, c(attr(object, 'idcolname'),
+				sort(setdiff(names(object), attr(object, 'idcolname')))))
+			cat('Data.table cohort with ') 
+		} else if (is.ffdf(object)) {
+			cat('FFDF cohort with ')
 		}
-		sapply(colnames, trygetclass)
-	}
+		cat(nrow(object), 'patients and ' %&% ncol(object) %&%
+			' columns; ID column =', attr(object, 'idcolname'), '\n')
 
-	description <- attr(object, 'description')
-	
-	if (!is.null(description)){
-		if (nrow(description) > 0){
-			cat('\nCOLUMN DESCRIPTIONS\n')
-			# Add columns without a description
-			description <- merge(description,
-				data.frame(colname = colnames(object)), by = 'colname',
-				all = TRUE)
-			description$description[is.na(description$description)] <- ''
-			
-			if (is.ffdf(object)){
-				object <- as.data.table(as.data.frame(object[1, ]))
+		getclass <- function(colnames){
+			# Get the class of columns in a data.frame, returning
+			# NULL if the column does not exist
+			trygetclass <- function(z){
+				if (z %in% colnames(object)){
+					class(object[[z]])[1]
+				} else {
+					'NULL'
+				}
 			}
+			sapply(colnames, trygetclass)
+		}
 
-			cat(paste(description$colname %&% ' (' %&%
-				getclass(description$colname) %&% '): ' %&%
-				truncateChar(description$description,
-				getOption('width') - nchar(description$colname) -
-				nchar(getclass(description$colname)) - 7), collapse='\n'))
-			cat('\n')
+		description <- attr(object, 'description')
+		
+		if (!is.null(description)){
+			if (nrow(description) > 0){
+				cat('\nCOLUMN DESCRIPTIONS\n')
+				# Add columns without a description
+				description <- merge(description,
+					data.frame(colname = colnames(object)), by = 'colname',
+					all = TRUE)
+				description$description[is.na(description$description)] <- ''
+				
+				if (is.ffdf(object)){
+					object <- as.data.table(as.data.frame(object[1, ]))
+				}
+
+				cat(paste(description$colname %&% ' (' %&%
+					getclass(description$colname) %&% '): ' %&%
+					truncateChar(description$description,
+					getOption('width') - nchar(description$colname) -
+					nchar(getclass(description$colname)) - 7), collapse='\n'))
+				cat('\n')
+			}
 		}
 	}
 }
@@ -205,47 +227,51 @@ subset.cohort <- function(x, subset, select){
 	# Ensure that as a minimum, code, medcode if GPRD,
 	# term and category are kept. It is only valid as a codelist
 	# if these columns are kept test
-	
-	if (missing(select)){
-		select <- colnames(x)
+	if (!is.cohort(x)){
+		setattr(x, 'class', setdiff(class(x), 'cohort'))		
+		subset(x, subset, select)
 	} else {
-		select <- c(attr(x, 'idcolname'),
-			sort(unique(setdiff(select, attr(x, 'idcolname')))))
-	}
-	
-	if (is.data.table(x)){
-		if (missing(subset)) {
-			includeRow <- TRUE
-		}	else {
-			expr <- substitute(subset)
-			includeRow <- eval(expr, x, parent.frame())
-			if (!is.logical(includeRow)) 
-				stop("'subset' must evaluate to a Boolean vector")
-			includeRow[is.na(includeRow)] <- FALSE
+		if (missing(select)){
+			select <- colnames(x)
+		} else {
+			select <- c(attr(x, 'idcolname'),
+				sort(unique(setdiff(select, attr(x, 'idcolname')))))
 		}
-		out <- x[includeRow, select, with = FALSE]
-	} else if (is.ffdf(x)){
-		# subset.ffdf does not use ...
-		out <- ffbase::subset.ffdf(x, subset)
-		# If using the select argument, need to select the relevant
-		# vectors by setting the others to NULL
-		if (!missing(select)){
-			if (is.logical(select) | is.numeric(select)){
-				select <- colnames(out)[select]
-			} 
-			if (is.character(select) & length(select) > 0){
-				# Remove unwanted columns
-				remove <- setdiff(colnames(out), select)
-				for (thecol in remove){
-					out[[thecol]] <- NULL
+		
+		if (is.data.table(x)){
+			if (missing(subset)) {
+				includeRow <- TRUE
+			}	else {
+				expr <- substitute(subset)
+				includeRow <- eval(expr, x, parent.frame())
+				if (!is.logical(includeRow)) 
+					stop("'subset' must evaluate to a Boolean vector")
+				includeRow[is.na(includeRow)] <- FALSE
+			}
+			out <- x[includeRow, select, with = FALSE]
+		} else if (is.ffdf(x)){
+			# subset.ffdf does not use ...
+			out <- ffbase::subset.ffdf(x, subset)
+			# If using the select argument, need to select the relevant
+			# vectors by setting the others to NULL
+			if (!missing(select)){
+				if (is.logical(select) | is.numeric(select)){
+					select <- colnames(out)[select]
+				} 
+				if (is.character(select) & length(select) > 0){
+					# Remove unwanted columns
+					remove <- setdiff(colnames(out), select)
+					for (thecol in remove){
+						out[[thecol]] <- NULL
+					}
 				}
 			}
 		}
+		out <- cohort(out, idcolname = attr(x, 'idcolname'),
+			description = attr(x, 'description')) 
+		out <- purgeDescription(out)
+		out
 	}
-	out <- cohort(out, idcolname = attr(x, 'idcolname'),
-		description = attr(x, 'description')) 
-	out <- purgeDescription(out)
-	out
 }
 
 
@@ -253,49 +279,56 @@ merge.cohort <- function(x, y, by = attr(x, 'idcolname'), ...){
 	# Merges two cohorts, warning if there are common columns
 	# The ID column name must be identical
 	# Combines the descriptions
-	if (!(is.cohort(x) & is.cohort(y))){
-		stop('x and y must be cohort objects')
-	}
 	
-	# If one of the objects is a data.table, both must be data.tables
-	if (is.data.table(x) & !is.data.table(y)){
-		y <- as.data.table(y)
-	}
-	if (is.data.table(y) & !is.data.table(x)){
-		x <- as.data.table(x)
-	}
-	if (attr(x, 'idcolname') != attr(y, 'idcolname')){
-		stop('ID column names in x and y are different')
-	}
+	if (!is.cohort(x)){
+		setattr(x, 'class', setdiff(class(x), 'cohort'))
+		merge(x, y, by, ...)
+	} else {
+		
+		if (is.cohort(x) & is.cohort(y)){
+			if (attr(x, 'idcolname') != attr(y, 'idcolname')){
+				stop('ID column names in x and y are different')
+			}
+		}
+		
+		# If one of the objects is a data.table, the other is converted
+		# t oa data.table before merging
+		if (is.data.table(x) & !is.data.table(y)){
+			y <- as.data.table(y)
+		}
+		if (is.data.table(y) & !is.data.table(x)){
+			x <- as.data.table(x)
+		}
 
-	if (length(intersect(colnames(x), colnames(y))) > 1){
-		warning('Columns ' %&%
-			paste(intersect(colnames(x), colnames(y)), collapse=', ') %&%
-			' are in both cohort datasets')
-	}
+		if (length(intersect(colnames(x), colnames(y))) > 1){
+			warning('Columns ' %&%
+				paste(intersect(colnames(x), colnames(y)), collapse=', ') %&%
+				' are in both cohort datasets')
+		}
 
-	classx <- class(x)
-	classy <- class(y)
+		classx <- class(x)
+		classy <- class(y)
 
-	# Simplify the classes to select the correct merge method
-	if (is.ffdf(x) & is.ffdf(y)){
-		setattr(x, 'class', 'ffdf')
-		setattr(y, 'class', 'ffdf')
+		# Simplify the classes to select the correct merge method
+		if (is.ffdf(x) & is.ffdf(y)){
+			setattr(x, 'class', 'ffdf')
+			setattr(y, 'class', 'ffdf')
+		}
+		if (is.data.table(x) & is.data.table(y)) {
+			setattr(x, 'class', c('data.table', 'data.frame'))
+			setattr(y, 'class', c('data.table', 'data.frame'))
+		}
+		
+		# Perform the merge
+		out <- merge(x, y, by = by, ...)
+		
+		# Restore original classes
+		setattr(x, 'class', classx)
+		setattr(y, 'class', classy)
+		
+		out <- cohort(out, idcolname = attr(x, 'idcolname'),
+			description <- rbind(attr(x, 'description'), attr(y, 'description')))
+		out
 	}
-	if (is.data.table(x) & is.data.table(y)) {
-		setattr(x, 'class', c('data.table', 'data.frame'))
-		setattr(y, 'class', c('data.table', 'data.frame'))
-	}
-	
-	# Perform the merge
-	out <- merge(x, y, by = by, ...)
-	
-	# Restore original classes
-	setattr(x, 'class', classx)
-	setattr(y, 'class', classy)
-	
-	out <- cohort(out, idcolname = attr(x, 'idcolname'),
-		description <- rbind(attr(x, 'description'), attr(y, 'description')))
-	out	
 }
 
