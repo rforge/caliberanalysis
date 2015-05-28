@@ -1,0 +1,18 @@
+Package: CALIBERdrugdose
+Type: Package
+Title: Extract drug dose from unstructured dosage text
+Version: 0.1-0
+Date: 2014-03-08
+Authors@R: c(person("Anoop", "Shah", role=c("aut", "cre"), email="anoop@doctors.org.uk"),
+    person("Harry", "Hemingway", role="ths"),
+    person("Aroon", "Hingorani", role="ths"),
+    person("Owen", "Nicholas", role="ths"))
+Description: Functions to extract drug dose from text in the Clinical Practice Research Datalink. The CALIBER programme is funded by the Wellcome Trust (086091/Z/08/Z) and the National Institute for Health Research (NIHR) under its Programme Grants for Applied Research programme (RP-PG-0407-10314). The author is supported by a Wellcome Trust Clinical Research Training Fellowship (0938/30/Z/10/Z).
+License: GPL-3
+Depends: data.table
+Author: Anoop Shah [aut, cre],
+  Harry Hemingway [ths],
+  Aroon Hingorani [ths],
+  Owen Nicholas [ths]
+Maintainer: Anoop Shah <anoop@doctors.org.uk>
+

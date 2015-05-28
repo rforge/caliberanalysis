@@ -1,0 +1,12 @@
+export(doseconvert, interpret, testdoseconvert)
+export(as.drugdose_singlewords, as.drugdose_multiwords)
+export(as.drugdose_patterns, as.drugdose_lookups)
+
+export("export")
+export(export.drugdose_singlewords, export.drugdose_multiwords)
+export(export.drugdose_patterns, export.drugdose_lookups)
+
+export("addterm")
+export(addterm.drugdose_singlewords, addterm.drugdose_multiwords)
+export(addterm.drugdose_patterns, addterm.drugdose_lookups)
+
