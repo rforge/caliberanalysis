@@ -40,8 +40,8 @@ Functions which automatically contract ICD-10 codelists: \code{\link{export}}
 
 \examples{
 setdictionary('icd10')
-assigncat(1, 'MI|Myocardial infarction', codematch('I211'))
-assigncat(2, 'MI NOS', explode(codematch('I211')))
+assigncat(1, 'MI|Myocardial infarction', codematch('I210'))
+assigncat(2, 'MI NOS', explode(codematch('I210')))
 assigncat(3, 'Recent MI', codematch('I2[23]'))
 print(as.codelist())
 print(contractCodelist(as.codelist()))

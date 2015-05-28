@@ -45,29 +45,39 @@ explode <- function(x = NULL, level = 3,
 	}
 
 	sel2 <- sel1[!duplicated(sel1)]
-	setkey(sel2, dict, partcode)
-
-	# matchto is drawn from the whole of CALIBER_DICT
-	matchto <- copy(CALIBER_DICT[,
-		list(dict, code, partcode=substr(code, 1, level))])
-	setkey(matchto, dict, partcode)	
-
-	# find out which of matchto matches up with the 3-character codes
-	matchto[, sel2match:=sel2[matchto][, sel]]
-	matchto[is.na(sel2match), sel2match:=FALSE]
-
-	# Restore the order
-	setkey(matchto, dict, code)
 	
-	# Return new terms which were not already selected
-	# require mininum number of events if not GPRD
-	out <- matchto[, sel2match] & !selected & 
-		(CALIBER_DICT[, events>=minFreqGPRD]  | CALIBER_DICT[, dict!='read'])	
-	class(out) <- 'selection'
+	if (nrow(sel2) > 0){
+		setkey(sel2, dict, partcode)
 
-	# Whether the original selection should be retained
-	if (keep==TRUE){
-		out <- out %OR% selected
+		# matchto is drawn from the whole of CALIBER_DICT
+		matchto <- copy(CALIBER_DICT[,
+			list(dict, code, partcode=substr(code, 1, level))])
+		setkey(matchto, dict, partcode)	
+
+		# find out which of matchto matches up with the 3-character codes
+		matchto[, sel2match:=sel2[matchto][, sel]]
+		matchto[is.na(sel2match), sel2match:=FALSE]
+
+		# Restore the order
+		setkey(matchto, dict, code)
+		
+		# Return new terms which were not already selected
+		# require mininum number of events if not GPRD
+		out <- matchto[, sel2match] & !selected & 
+			(CALIBER_DICT[, events>=minFreqGPRD] |
+			CALIBER_DICT[, dict!='read'])	
+		class(out) <- 'selection'
+
+		# Whether the original selection should be retained
+		if (keep==TRUE){
+			out <- out %OR% selected
+		}
+	} else {
+		# Whether the original selection should be retained
+		if (keep==FALSE){
+			# Null selection
+			out <- as.selection(rep(FALSE, nrow(CALIBER_DICT)))
+		}
 	}
 	return(out)
 }

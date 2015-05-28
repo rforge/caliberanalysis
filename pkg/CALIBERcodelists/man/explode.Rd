@@ -54,4 +54,8 @@ print(as.codelist())
 angina <- selection('angina')
 explode(angina)
 stopifnot('Preinfarction syndrome' \%in\% CALIBER_DICT[explode(angina), term])
+
+setdictionary('icd10')
+mi <- codematch('I213', 'icd10')
+explode(mi)
 }
