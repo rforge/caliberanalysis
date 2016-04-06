@@ -13,7 +13,7 @@ extract structured information such as quantity, frequency and units.
 \usage{
 doseconvert(text, textid = NULL, simplify = TRUE, singlewords = NULL,
     multiwords = NULL, patterns = NULL, uselookups = TRUE,
-    lookups = NULL, customlookups = NULL, cores = 1, ...)
+    lookups = NULL, customlookups = NULL, cores = 1)
 }
 
 \arguments{
@@ -41,8 +41,7 @@ A \code{\link{drugdose_patterns}} object or file path to the patterns
 dictionary. If NULL it is loaded from the package data directory.
 }
   \item{uselookups}{
-A \code{\link{drugdose_lookups}} object or file path to the lookups
-dictionary. If NULL it is loaded from the package data directory.
+Whether to use a lookup table of exact dose strings and their conversion.
 }
   \item{lookups}{
 A \code{\link{drugdose_lookups}} object or file path to the lookups
@@ -92,7 +91,7 @@ dose if \code{ids} are supplied, or equal to the row numbers otherwise.
 \references{
 Shah AD, Martinez C. An algorithm to derive a numerical daily dose
 from unstructured text dosage instructions.
-Pharmacoepidemiol Drug Saf 2006; 15(3): 161–166. doi: 10.1002/pds.1151
+Pharmacoepidemiol Drug Saf 2006; 15(3): 161-166. doi: 10.1002/pds.1151
 \url{http://onlinelibrary.wiley.com/doi/10.1002/pds.1151/}
 }
 
@@ -109,9 +108,34 @@ Converted from the original Visual Basic algorithm.
 }
 
 \examples{
+# Using default dictionaries (loaded each time by function)
 doseconvert(c('2 tab twice daily',
     'one daily for 1 week then two daily'),
     textid = 1:2, simplify = FALSE)
 doseconvert('one daily for 1 week then two daily',
     textid = 2, simplify = TRUE)
+
+# Timing test
+system.time(doseconvert(text = '2 tablets daily', textid = 3))
+    
+# Pre-loading dictionaries for faster analysis
+# This is particularly useful when running in server mode for on-demand
+# dosage text conversion
+data(singlewords)
+the_singlewords <- as.drugdose_singlewords(singlewords)
+data(multiwords)
+the_multiwords <- as.drugdose_multiwords(multiwords)
+data(patterns)
+the_patterns <- as.drugdose_patterns(patterns)
+data(lookups)
+the_lookups <- as.drugdose_lookups(lookups)
+
+# Write a function to use pre-loaded dictionaries
+doseconvert_fast <- function(text, textid){
+	doseconvert(text = text, textid = textid, simplify = TRUE,
+	singlewords = the_singlewords, multiwords = the_multiwords,
+	patterns = the_patterns, lookups = the_lookups, cores = 1)
+}
+
+system.time(doseconvert_fast(text = '2 tablets daily', textid = 3))
 }

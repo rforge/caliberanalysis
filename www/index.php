@@ -54,6 +54,50 @@ http://r-forge.r-project.org/R/?group_id=1598</a></p>
 
 <hr/>
 
+
+<h2>CALIBERcodelists</h2>
+
+<p>Identifying patients with particular medical diagnoses in electronic health record data requires an algorithm to select the appropriate diagnostic codes. Research groups may accumulate a large number of code lists for different medical conditions, and the CALIBERcodelists package contains functions for creating codelists and storing them in a standardised format with metadata such as the authors and version number.</p>
+
+<p>CALIBER investigators can use this package in conjunction with the CALIBERlookups package which contains the source dictionaries; other researchers can use the scripts provided to create lookup tables from the official sources of the Read, ICD-10, OPCS and CPRD dictionaries.</p>
+
+
+<h2>CALIBERdatamanage</h2>
+
+<p>The CALIBER data management package includes functions to:</p>
+
+<ol>
+<li><strong>Import data</strong> - Import single or multiple files to data.table or ffdf objects in R, with automatic unzipping of compressed files and conversion of dates, and decoding using lookup tables in the CALIBERlookups package.</li>
+
+<li><strong>Build cohorts</strong> - A 'cohort' S3 class to store information about a cohort, and functions for generating analysis variables from multiple row per patient data.</li>
+
+<li><strong>Create presentation tables</strong> - Produce summary tables in LaTeX or plain text, and format numbers and percentages.</li>
+
+<li><strong>Make forest plots</strong> - Produce forest plots using a spreadsheet template, with the facility to include several plots side by side, and specify the formatting of text.</li>
+</ol>
+
+<h2>CALIBERdrugdose</h2>
+
+<p>The CALIBER drug dose algorithm converts unstructured text dosage instructions into a structured format.</p>
+
+<h3>Reference</h3>
+
+<ol>
+<li>
+Shah AD, Martinez C. Pharmacoepidemiology and Drug Safety 2006; 15: 161-166. doi: <a href="http://dx.doi.org/10.1002/pds.1151">10.1002/pds.1151</a>
+</li>
+</ol>
+
+<h2>CALIBERfma</h2>
+
+<p>The Freetext Matching Algorithm is a natural language processing system for analysing clinical free text,
+and is available from the <a href="https://github.com/anoopshah/freetext-matching-algorithm">freetext-matching-algorithm GitHub repository</a>.
+It uses lookup tables from the <a href="https://github.com/anoopshah/freetext-matching-algorithm-lookups">freetext-matching-algorithm-lookups GitHub repository</a>.
+
+This R package provides an interface to the program, as well as tools to help manipulate the lookup tables.
+It is currently only availble for Linux systems as it requires <a href="http://www.winehq.org/">wine</a> and
+<a href="http://en.wikipedia.org/wiki/Git_%28software%29">git</a>.</p>
+
 <h2>CALIBERrfimpute</h2>
 
 <p>Missing data are frequently handled by multiple imputation, but parametric imputation methods
@@ -77,31 +121,6 @@ Doove LL, van Buuren S, Dusseldorp E. Recursive partitioning for missing data im
 </li>
 </ol>
 
-<h2>CALIBERcodelists</h2>
-
-<p>Identifying patients with particular medical diagnoses in electronic health record data requires an algorithm to select the appropriate diagnostic codes. Research groups may accumulate a large number of code lists for different medical conditions, and the CALIBERcodelists package contains functions for creating codelists and storing them in a standardised format with metadata such as the authors and version number.</p>
-
-<p>CALIBER investigators can use this package in conjunction with the CALIBERlookups package which contains the source dictionaries; other researchers can use the scripts provided to create lookup tables from the official sources of the Read, ICD-10, OPCS and CPRD dictionaries.</p>
-
-<h2>CALIBERfma</h2>
-
-<p>The Freetext Matching Algorithm is a natural language processing system for analysing clinical free text, and is available from the <a href="https://github.com/anoopshah/freetext-matching-algorithm">freetext-matching-algorithm GitHub repository</a>. It uses lookup tables from the <a href="https://github.com/anoopshah/freetext-matching-algorithm-lookups">freetext-matching-algorithm-lookups GitHub repository</a>.
-
-This R package provides an interface to the program, as well as tools to help manipulate the lookup tables. It is currently only availble for Linux systems as it requires <a href="http://www.winehq.org/">wine</a> and <a href="http://en.wikipedia.org/wiki/Git_%28software%29">git</a>.</p>
-
-<h2>CALIBERdatamanage</h2>
-
-<p>The CALIBER data management package includes functions to:</p>
-
-<ol>
-<li><strong>Import data</strong> - Import single or multiple files to data.table or ffdf objects in R, with automatic unzipping of compressed files and conversion of dates, and decoding using lookup tables in the CALIBERlookups package.</li>
-
-<li><strong>Build cohorts</strong> - A 'cohort' S3 class to store information about a cohort, and functions for generating analysis variables from multiple row per patient data.</li>
-
-<li><strong>Create presentation tables</strong> - Produce summary tables in LaTeX or plain text, and format numbers and percentages.</li>
-
-<li><strong>Make forest plots</strong> - Produce forest plots using a spreadsheet template, with the facility to include several plots side by side, and specify the formatting of text.</li>
-</ol>
 
 <hr/>
 

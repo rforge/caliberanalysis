@@ -31,8 +31,9 @@ Users can specify a 'customlookups' table in the same format to provide addition
 }
 
 \references{
-Shah AD, Martinez C. An algorithm to derive a numerical daily dose from unstructured text dosage instructions.
-Pharmacoepidemiology and Drug Safety 2006; 15(3): 161–166. doi: 10.1002/pds.1151
+Shah AD, Martinez C. An algorithm to derive a numerical daily dose
+from unstructured text dosage instructions.
+Pharmacoepidemiol Drug Saf 2006; 15(3): 161-166. doi: 10.1002/pds.1151
 \url{http://onlinelibrary.wiley.com/doi/10.1002/pds.1151/}
 }
 
@@ -41,6 +42,6 @@ Pharmacoepidemiology and Drug Safety 2006; 15(3): 161–166. doi: 10.1002/pds.11
 data(lookups)
 
 # Convert into the lookup table format
-as.drugdose_lookups(lookups)
+lookups <- as.drugdose_lookups(lookups)
 }
 \keyword{datasets}

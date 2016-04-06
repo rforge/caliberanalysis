@@ -1,4 +1,5 @@
 \name{export}
+\alias{export}
 \alias{export.drugdose_singlewords}
 \alias{export.drugdose_multiwords}
 \alias{export.drugdose_patterns}
@@ -39,11 +40,10 @@ Generic arguments for \code{export} method.
 Exports the dictionary as a comma separated values text file.
 }
 
-
 \references{
 Shah AD, Martinez C. An algorithm to derive a numerical daily dose
 from unstructured text dosage instructions.
-Pharmacoepidemiol Drug Saf 2006; 15(3): 161–166. doi: 10.1002/pds.1151
+Pharmacoepidemiol Drug Saf 2006; 15(3): 161-166. doi: 10.1002/pds.1151
 \url{http://onlinelibrary.wiley.com/doi/10.1002/pds.1151/}
 }
 
@@ -53,11 +53,36 @@ Anoop Shah
 
 
 \seealso{
-\code{\link{importSinglewords}}, \code{\link{importMultiwords}},
-\code{\link{importPatterns}},    \code{\link{importLookups}}
-
+\code{\link{as.drugdose_singlewords}}, \code{\link{as.drugdose_multiwords}},
+\code{\link{as.drugdose_patterns}},    \code{\link{as.drugdose_lookups}},
 \code{\link{addterm}}
 }
 
 \examples{
+# Testing singlewords roundtrip
+data(singlewords)
+old_singlewords <- as.drugdose_singlewords(singlewords)
+export(old_singlewords, paste(tempdir(),
+	'singlewords.csv', sep = '/'))
+new_singlewords <- as.drugdose_singlewords(paste(tempdir(),
+	'singlewords.csv', sep = '/'))
+str(new_singlewords)
+
+# Testing multiwords roundtrip
+data(multiwords)
+old_multiwords <- as.drugdose_multiwords(multiwords)
+export(old_multiwords, paste(tempdir(),
+	'multiwords.csv', sep = '/'))
+new_multiwords <- as.drugdose_multiwords(paste(tempdir(),
+	'multiwords.csv', sep = '/'))
+str(new_multiwords)
+
+# Testing patterns roundtrip
+data(patterns)
+old_patterns <- as.drugdose_patterns(patterns)
+export(old_patterns, paste(tempdir(),
+	'patterns.csv', sep = '/'))
+new_patterns <- as.drugdose_patterns(paste(tempdir(),
+	'patterns.csv', sep = '/'))
+str(new_patterns)
 }

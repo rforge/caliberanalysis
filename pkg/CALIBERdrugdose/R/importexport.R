@@ -18,6 +18,9 @@ loadDict <- function(dictionary, dictname){
 				stop(paste('Unable to load', dictname, 'from data folder'))
 			}
 		}
+	} else if (class(dictionary)[1] ==
+		paste('drugdose_', dictname, sep = '')){
+		# dictionary is already the correct dictionary
 	} else if (length(dictionary) == 1) {
 		cat('\nLoading', dictname, 'from', dictionary, '\n')
 		temp <- NULL
@@ -46,9 +49,10 @@ export <- function(x, ...){
 }
 
 export.drugdose_singlewords <- function(x, filename){
-	out <- data.frame(x)
+	setattr(x, 'class', NULL)
+	out <- as.data.frame(x)
 	names(out) <- 'replacement'
-	out$words <- names(singlewords)
+	out$words <- row.names(out)
 	out$replacement[out$words == out$replacement] <- NA
 	write.csv(out, filename, row.names = FALSE)
 }

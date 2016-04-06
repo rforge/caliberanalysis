@@ -34,7 +34,7 @@ words,qty,units,freq,tot,priority,max,time,change,choice,doubledose,duration,com
  every 6 hours ,,,1,,NA,,0.25,NA,,,,,second,33
  every 8 hours ,,,1,,NA,,0.3333333333,NA,,,,,second,34
  every 12 hours ,,,1,,NA,,0.5,NA,,,,,second,35
- every ([[:digit:]\.]+) days ,,,1,,NA,,1002,NA,,,,,second,36
+ every ([[:digit:]\.]+) days ,,,1,,NA,,\1,NA,,,,,second,36
  ([[:digit:]\.]+) day ,\1,,,,1,,,NA,,,,,second,37
  ([[:digit:]\.]+) every ([[:digit:]\.]+) hours ,\1,,,,1,,,NA,,,,,second,38
  changeto 0 for ([[:digit:]\.]+) days ,,,1,,NA,,1,NA,,,\1,,second,39

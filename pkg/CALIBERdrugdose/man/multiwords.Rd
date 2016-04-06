@@ -28,16 +28,16 @@ been modified by previous rules.
 }
 
 \references{
-Shah AD, Martinez C. An algorithm to derive a numerical daily dose from unstructured text dosage instructions.
-Pharmacoepidemiology and Drug Safety 2006; 15(3): 161–166. doi: 10.1002/pds.1151
+Shah AD, Martinez C. An algorithm to derive a numerical daily dose
+from unstructured text dosage instructions.
+Pharmacoepidemiol Drug Saf 2006; 15(3): 161-166. doi: 10.1002/pds.1151
 \url{http://onlinelibrary.wiley.com/doi/10.1002/pds.1151/}
 }
-
 
 \examples{
 data(multiwords)
 
 # Convert to multiwords dictionary for analysis
-as.drugdose_multiwords(multiwords)
+multiwords <- as.drugdose_multiwords(multiwords)
 }
 \keyword{datasets}

@@ -5,9 +5,6 @@
 # interpretation between different version of the 
 # algorithm, for checking.
 
-# Housekeeping
-defaultfilepath	<- '/home/anoop/Dropbox/Rpackages/CALIBERdrugdose/data/'
-
 # Dictionaries are replaced
 # first
 # singlewords
@@ -167,47 +164,6 @@ testdoseconvert <- function(text = NULL, infile = NULL,
 	}
 	
 	# Return the interpreted dataset
-	invisible(B[A])
-}
-
-testingOLD <- function(
-	infile = "/home/anoop/Dropbox/Rpackages/CALIBERdrugdose_scratch/testing.csv", 
-	outfile = "/home/anoop/Dropbox/Rpackages/CALIBERdrugdose_scratch/testresult.csv",
-	folder = "/home/anoop/Dropbox/Rpackages/CALIBERdrugdose_scratch/dicts/",
-	lookups = "/home/anoop/Dropbox/Rpackages/CALIBERdrugdose_scratch/lookups.csv",
-	noisy = TRUE, tolerance = 0.001,	...){
-	A <- fread(infile)
-	cat('\n\nAnalysing ' , A$text[1], '\n')
-	B <- doseconvert(A$text[1], A$textid[1],
-		singlewords = paste(folder, 'singlewords.csv', sep = '/'),
-		multiwords = paste(folder, 'multiwords.csv', sep = '/'),
-		patterns = paste(folder, 'patterns.csv', sep = '/'),
-		lookups = lookups)
-	print(B)
-	if (nrow(A) > 1){
-		for (i in 2:nrow(A)){
-			if (noisy) cat('\n\nAnalysing ' , A$text[i], '\n')
-			B <- rbind(B, doseconvert(A$text[i], A$textid[i],
-				singlewords = paste(folder, 'singlewords.csv', sep = '/'),
-				multiwords = paste(folder, 'multiwords.csv', sep = '/'),
-				patterns = paste(folder, 'patterns.csv', sep = '/'),
-				lookups = lookups))
-			if (noisy) print(B[i, ])
-		}
-	}
-	B[, text := NULL]
-	setkey(A, textid)
-	B[, textid := as.numeric(ids)]
-	setkey(B, textid)
-	write.csv(B[A], outfile, row.names = FALSE)
-	if (noisy){
-		cat('\nIncorrect results:\n')
-		print(B[A][abs(correct_dose - daily_dose) > tolerance,
-			list(textid, text, freq, qty, time, tot, daily_dose, correct_dose)])
-	}
-	write.csv(B[A][abs(correct_dose - daily_dose) > tolerance,
-		list(textid, text, freq, qty, time, tot, daily_dose, correct_dose)],
-		paste(outfile, 'errors.csv', sep = ''), row.names = FALSE)	
 	invisible(B[A])
 }
 

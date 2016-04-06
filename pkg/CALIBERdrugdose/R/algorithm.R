@@ -22,7 +22,9 @@ doseconvert <- function(text, textid = NULL, simplify = TRUE,
 	#	 lookups = lookup table for common dosages to avoid the need to
 	#		 interpret
 	# For testing:
-	# textid = NULL; simplify = TRUE;	singlewords = NULL; multiwords = NULL; patterns = NULL;	uselookups = TRUE; lookups = NULL; customlookups = NULL; cores = 1
+	# textid = NULL; simplify = TRUE; singlewords = NULL; multiwords = NULL;
+	#    patterns = NULL; uselookups = TRUE; lookups = NULL;
+	#    customlookups = NULL; cores = 1
 
 	dosestrings <- as.character(text)
 	if (is.null(textid)) {
@@ -31,6 +33,7 @@ doseconvert <- function(text, textid = NULL, simplify = TRUE,
 		ids <- as.character(textid)
 	}
 	
+	lookups <- NULL
 	if (!is.null(customlookups)){
 		custom <- NULL
 		try(custom <- as.drugdose_lookups(customlookups))
