@@ -17,7 +17,7 @@ the \code{order} column.
 \format{
   A data frame with observations on the following 15 variables.
   \describe{
-    \item{\code{words}}{character; }
+    \item{\code{words}}{character; pattern phrase}
     \item{\code{qty}}{character; dose quantity or regular expression
     component for extracting quantity from the matched text.}
     \item{\code{units}}{a character vector}

@@ -3,64 +3,60 @@
 # Instead of partdata, the dosage string is stored in
 # an R character vector.
 
-doseconvert <- function(text, textid = NULL, simplify = TRUE,
+doseconvert <- function(text, textid = seq_along(text), simplify = TRUE,
 	singlewords = NULL, multiwords = NULL, patterns = NULL,
-	uselookups = TRUE, lookups = NULL, customlookups = NULL, cores = 1) {
+	maxifchoice = TRUE, usebuiltinlookups = TRUE, 
+	customlookups = NULL, cores = 1, noisy = FALSE){
 	# converts a set of dosages. dosestrings must be a character vector
 	# and ids should be a vector of unique IDs.
 	# Cannot use this in noisy mode.
 	# Arguments:
-	#	 text = vector of dosestrings to analyse
-	#	 textid = vector of identifiers for dosestrings
-	#	 simplify = whether to return only a single row per dosestring
-	#	 patterns = patterns lookup, loaded from data or imported from
-	#		 parent / global environment if not available
+	#    text = vector of dosestrings to analyse
+	#    textid = vector of identifiers for dosestrings
+	#    simplify = whether to return only a single row per dosestring
+	#    patterns = patterns lookup, loaded from data or imported from
+	#        parent / global environment if not available
 	#	 multiwords = multiwords lookup, loaded from data or imported from
-	#		 parent / global environment if not available
-	#	 singlewords = singlewords lookup, loaded from data or imported from
-	#		 parent / global environment if not available
+	#        parent / global environment if not available
+	#    singlewords = singlewords lookup, loaded from data or imported from
+	#        parent / global environment if not available
 	#	 lookups = lookup table for common dosages to avoid the need to
-	#		 interpret
+	#        interpret
+	#    maxifchoice = whether to report the maximum if choice of dose,
+	#        otherwise report the average
 	# For testing:
 	# textid = NULL; simplify = TRUE; singlewords = NULL; multiwords = NULL;
 	#    patterns = NULL; uselookups = TRUE; lookups = NULL;
 	#    customlookups = NULL; cores = 1
 
-	dosestrings <- as.character(text)
-	if (is.null(textid)) {
-		ids <- dosestrings
-	} else {
-		ids <- as.character(textid)
-	}
-	
 	lookups <- NULL
 	if (!is.null(customlookups)){
 		custom <- NULL
 		try(custom <- as.drugdose_lookups(customlookups))
 		if (is.null(custom)){
 			warning('Custom lookup table ignored as it is in incorrect format.')
-			if (uselookups){
+			if (usebuiltinlookups){
 				# Load lookups
 				lookups <- loadDict(lookups, 'lookups')
-				lookups <- rbind(lookups, custom)
 			} 
 		} else {
-			if (uselookups){
-				# Load lookups
+			if (usebuiltinlookups){
+				# Load lookups and append customlookups
 				lookups <- loadDict(lookups, 'lookups')
 				lookups <- rbind(lookups, custom)
 			} else {
 				# Only custom lookups are available
 				lookups <- custom
 			}
-			setkey(lookups, words)
+			setkey(lookups, text)
 		}
 	} else {
-		if (uselookups){
+		if (usebuiltinlookups){
 			lookups <- loadDict(lookups, 'lookups')	
 		}
 	}
 	
+	# If no lookups table is in use, lookups remains NULL
 	singlewords <- loadDict(singlewords, 'singlewords')
 	multiwords <- loadDict(multiwords, 'multiwords')
 	patterns <- loadDict(patterns, 'patterns')
@@ -74,11 +70,13 @@ doseconvert <- function(text, textid = NULL, simplify = TRUE,
 		multicore = FALSE
 	}
 	
-	# Generate a unique list of dosestrings to make analysis
-	# faster
-	indata <- data.table(dosestrings = dosestrings, ids = ids)
-	indata[, order := 1:.N]
+	indata <- data.table(dosestrings = as.character(text), textid = textid)
+	# Store the original order of the input data so that the output can 
+	# match it
+	indata[, originalorder := 1:.N]
+	# doseid is the ID for a unique dose string
 	indata[, doseid := .GRP, by = dosestrings]
+	# Generate a unique list of dosestrings to make analysis faster
 	uniquedoses <- indata[, list(doseid = doseid[1]),
 		by = dosestrings]
 
@@ -86,11 +84,15 @@ doseconvert <- function(text, textid = NULL, simplify = TRUE,
 		x <- trim(tolower(text))
 		if (!is.null(lookups)){
 			result <- lookups[x, nomatch = 0]
+		} else {
+			#  Zero-row result if no lookup
+			result <- as.data.frame(cbind(0, 0))[-1,]
 		}
-		if (is.null(lookups) | nrow(result) == 0){
+		if (nrow(result) == 0){
 			result <- interpret(x, singlewords = singlewords,
 				multiwords = multiwords, patterns = patterns,
-				simplify = simplify)	
+				simplify = simplify, maxifchoice = maxifchoice,
+				noisy = noisy)
 		}
 		result
 	}
@@ -101,33 +103,39 @@ doseconvert <- function(text, textid = NULL, simplify = TRUE,
 	} else {
 		results <- lapply(uniquedoses$dosestrings, analysis)
 	}
-	
+
 	# Combine the results
 	results <- lapply(seq_along(results), function(x){
-		cbind(results[[x]],
-		data.frame(doseid = uniquedoses[x, doseid][nrow(results[[x]])]))
+		cbind(results[[x]], data.frame(doseid =
+			rep(uniquedoses[x, doseid], nrow(results[[x]]))))
 	})
 	results <- as.data.table(do.call('rbind', results))
 	setkey(indata, doseid)
 	setkey(results, doseid)
 	results <- results[indata]
-	setnames(results, 'ids', 'textid')
 		
 	# If the original textid were numeric, make them numeric in the output
 	if (is.numeric(textid)){
 		results[, textid := as.numeric(textid)]
 	}
-	
+
 	# Order the output
-	setkey(results, textid, order)
-	# Remove temporary doseid
-	results[, c('order', 'doseid'):= NULL, with = FALSE]
+	setkey(results, originalorder, order)
+	# Remove temporary doseid and other unnecessary variables
+	results[, c('originalorder', 'doseid'):= NULL, with = FALSE]
+	if ('text' %in% colnames(results)) results[, text := NULL]
+	if ('i.textid' %in% colnames(results)) results[, i.textid := NULL]
+	setnames(results, 'dosestrings', 'text')
+	setcolorder(results, c('textid', 'order', 'text', 'qty',
+		'units', 'freq', 'tot', 'max', 'time', 'change',
+		'choice', 'duration', 'daily_dose'))
 	cat('\nAnalysed', length(text), 'dosage texts.\n')
 	results[]
 }
 
 interpret <- function(instring, singlewords, multiwords,
-	patterns, noisy = FALSE, simplify = FALSE, id = NULL){
+	patterns, noisy = FALSE, simplify = FALSE, maxifchoice = TRUE,
+	id = NULL){
 	# returns a data.frame with one (if simplify=TRUE) or
 	# potentially many observations if there are multiple time
 	# intervals with different doses.
@@ -135,7 +143,8 @@ interpret <- function(instring, singlewords, multiwords,
 	
 	# STAGE 0. Initialisation
 	pd <- c('start', pdInit(instring))
-	if (noisy) cat('\nInitialising: ', paste(pd, collapse = ' '))
+	if (noisy) cat('\n====================\nInitialising: ',
+		paste(pd, collapse = ' '))
 	
 	# STAGE 1. singlewords checking and replacement
 	# only up to 1 word will be wordspace'd
@@ -185,8 +194,9 @@ interpret <- function(instring, singlewords, multiwords,
 	
 	# STAGE 3. Numbers replacement phase one.
 	# Note that numbersReplace returns whether there was a choice of
-	# dose
-	nrep1 <- numbersReplace(pds)
+	# dose. If maxifchoice is TRUE, the maximum dose is returned.
+	# If maxifchoice is FALSE, the average dose is returned
+	nrep1 <- numbersReplace(pds, maxifchoice)
 	pds <- nrep1$pds
 	if (noisy) cat('\nAfter numbers replace 1: ', pds, " Choice: ",
 		nrep1$choice)
@@ -207,12 +217,12 @@ interpret <- function(instring, singlewords, multiwords,
 	}
 	
 	# STAGE 5. Numbers replacement phase two.
-	nrep2 <- numbersReplace(pds)
+	nrep2 <- numbersReplace(pds, maxifchoice)
 	pds <- nrep2$pds
-	if (noisy) cat('\nAfter numbers replace 2: ', pds, " Choice: ",
-		nrep2$choice, '\n')
 	choice <- nrep1$choice | nrep2$choice
-
+	if (noisy) cat('\nAfter numbers replace 2: ', pds, " Choice: ",
+		choice, '\n')
+	
 	# Convert pd string to pd
 	pd <- strsplit(pds, ' ')[[1]]
 	pd <- pd[!pd == '']
@@ -228,14 +238,19 @@ interpret <- function(instring, singlewords, multiwords,
 		print(thedose)
 	}
 	
-	if (choice == TRUE & all(thedose$choice == 'nochoice')){
-		cat('\nRegistering choice of doses\n')
-		thedose$choice <- rep('choice', nrow(thedose))
+	if (choice == TRUE & all(thedose$choice %in% c('nochoice', 'asneeded'))){
+		if (noisy) cat('\nRegistering choice of doses\n')
+		thedose$choice <- sub('nochoice', 'choice', thedose$choice)
+		if (maxifchoice){
+			thedose$max <- rep('max', nrow(thedose))
+		} else {
+			thedose$max <- rep('average', nrow(thedose))
+		}
 	}
 	
 	# double dose for 'each ear' or 'each eye'
 	if (any(thedose$doubledose)) {
-		cat('\nDoubling dose for both ears / eyes')
+		if (noisy) cat('\nDoubling dose for both ears / eyes')
 		thedose$tot <- thedose$tot*2
 		thedose$qty <- thedose$qty*2
 	}
@@ -243,7 +258,7 @@ interpret <- function(instring, singlewords, multiwords,
 	# from the previous version
 	
 	if (any(thedose$units == 'fiveml')) {
-		cat('\nConverting fiveml')
+		if (noisy) cat('\nConverting fiveml')
 		thedose$units <- rep('ml', nrow(thedose))
 		thedose$tot <- thedose$tot*5
 		thedose$qty <- thedose$qty*5
@@ -261,36 +276,54 @@ interpret <- function(instring, singlewords, multiwords,
 		thedose[changeme, 'freq'] <- 1	
 	}
 
+	# Simplify into a single dose if required
+	thedose$id <- id
 	if (simplify == TRUE & nrow(thedose) > 1) {
 		if (noisy) cat('\nSimplfying into a single dose.\n')
-		thedose <- simplifydose(thedose)
+		thedose <- simplifydose(thedose, noisy)
 		if (!is.null(id)) {
 			# use ID for row names
 			row.names(thedose) <- id
 		}
 	} else {
+		# Not simplifying
 		if (!is.null(id)) {
 			# use ID.X for row names where X is the row number
 			row.names(thedose) <- paste(id, 1:nrow(thedose), sep='.')
 		}
 	}
+
+	# Also add a separate column for dose line order
+	thedose$order <- 1:nrow(thedose)
 	
 	# Add daily dose
-	thedose$daily_dose <- NA_real_
+	thedose$daily_dose <- 0
 	hasdailydose <- !is.na(thedose$tot) & !is.na(thedose$time)
 	thedose$daily_dose[hasdailydose] <-
 		thedose$tot[hasdailydose] / thedose$time[hasdailydose]
-	thedose$daily_dose[thedose$daily_dose == Inf] <- NA_real_
+	thedose$daily_dose[thedose$daily_dose == Inf] <- 0
+	
+	# Convert missing numerical data to zero
+	thedose$qty[is.na(thedose$qty)] <- 0
+	thedose$freq[is.na(thedose$freq)] <- 0
+	thedose$time[is.na(thedose$time)] <- 0
+	thedose$tot[is.na(thedose$tot)] <- 0
+	thedose$duration[is.na(thedose$duration)] <- 0
+	
+	if (noisy) cat('\nFinished analysing dose.\n================\n')
 	
 	# Remove unnecessary columns
+	thedose$words <- NULL
 	thedose$doubledose <- NULL
 	thedose$link <- NULL
 	thedose$divpos <- NULL
+	thedose$priority <- NULL
 	thedose[]
 }
 
-simplifydose <- function(regimens, noisy=FALSE) {
-	# like combineparts, but combine different dose regimens
+simplifydose <- function(regimens, noisy = FALSE) {
+	# like combineparts, but combine different dose lines with
+	# defined durations (e.g. 1 daily for 1 week then 2 daily for 1 week)
 	# to produce output similar to the initial (VB) version of 
 	# the dose analysis software
 	
@@ -298,44 +331,115 @@ simplifydose <- function(regimens, noisy=FALSE) {
 		# loop through, combining doses until there is only one dose
 		if (regimens$link[1] == 'stat') {
 			# deal with a 'stat' or loading dose
+			# assume frequency is the same as main part of prescription
 			if (regimens$time[2] > 0) {
 				if (regimens$freq[2] > 0) {
+					# most common situation, hopefully
+					# frequency is taken from instruction after stat dose
+					# stat dose assumed to be taken at the same frequency
+					# as main dose (e.g. stat dose before a three times a 
+					# day dose would be taken 1/3 of a day before)
 					regimens$duration[1] <- 
 						regimens$time[2] / regimens$freq[2]
 					regimens$time[1] <- regimens$time[2] / regimens$freq[2]
+					regimens$freq[1] <- 1
 				} else {
+					# second dose does not have frequency
+					# assume that stat dose section contains frequency
 					regimens$duration[1] <- regimens$time[2]
 					regimens$time[1] <- regimens$time[2]
 				}
 			} else {
+				# assume stat dose lasts for 1 day
+				regimens$freq[1] <- 1
 				regimens$time[1] <- 1
 				regimens$duration <- 1
+			}
+			if (noisy){
+				cat('\nAfter preparing stat dose line:\n')
+				print(regimens[1:2,])
 			}
 		}
 		
 		# combine doses if they both have a duration
 		# use 2nd dose if one or both have no duration and both are valid
 		if (regimens$duration[1] > 0 & regimens$duration[2] > 0) {
-			if (all(regimens$freq[1:2] > 0) & all(regimens$qty[1:2] > 0)) {
-				# average over the two regimens
-				regimens$freq[1] <- sum(regimens$freq[1:2] *
-					regimens$duration[1:2]) /	sum(regimens$duration[1:2])
-				regimens$tot[1] <- regimens$freq[1] * regimens$qty[1]
-			} else if (
-				all(regimens$freq[1:2] == 0) & all(regimens$qty[1:2] > 0)) {
-				regimens$tot[1] <- sum(regimens$tot[1:2] *
-					regimens$duration[1:2]) / sum(regimens$duration[1:2])
+			# 1st dose   2nd dose         Combined
+			# freq, qty  freq, qty[same]  weighted average freq
+			# freq, qty  freq[same], qty  weighted average qty
+			# freq, qty  freq, qty        weighted average qty, freq from 1st dose
+			# freq, qty  freq             assume 2nd dose qty is the same
+			# freq, qty  qty              assume 2nd dose freq is the same
+			# freq, qty  [other]          assume 2nd dose is the same as first
+			# [missing]  [any]            use freq, qty from 2nd dose
+			
+			# first fill in missing frequencies, quantities and totals
+			# (unless both freq and qty are 0, in which case it might be
+			# intentional)
+			if (regimens$freq[2] == 0 & regimens$qty[2] > 0){	
+				regimens$freq[2] <- regimens$freq[1]
+			} else if (regimens$qty[2] == 0 & regimens$freq[2] > 0){
+				regimens$qty[2] <- regimens$qty[1]
+			} else if (regimens$freq[1] == 0 & regimens$qty[1] > 0){	
+				regimens$freq[1] <- regimens$freq[2]
+			} else if (regimens$qty[1] == 0 & regimens$freq[1] > 0){
 				regimens$qty[1] <- regimens$qty[2]
-			} else {
-				# average over totals
-				regimens$tot[1] <- sum(regimens$tot[1:2] *
-					regimens$duration[1:2]) / sum(regimens$duration[1:2])
-				if (regimens$freq[1] == 0) {regimens$freq[1] <- 1}
-				regimens$qty[1] <- regimens$tot[1] / regimens$freq[1]
 			}
+			if (noisy){
+				cat('\nPreparing to combine dose lines:\n')
+				print(regimens[1:2,])
+			}
+			# Check that time is the same between the dose lines
+			if (regimens$time[1] != regimens$time[2]){
+				regimens$freq[2] <- regimens$freq[2] *
+					(regimens$time[1] / regimens$time[2])
+				regimens$tot[2] <- regimens$tot[2] *
+					(regimens$time[1] / regimens$time[2])
+				regimens$time[2] <- regimens$time[1]
+				cat('\nStandarising time between dose lines:\n')
+				print(regimens[1:2,])
+			}
+			if (regimens$qty[1] == 0 & regimens$qty[2] == 0){
+				# no quantities, only frequencies (e.g. 'apply twice daily')
+				cat('\nNo quantities, only frequencies\n')
+				totaldose <- sum(regimens$tot[1:2] * regimens$duration[1:2])
+				totalfreq <- sum(regimens$freq[1:2] * regimens$duration[1:2])
+				regimens$tot[1] <- totaldose / sum(regimens$duration[1:2])
+				regimens$freq[1] <- totalfreq / sum(regimens$duration[1:2])
+			} else if (regimens$qty[1] == regimens$qty[2] & regimens$freq[1] > 0) {
+				# equal qty, nonmissing freq --> calculate average freq
+				cat('\nEqual quantities, calculating average frequency\n')
+				totalfreq <- sum(regimens$freq[1:2] * regimens$duration[1:2])
+				regimens$freq[1] <- totalfreq / sum(regimens$duration[1:2])
+				regimens$tot[1] <- regimens$freq[1] * regimens$qty[1]
+			} else if (regimens$freq[1] == regimens$freq[2]){
+				# equal freq (and nonmissing qty) --> calculate average qty
+				cat('\nEqual frequency, calculating average quantity\n')
+				totalqty <- sum(regimens$qty[1:2] * regimens$duration[1:2])
+				regimens$qty[1] <- totalqty / sum(regimens$duration[1:2])
+				regimens$tot[1] <- regimens$freq[1] * regimens$qty[1]
+			} else if (regimens$time[2] > 0) {
+				cat('\nUse frequency and time from first dose; standardise quantity\n')
+				# at least some data in dose line 2
+				# use frequency from first dose; scale quantity appropriately
+				regimens$qty[2] <- regimens$tot[2] / regimens$freq[1]
+				regimens$freq[2] <- regimens$freq[1]
+				# now calculate average quantity
+				totalqty <- sum(regimens$qty[1:2] * regimens$duration[1:2])
+				regimens$qty[1] <- totalqty / sum(regimens$duration[1:2])
+				regimens$tot[1] <- regimens$freq[1] * regimens$qty[1]
+			} else if (regimens$time[2] == 0) {
+				# no data in dose 2; use qty and freq from dose 1
+				# (all values should already be in the right place)
+				cat('\nNo daily dose in dose 2\n')
+			}
+			# add durations. 'change' marked as combined doses
 			regimens$duration[1] <- sum(regimens$duration[1:2])
-			# 'change' is not affected because both doses can be
-			# incorporated properly
+			regimens$change[1] <- 'combined'
+			if (noisy){
+				cat('\nAfter combining dose lines:\n')
+				print(regimens[1,])
+			}
 		} else {								
 			# use the first dose if:
 			# it is a valid dose AND (dose2 not valid OR dose2 is zero)
@@ -343,6 +447,10 @@ simplifydose <- function(regimens, noisy=FALSE) {
 				regimens$time[2] == 0 | regimens$tot[2] == 0)) {
 				# use first dose, as second dose is not complete
 				regimens$change[1] <- 'first'
+				if (noisy){
+					cat('\nKeeping first dose line:\n')
+					print(regimens[1,])
+				}
 			} else {
 				# otherwise use second dose
 				if (regimens$link[1] == 'stat') {
@@ -351,16 +459,28 @@ simplifydose <- function(regimens, noisy=FALSE) {
 						regimens$qty[2] <- regimens$qty[1]
 						regimens$tot[2] <- regimens$freq[2] * regimens$qty[2]
 					}
-					regimens$change[1] <- 'second'
 				}
 				items <- c('time', 'freq', 'qty', 'tot', 'duration')
-				regimens[1,items] <- regimens[2,items]
+				regimens[1, items] <- regimens[2, items]
+				regimens$change[1] <- 'second'
+				if (noisy){
+					cat('\nKeeping second dose line:\n')
+					print(regimens[1,])
+				}
 			}
 		}
+		# ensure that time is minimum 1 day
+		if (regimens$time[1] < 1 & regimens$time[1] > 0){
+			if (noisy) cat('\nEnsuring that time interval is 1 day.\n')
+			regimens$freq[1] <- regimens$freq[1] / regimens$time[1]
+			regimens$tot[1] <- regimens$tot[1] / regimens$time[1]
+			regimens$time[1] <- 1
+		}
+		
 		# remove the second row now that it has been
 		# incorporated into the first row
 		if (nrow(regimens) > 2) {
-			regimens <- regimens[c(1,3:nrow(regimens)),]
+			regimens <- regimens[c(1, 3:nrow(regimens)),]
 		} else {regimens <- regimens[1,]}
 	}
 	regimens$link <- NULL
@@ -469,7 +589,6 @@ analyseDose <- function(pd, noisy = FALSE, patterns = patterns){
 	return(trial)
 }
 
-
 pdInit <- function(instring){
 	# Quite slow, takes 0.1 seconds per text!
 	# Initialise text, splitting words if there are no
@@ -499,7 +618,6 @@ pdInit <- function(instring){
 	outstring[!(outstring %in% c('', ' ', ',', '.'))]
 }
 
-
 wordspace <- function(word, maxwd = 8, singlewords) {
 	# A simpler R-style version of wordspace
 	# Recursive method to builds a list of potential matches
@@ -513,22 +631,22 @@ wordspace <- function(word, maxwd = 8, singlewords) {
 	word <- sub('[x]+$', '', word)
 
 	# don't bother if word is more than 13 characters
-	if (nchar(word)>13) return(word)
+	if (nchar(word) > 13) return(word)
 	
 	# now the main part of the function to try possible splits
 	maxtrials <- 20
 	numtried <- 0
 	found <- FALSE
 	splits <- matrix(logical(maxtrials * nchar(word)),
-									 nrow=maxtrials, ncol=nchar(word))
+		nrow = maxtrials, ncol = nchar(word))
 	scores <- numeric(maxtrials)
 
 	pushback <- function(mybool) {
 		# switches the last set of contiguous TRUE to FALSE
 		# and switches the immediately preceding item to TRUE
-		starttrue <- (mybool==TRUE &
-			c(FALSE, mybool[1:(length(mybool)-1)])==FALSE)
-		mybool[max(which(starttrue))-1] <- TRUE
+		starttrue <- (mybool == TRUE &
+			c(FALSE, mybool[1:(length(mybool) - 1)])==FALSE)
+		mybool[max(which(starttrue)) - 1] <- TRUE
 		mybool[max(which(starttrue)):length(mybool)] <- FALSE
 		mybool
 	}
@@ -538,7 +656,7 @@ wordspace <- function(word, maxwd = 8, singlewords) {
 		# or full match against the singlewords dictionary
 		words <- strsplitPos(word, mybool)
 		trial <- singlewords[words]
-		if (length(trial)==1) {
+		if (length(trial) == 1) {
 			if (is.na(trial)) return(0) else return(50)
 		}
 		if (!any(is.na(trial[1:(length(trial)-1)]))) {
@@ -549,8 +667,8 @@ wordspace <- function(word, maxwd = 8, singlewords) {
 				# calculate a matchscore according to
 				# fewer number of words, fewer one-letter words, lack
 				# of repetition: 
-				return(50 - (length(words)-length(unique(words)) - 
-					sum(nchar(words)==1)))
+				return(50 - (length(words) - length(unique(words)) - 
+					sum(nchar(words) == 1)))
 			}
 		} else return(0)
 	}
@@ -594,12 +712,15 @@ wordspace <- function(word, maxwd = 8, singlewords) {
 	}
 }
 
-numbersReplace <- function(pds) {
+numbersReplace <- function(pds, maxifchoice) {
 	# requires pds as a character string
 	# (with one space between words)
 	# returns a list containing the modified pds string
 	# and a TRUE/FALSE variable as to whether
 	# there is a choice of dose
+	# Arguments:  pds = character string
+	#             maxifchoice = Boolean, whether to return maximum dose
+	#                 if there is a choice of dose
 	
 	# default
 	choice <- FALSE
@@ -648,11 +769,17 @@ numbersReplace <- function(pds) {
 	# 3 months ... NB assume 30 days in a month
 	pds <- gsub(' ([[:digit:].]+) (month) ',
 		' \\1\\*30 days ', pds)
-	
 	# day 1 to day 14 ...
 	pds <- gsub(' day ([[:digit:]]+) (to|-) day ([[:digit:]]+) ',
 		' for \\3-\\1 days ', pds)
-	pds2 <- gsub(' ([[:digit:]]+) (times|x) day (to|or|-|upto|star) ([[:digit:]]+) (times|x) day ', ' (\\1+\\4)/2 times day ', pds)
+	# X times day to X times day
+	if (maxifchoice){
+		pds2 <- gsub(' ([[:digit:]]+) (times|x) day (to|or|-|upto|star) ([[:digit:]]+) (times|x) day ',
+			' max(c(\\1,\\4)) times day ', pds)
+	} else {
+		pds2 <- gsub(' ([[:digit:]]+) (times|x) day (to|or|-|upto|star) ([[:digit:]]+) (times|x) day ',
+			' (\\1+\\4)/2 times day ', pds)
+	}
 	if (pds2 != pds) {
 		choice <- TRUE
 		pds <- pds2
@@ -662,19 +789,29 @@ numbersReplace <- function(pds) {
 		' for \\3-\\1 days ', pds)
 	# 1 or 2 ... moved to below 'days X to X' because
 	# otherwise the day numbers would be averaged
-	pds2 <- gsub(' ([[:digit:].]+) (to|or|-|star) ([[:digit:].]+) ',
-		' (\\1+\\3)/2 ', pds)
+	if (maxifchoice){
+		pds2 <- gsub(' ([[:digit:].]+) (to|or|-|star) ([[:digit:].]+) ',
+			' max(c(\\1,\\3)) ', pds)
+	} else {
+		pds2 <- gsub(' ([[:digit:].]+) (to|or|-|star) ([[:digit:].]+) ',
+			' (\\1+\\3)/2 ', pds)	
+	}
 	if (pds2 != pds) {
 		choice <- TRUE
 		pds <- pds2
 	}
-	pds2 <- gsub(' ([[:digit:].]+) times (to|or|-|star) ([[:digit:].]+) times ',
-		' (\\1+\\3)/2 times ', pds)
+	# X times or X times ...
+	if (maxifchoice){
+		pds2 <- gsub(' ([[:digit:].]+) times (to|or|-|star) ([[:digit:].]+) times ',
+			' max(c(\\1,\\3)) times ', pds)
+	} else {
+		pds2 <- gsub(' ([[:digit:].]+) times (to|or|-|star) ([[:digit:].]+) times ',
+			' (\\1+\\3)/2 times ', pds)	
+	}
 	if (pds2 != pds) {
 		choice <- TRUE
 		pds <- pds2
 	}
-	
 	# x days every x days
 	pds <- gsub('( for | )([[:digit:]\\.]+) days every ([[:digit:]\\.]+) days ',
 		' for \\2 days changeto 0 0 times day for \\3-\\2 days ', pds)
@@ -684,7 +821,8 @@ numbersReplace <- function(pds) {
 	pd <- pd[!is.na(pd)]
 	pd <- pd[pd != '' & pd != ' ']
 
-	hastext <- grepl('[a-z]', pd)
+	# Only evaluate words without numbers, or if the text is 'max...'
+	hastext <- (grepl('[a-z]', pd) & !grepl('^max', pd)) | pd %in% c('(', ')')
 	for (i in seq_along(pd)){
 		if (!hastext[i]){
 			try(pd[i] <- as.character(eval(parse(text = pd[i]))))
@@ -695,19 +833,18 @@ numbersReplace <- function(pds) {
 	list(pds=pds, choice=choice)
 }
 
-singledosage <- function(words='', qty=0, units='', freq=0,
-	tot=0, priority=0, max=c('exact', 'max', 'average'), time=0,
-	change=c('nochange', 'first', 'second'),
-	choice=c('nochoice', 'choice', 'asneeded'),
-	doubledose=FALSE, duration=0){
+singledosage <- function(words = '', qty = 0, units = '', freq = 0,
+	tot = 0, priority = 0, max = c('exact', 'max', 'average'), time = 0,
+	change = c('nochange', 'first', 'second', 'combined'),
+	choice = c('nochoice', 'choice', 'asneeded'),
+	doubledose = FALSE, duration = 0){
 	max <- factor(max, c('max', 'average', 'exact'))[1]
-	change <- factor(change, c('first', 'second', 'nochange'))[1]
+	change <- factor(change, c('first', 'second', 'nochange', 'combined'))[1]
 	choice <- factor(choice, c('choice', 'asneeded', 'nochoice'))[1]
-	data.frame(words=words, qty=qty, units=units, freq=freq,
-		tot=tot, priority=priority, max=max, time=time, change=change,
-		choice=choice, doubledose=doubledose, duration=duration)
+	data.frame(words = words, qty = qty, units = units, freq = freq,
+		tot = tot, priority = priority, max = max, time = time, change = change,
+		choice = choice, doubledose = doubledose, duration = duration)
 }
-
 
 extractNum <- function(pattern_dose, existing_dose, pd_matched,
 	noisy = FALSE){
@@ -721,7 +858,7 @@ extractNum <- function(pattern_dose, existing_dose, pd_matched,
 		existing_dose$priority) {
 		existing_dose$priority <- pattern_dose$priority
 		existing_dose$units <- sub(pattern_dose$words,
-			pattern_dose$units, paste(c(' ', pd_matched, ' '),
+			trim(pattern_dose$units), paste(c(' ', pd_matched, ' '),
 			collapse = ' '))
 	}
 	
@@ -821,6 +958,11 @@ partDose <- function(text, noisy=FALSE, patterns) {
 	if (trial$tot == 0 & trial$freq == 0) {
 		trial$tot <- trial$qty
 	}
+	
+	# clean up
+	trial$units <- trim(trial$units)
+	
+	# return the interpreted data
 	return(trial)
 }
 
@@ -860,7 +1002,7 @@ combineParts <- function(trial, linkword, noisy = FALSE) {
 				b$qty <- 0
 			}
 		} else if (a$units != b$units) {		
-			#	if both a and b are valid doses, make b replace a if
+			# if both a and b are valid doses, make b replace a if
 			# higher priority (e.g. mcg over puffs) otherwise stick with a.
 			if (a$tot > 0 & b$tot > 0 & a$time > 0 & 
 				b$time > 0 & a$priority < b$priority) {

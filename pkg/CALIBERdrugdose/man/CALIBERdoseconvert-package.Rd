@@ -21,31 +21,31 @@ prior to conversion, and can use multiple processors (using the parallel package
 The program can be run in server mode using RServe. This is an example using Python
 on Ubuntu to access an R service (type these commands into the terminal):
 
-# Install required packages (command line): 
+\code{# Install required packages (command line):}
 \cr
-sudo apt-get install r-cran-rserve \cr
-sudo apt-get install python-pip \cr
-sudo pip install pyRserve
+\code{sudo apt-get install r-cran-rserve} \cr
+\code{sudo apt-get install python-pip} \cr
+\code{sudo pip install pyRserve}
 
-# Start R in daemon mode: 
+\code{# Start R in daemon mode:}
 \cr
-R CMD Rserve
+\code{R CMD Rserve}
 
-# Start python: 
+\code{# Start python:}
 \cr
-python
+\code{python}
 
-# Now type the following commands in python: 
+\code{# Now type the following commands in python:}
 \cr
-import pyRserve \cr
-conn = pyRserve.connect() \cr
-conn.voidEval('library(CALIBERdrugdose)')
+\code{import pyRserve} \cr
+\code{conn = pyRserve.connect()} \cr
+\code{conn.voidEval('library(CALIBERdrugdose)')}
 
-# Analyse a text \cr
-conn.r.doseconvert('2 tablets daily')
+\code{# Analyse a text} \cr
+\code{conn.r.doseconvert('2 tablets daily')}
 
-# Shut down R session \cr
-conn.shutdown()
+\code{# Shut down R session} \cr
+\code{conn.shutdown()}
 
 Example \href{../doc/pythonexample.py}{python code} for a faster way to
 run a conversion service (by preloading lookup dictionaries).
@@ -55,8 +55,8 @@ run a conversion service (by preloading lookup dictionaries).
 \tabular{ll}{
 Package: \tab CALIBERdrugdose\cr
 Type: \tab Package\cr
-Version: \tab 0.1-1\cr
-Date: \tab 2016-03-31\cr
+Version: \tab 0.1-2\cr
+Date: \tab 2017-02-27\cr
 License: \tab GPL-3\cr
 }
 }

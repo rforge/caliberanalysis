@@ -24,12 +24,18 @@ see 'Details' below.
 }
 
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+The data.frame, data.table or file should have the following columns:
+  \describe{
+    \item{\code{replacement}}{character; replacement for \code{words}.
+    If missing (NA), the word is left as it is (equivalent to setting
+    \code{replacement} equal to \code{words} .}
+    \item{\code{words}}{character; a single word}
+  }
 }
 
 
 \value{
-A named character vector with class 'drugdose_singlewords'.
+A named character vector with class \code{drugdose_singlewords}.
 }
 
 \references{
@@ -51,5 +57,8 @@ Anoop Shah
 }
 
 \examples{
+data(singlewords)
 
+# Convert to singlewords dictionary for analysis
+singlewords <- as.drugdose_singlewords(singlewords)
 }

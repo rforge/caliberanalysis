@@ -1,3 +1,21 @@
+Version 0.1-2
+===================
+
+CHANGES:
+
+-   textid now defaults to numbers rather than text strings
+-   Lookup table specification in doseconvert altered; now there is an
+    option to supply only a single lookup table (customlookups) or use
+    the built-in lookup table (option usebuiltinlookups = TRUE)
+-   Some corrections to lookup tables
+-   New option maxifchoice, whether to return maximum or average
+    dose if there is a choice of dose. Returns maximum dose by default
+-   Modified testdoseconvert function - now uses the same arguments
+    as doseconvert, and can compare the results with a gold standard
+-   Added 'combined' as a return option for multiple doses combined
+    into a single dose
+-   Corrected the function for combining multiple dose lines
+
 Version 0.1-1
 ===================
 

@@ -17,15 +17,16 @@ with an additional row.
 \usage{
 addterm(x, \dots)
 \method{addterm}{drugdose_singlewords}(x, words = "", replacement = "")
-\method{addterm}{drugdose_multiwords}(x, order = NA, words = "",
-    replacement = "", comment = "")
-\method{addterm}{drugdose_patterns}(x, order = NA, words = "",
-    qty = NA, units = "", freq = NA, tot = NA, priority = 0,
-    max = "exact", time = NA, change = "nochange", choice = "nochoice",
-    doubledose = FALSE, duration = NA, category = "", comment = "")
-\method{addterm}{drugdose_lookups}(x, words = "", qty = NA, units = "",
-    freq = NA, tot = NA, max = "exact", time = NA, change = "nochange",
-    choice = "nochoice", duration = NA, daily_dose)
+\method{addterm}{drugdose_multiwords}(x, order = NA, words = "", replacement = "",
+    comment = "")
+\method{addterm}{drugdose_patterns}(x, order = NA, words = "", qty = NA, units = "",
+    freq = NA, tot = NA, priority = 0, max = "exact", time = NA,
+    change = "nochange", choice = "nochoice", doubledose = FALSE,
+    duration = NA, category = "", comment = "")
+\method{addterm}{drugdose_lookups}(x, textid = 0, text = "", qty = NA, units = "",
+    freq = NA, tot = NA, max = "exact", time = NA,
+    change = "nochange", choice = "nochoice", duration = NA,
+    daily_dose)
 }
 
 \arguments{
@@ -34,9 +35,15 @@ An R object of class \code{\link{drugdose_singlewords}},
 \code{\link{drugdose_multiwords}},
 \code{\link{drugdose_patterns}} or \code{\link{drugdose_lookups}}.
 }
+  \item{textid}{
+Identifier for lookup (numeric).
+}
   \item{words}{
 Single word for singlewords, regular expression for multiwords and
-patterns, complete dosage text for lookups.
+patterns.
+}
+  \item{text}{
+Complete dosage text for lookup table.
 }
   \item{replacement}{
 Replacement for words.
@@ -69,8 +76,9 @@ Time period in days.
 }
   \item{change}{
 "nochange", "first" (there is a change of dose, and the extracted
-daily dose refers to the dose for the first period of the prescrription)
-or "second" (second dose is reported). "nochange" is default.
+daily dose refers to the dose for the first period of the prescrription),
+"second" (second dose is reported) or "combined" (multiple dose lines
+with defined durations are combined). "nochange" is default.
 }
   \item{choice}{
 "nochoice", "choice" or "asneeded". "nochoice" is default.

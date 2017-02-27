@@ -1,185 +1,114 @@
-# Contains code for loading dictionaries from 
-# spreadsheet and exporting to spreadsheet,
-# also for testing the algorithm using the
-# pre-converted texts, and identifying differences in
-# interpretation between different version of the 
-# algorithm, for checking.
+# Contains code for testing dose conversion program
 
-# Dictionaries are replaced
-# first
-# singlewords
-# second
-
-# 'singlewords' dictionary is just word and replacement, can be 
-# a character vector with named elements.
-# Format in Excel sheet: words, replacement
-
-# Modified 12 Apr 2012:
-# 'second' dictionary renamed 'patterns' and now includes
-# all pattern recognition for attributes
-# 'first' replaced by 'multiwords' which is
-# different from singlewords because terms are ordered
-# and intended to be used sequentially.
-
-# Re-written 12 April 2012 so that the three types of dictionary
-# have separate code:
-# singlewords, multiwords, patterns
-
-# singlewords has the following columns:
-# words, replacement
-
-# multiwords has the following columns:
-# words, replacement, comments, order
-
-# 'pattern' dictionary has the following columns:
-# words -- words to replace
-# qty -- dose quantity
-# units -- this can also be the replacement text e.g. four=4
-# freq -- freq and qty must be analysed separately for liquid
-#					doses in mL
-# tot -- total dose per time period
-# priority -- priority for dose units
-# max -- whether max or average dose 1=max, 2=average
-# time -- time period over which dose applies, in days
-# change -- 0=no change, 1=first, 2=second
-# choice -- 1=choice, 2=when needed
-# doubledose -- if 'each eye' etc. then double the dose.
-# duration -- only used in a few cases
-# category -- not in the Excel version; included here so that
-#				 all the contents of the Excel table can be stored in R
-# comments -- also not in the Excel version
-# order -- can be used to re-order entries in the Excel file.
-#				 If this column has missing or duplicate entries,
-#				 it is ignored.
-
-testdoseconvert <- function(text = NULL, infile = NULL,
-	outfile = NULL, outfileerrors = NULL, singlewords = NULL,
-	multiwords = NULL, patterns = NULL, uselookups = FALSE,
-	lookups = NULL, customlookups = NULL,	noisy = TRUE,
-	tolerance = 0.001, ...){
-	# Arguments
-	# infile = input file, should contain text and ideally textid;
-	#   customlookups if text and infile are both NULL, lookups if
-	#   customlookups is NULL
-	# outfile, outfileerrors = output files, none if NULL
-	# singlewords, multiwords, patterns
-	# uselookups = whether to use direct lookups
-	# noisy = whether to print to console
-	# tolerance = how close the daily doses have to be
-	#   (to account for rounding)
+testdoseconvert <- function(text = goldstandard$text,
+	textid = NULL, simplify = TRUE, singlewords = NULL,
+	multiwords = NULL, patterns = NULL, maxifchoice = TRUE,
+	usebuiltinlookups = FALSE, customlookups = NULL, cores = 1,
+	noisy = ifelse(length(text) == 1, TRUE, FALSE),
+	goldstandard = NULL){
+	# Arguments:
+	# Similar to doseconvert but with additional argument goldstandard
+	# goldstandard is a dataset containing textid and interpreted
+	# results, against which the results can be compared. 
+	# Detailed output ('noisy') is shown by default if only one text is
+	# being analysed.
+	# Output is a combination of new interpreted result and goldstandard
+	# with outcome field outcome = 'actual', 'intended' or 'correct'
+	# All errors are also printed to the debug window
 	
-	if (is.null(text)){
-		if (!is.null(infile)){
-			A <- fread(infile)
-			if ('daily_dose' %in% colnames(A)){
-				checkdailydose <- TRUE
-				if (!('correct_dose' %in% colnames(A))){
-					setnames(A, 'daily_dose', 'correct_dose')
-				}
-			}
-		} else if (!is.null(customlookups)){
-			A <- importLookups(customlookups)
-			checkdailydose <- TRUE
-			setnames(A, 'daily_dose', 'correct_dose')
-		} else if (!is.null(lookups)){
-			A <- importLookups(lookups)
-			checkdailydose <- TRUE
-			setnames(A, 'daily_dose', 'correct_dose')
-		} else {
-			A <- data.table(text = '', textid = 1)
-			checkdailydose <- FALSE
-		}
-	} else {
-		A <- data.table(text = text, textid = 1)
-		checkdailydose <- FALSE
-	}
+	tolerance = 0.0001 # tolerance for numerical value comparison
 
-	# Prepare input file
-	if (ncol(A) == 1){
-		setnames(A, 'text')
-		A[, textid := 1:.N]
-	} else if ('text' %in% colnames(A)){
-		if (!('textid' %in% colnames(A))){
-			A[, textid := 1:.N]
-		}
-	} else if ('words' %in% colnames(A)){
-		setnames(A, 'words', 'text')
-		if (!('textid' %in% colnames(A))){
-			A[, textid := 1:.N]
-		}
-	} else {
-		stop("infile must have a 'text' column")
+	if (is.null(textid)){
+		textid <- seq_along(text)
 	}
-	
+	INPUT <- data.table(text = text, textid = textid)
 	if (noisy){
 		# Analyse one dose at a time
-		cat('\n\nAnalysing ' , A$text[1], '\n')
-		B <- doseconvert(A$text[1], A$textid[1],
+		cat('\n\nAnalysing ' , INPUT$text[1], '\n')
+		OUTPUT <- doseconvert(INPUT$text[1], INPUT$textid[1],
 			singlewords = singlewords, multiwords = multiwords,
-			patterns = patterns, uselookups = uselookups,
-			lookups = lookups, customlookups = customlookups,
-			noisy = TRUE, ...)
-		print(B)
-		if (nrow(A) > 1){
-			for (i in 2:nrow(A)){
-				cat('\n\nAnalysing ', A$text[i], '\n')
-				B <- rbind(B, doseconvert(A$text[i], A$textid[i],
+			patterns = patterns, usebuiltinlookups = usebuiltinlookups,
+			customlookups = customlookups, noisy = TRUE,
+			simplify = simplify)
+		print(OUTPUT)
+		if (nrow(INPUT) > 1){
+			for (i in 2:nrow(INPUT)){
+				cat('\n\nAnalysing ', INPUT$text[i], '\n')
+				OUTPUT <- rbind(OUTPUT, doseconvert(INPUT$text[i], INPUT$textid[i],
 					singlewords = singlewords, multiwords = multiwords,
-					patterns = patterns, uselookups = uselookups,
-					lookups = lookups, customlookups = customlookups, ...))
-				print(B[i, ])
+					patterns = patterns, usebuiltinlookups = usebuiltinlookups,
+					customlookups = customlookups, noisy = TRUE,
+					simplify = simplify))
+				print(OUTPUT[i, ])
 			}
 		}
 	} else {
 		# Analyse multiple doses simultaneously
-		B <- doseconvert(A$text, A$textid, singlewords = singlewords,
-			multiwords = multiwords, patterns = patterns,
-			uselookups = uselookups, lookups = lookups,
-			customlookups = customlookups, ...)
+		OUTPUT <- doseconvert(INPUT$text, INPUT$textid,
+			singlewords = singlewords, multiwords = multiwords,
+			patterns = patterns, usebuiltinlookups = usebuiltinlookups,
+			simplify = simplify, customlookups = customlookups)
 	}
 	
-	suppressWarnings(B[, text := NULL])
-	A[, textid := as.numeric(textid)]
-	setkey(A, textid)
-	B[, textid := as.numeric(textid)]
-	setkey(B, textid)
+	suppressWarnings(OUTPUT[, text := NULL])
+	INPUT[, textid := as.numeric(textid)]
+	setkey(INPUT, textid)
+	OUTPUT[, textid := as.numeric(textid)]
+	setkey(OUTPUT, textid)
 	
-	if (noisy & checkdailydose){
-		cat('\nIncorrect results:\n')
-		print(B[A][abs(correct_dose - daily_dose) > tolerance,
-			list(textid, text, freq, qty, time, tot, daily_dose, correct_dose)])
-	}
-	
-	# Write output to file
-	if (!is.null(outfile)){
-		write.csv(B[A], outfile, row.names = FALSE)
-	}
-	
-	if (checkdailydose){
-		if (!is.null(outfileerrors)){
-			write.csv(B[A][abs(correct_dose - daily_dose) > tolerance,
-				list(textid, text, freq, qty, time, tot, daily_dose, correct_dose)],
-				file = outfileerrors, row.names = FALSE)		
+	# If checking against reference
+	if (is.null(goldstandard)){
+		OUTPUT$outcome <- 'actual'
+		return(OUTPUT)
+	} else {
+		# Compare output with goldstandard and return the comparison
+		REFERENCE <- as.data.table(goldstandard)
+		if (!('textid' %in% names(REFERENCE))){
+			# Add a column for textid
+			REFERENCE[, textid := textid]
 		}
-	}
-	
-	# Return the interpreted dataset
-	invisible(B[A])
-}
+		if ('order' %in% names(OUTPUT)){
+			# Multi-row dosage interpretations
+			if (!('order' %in% names(REFERENCE))){
+				# Add a column for order
+				REFERENCE[, order := 1]
+			}
+			setkey(OUTPUT, textid, order)
+			setkey(REFERENCE, textid, order)
+		} else {
+			setkey(OUTPUT, textid)
+			setkey(REFERENCE, textid)
+		}
+		
+		# Transfer initial text to output
+		OUTPUT[, text := REFERENCE[OUTPUT][, text]]
 
-test <- function(instring,
-	folder = "/home/anoop/Dropbox/Rpackages/CALIBERdrugdose_scratch/dicts/",
-	...){
-	# Load dictionaries
-	cat('\nLoading dictionaries')
-	singlewords <- importSinglewords(
-		paste(folder, 'singlewords.csv', sep = '/'))
-	multiwords <- importMultiwords(
-		paste(folder, 'multiwords.csv', sep = '/'))
-	patterns <- importPatterns(
-		paste(folder, 'patterns.csv', sep = '/'))
-	# Interpret the string in noisy mode
-	interpret(instring, singlewords = singlewords,
-		multiwords = multiwords, patterns = patterns,
-		noisy = TRUE, ...)
+		for (i in 1:nrow(OUTPUT)){
+			# Row by row comparison
+			OUTPUT[i, outcome := ifelse(
+				abs(OUTPUT[i, qty] - REFERENCE[i, qty]) < tolerance &
+				OUTPUT[i, units] == REFERENCE[i, units] &
+				abs(OUTPUT[i, freq] - REFERENCE[i, freq]) < tolerance &
+				abs(OUTPUT[i, tot] - REFERENCE[i, tot]) < tolerance &
+				OUTPUT[i, max] == REFERENCE[i, max] &
+				abs(OUTPUT[i, time] - REFERENCE[i, time]) < tolerance &
+				OUTPUT[i, change] == REFERENCE[i, change] &
+				OUTPUT[i, choice] == REFERENCE[i, choice] &
+				abs(OUTPUT[i, duration] - REFERENCE[i, duration]) < tolerance &
+				abs(OUTPUT[i, daily_dose] - REFERENCE[i, daily_dose]) < tolerance,
+				'correct', 'actual')]
+		}
+		
+		REFERENCE[, outcome := OUTPUT[REFERENCE][, outcome]]
+		# Mark texts with incorrect interpretation in the reference table
+		REFERENCE[outcome == 'actual', outcome := 'intended']
+		if (any(REFERENCE[, outcome] == 'intended')){
+			OUTPUT <- rbind(REFERENCE[outcome == 'intended'],
+				OUTPUT, fill = TRUE)
+		}
+		OUTPUT[, outcome := factor(outcome, levels = c('correct',
+			'actual', 'intended'))]
+		OUTPUT <- OUTPUT[order(textid, order, outcome)]
+		return(OUTPUT)
+	}
 }

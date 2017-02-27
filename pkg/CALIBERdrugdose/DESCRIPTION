@@ -1,10 +1,10 @@
 Package: CALIBERdrugdose
 Type: Package
 Title: Extract drug dose from unstructured dosage text
-Version: 0.1-1
-Date: 2016-03-31
+Version: 0.1-2
+Date: 2017-02-27
 Authors@R: c(person("Anoop", "Shah", role=c("aut", "cre"), email="anoop@doctors.org.uk"))
-Description: Functions to extract drug dose from text in the Clinical Practice Research Datalink. The CALIBER programme is funded by the Wellcome Trust (086091/Z/08/Z) and the National Institute for Health Research (NIHR) under its Programme Grants for Applied Research programme (RP-PG-0407-10314). The author is supported by a Wellcome Trust Clinical Research Training Fellowship (0938/30/Z/10/Z).
+Description: Functions to extract drug dose from text in general practice records, such as in the CALIBER electronic health record database. The CALIBER programme is funded by the Wellcome Trust (086091/Z/08/Z) and the National Institute for Health Research (NIHR) under its Programme Grants for Applied Research programme (RP-PG-0407-10314). The author is supported by a Wellcome Trust Clinical Research Training Fellowship (0938/30/Z/10/Z).
 License: GPL-3
 Depends: data.table
 Author: Anoop Shah [aut, cre]

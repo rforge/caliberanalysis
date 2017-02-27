@@ -24,7 +24,25 @@ see 'Details' below.
 }
 
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+The data.frame, data.table or file should have the following columns:
+  \describe{
+    \item{\code{words}}{character; pattern phrase}
+    \item{\code{qty}}{character; dose quantity or regular expression
+    component for extracting quantity from the matched text.}
+    \item{\code{units}}{a character vector}
+    \item{\code{freq}}{a character vector}
+    \item{\code{tot}}{a character vector}
+    \item{\code{priority}}{a numeric vector}
+    \item{\code{max}}{a character vector}
+    \item{\code{time}}{a character vector}
+    \item{\code{change}}{a logical vector}
+    \item{\code{choice}}{a character vector}
+    \item{\code{doubledose}}{a character vector}
+    \item{\code{duration}}{a character vector}
+    \item{\code{comment}}{a character vector}
+    \item{\code{category}}{a character vector}
+    \item{\code{order}}{a numeric vector}
+  }
 }
 
 
@@ -52,5 +70,8 @@ Anoop Shah
 }
 
 \examples{
+data(patterns)
 
+# Convert to patterns dictionary for analysis
+patterns <- as.drugdose_patterns(patterns)
 }

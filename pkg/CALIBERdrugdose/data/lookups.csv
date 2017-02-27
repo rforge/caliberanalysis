@@ -1,4 +1,5 @@
-words,qty,units,freq,tot,max,time,change,choice,duration,daily_dose
-TAKE ONE DAILY (YOU MUST HAVE YOUR THYROXINE LEVEL CHECKED YEARLY),1,,1,1,,1,,,,1
-1 EVERY MORNING AS DIRECTED DO NOT GIVE TO CHILDREN UNDER 16 YEARS OLD UNLESS DI,1,,1,1,,1,,,,1
-TWICE WEEK,1,,2,1,,7,,,,0.2857142857
+textid,text,qty,units,freq,tot,max,time,change,choice,duration,daily_dose
+1,TAKE ONE DAILY (YOU MUST HAVE YOUR THYROXINE LEVEL CHECKED YEARLY),1,,1,1,,1,,,,1
+2,1 EVERY MORNING AS DIRECTED DO NOT GIVE TO CHILDREN UNDER 16 YEARS OLD UNLESS DI,1,,1,1,,1,,,,1
+3,TWICE WEEK,1,,2,1,,7,,,,0.2857142857
+4,pleasetakeonetabblettedaily,1,tab,1,1,,1,,,,1

@@ -24,11 +24,12 @@ see 'Details' below.
 }
 
 \details{
-
+This function is used to pre-process the builtin-in \code{\link{lookups}}
+table as well as user-specified custom lookups in \code{\link{doseconvert}}.
 }
 
 \value{
-A data.table with class 'drugdose_lookups'.
+A data.table with class \code{drugdose_lookups}.
 }
 
 \references{
@@ -43,11 +44,13 @@ Anoop Shah
 }
 
 \seealso{
-\code{\link{as.drugdose_singlewords}}, \code{\link{as.drugdose_multiwords}}
-\code{\link{as.drugdose_patterns}}, \code{\link{as.drugdose_lookups}},
-\code{\link{export}}, \code{\link{addterm}}
+\code{\link{lookups}}
 }
 
 \examples{
+# Import the raw table
+data(lookups)
 
+# Convert into the lookup table format
+lookups <- as.drugdose_lookups(lookups)
 }

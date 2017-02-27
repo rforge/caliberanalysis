@@ -11,9 +11,10 @@ extract structured information such as quantity, frequency and units.
 }
 
 \usage{
-doseconvert(text, textid = NULL, simplify = TRUE, singlewords = NULL,
-    multiwords = NULL, patterns = NULL, uselookups = TRUE,
-    lookups = NULL, customlookups = NULL, cores = 1)
+doseconvert(text, textid = seq_along(text), simplify = TRUE,
+    singlewords = NULL, multiwords = NULL, patterns = NULL,
+    maxifchoice = TRUE, usebuiltinlookups = TRUE,
+    customlookups = NULL, cores = 1, noisy = FALSE)
 }
 
 \arguments{
@@ -40,30 +41,36 @@ dictionary. If NULL it is loaded from the package data directory.
 A \code{\link{drugdose_patterns}} object or file path to the patterns
 dictionary. If NULL it is loaded from the package data directory.
 }
-  \item{uselookups}{
-Whether to use a lookup table of exact dose strings and their conversion.
+  \item{maxifchoice}{
+Whether to return the maximum dose if there is a choice of dose (e.g.
+1 or 2 tablets daily). If FALSE, the average is returned. 
 }
-  \item{lookups}{
-A \code{\link{drugdose_lookups}} object or file path to the lookups
-dictionary. If NULL it is loaded from the package data directory.
+  \item{usebuiltinlookups}{
+Whether to use the lookup table of exact dose strings and their conversion
+included in the package.
 }
   \item{customlookups}{
 A \code{\link{drugdose_lookups}} object or file path to the a custom
 lookups table. This may consist of errors that you have found and corrected,
 for which you would like the algorithm to use the correct interpretation
-in the future.
+in the future. This lookup table is in the same format as the output 
 }
   \item{cores}{
 Number of cores to use, for multiprocessor machines running R on Linux.
 The 'parallel' package must be loaded in order to use more than one core.
+}
+  \item{noisy}{
+TRUE or FALSE - whether to print debug information to console.
 }
 }
 
 \details{
 This function calls \code{\link{interpret}} repeatedly to analyse
 individual dosage texts. First it compiles a list of unique dosage texts
-to be analysed, so that each is interpreted only once. If uselookups = TRUE
-and a text is found in the lookups table, the pre-analysed output is
+to be analysed, so that each is interpreted only once.
+If usebuiltinlookups = TRUE
+and a text is found in the lookups table, or if it is in the customlookups
+table, the pre-analysed output is
 returned, otherwise the \code{\link{interpret}} function is called to
 analyse the text. 
 }
@@ -71,17 +78,23 @@ analyse the text.
 \value{
 Data frame with the following columns:
 
-\item{qty}{Description of 'comp2'}
-\item{units}{Description of 'comp2'}
-\item{freq}{dose frequency per time interval}
-\item{tot}{total dose per time period}
-\item{priority}{[not relevant - to be removed]}
-\item{max}{factor with 3 levels: max, average, exact}
-\item{time}{Description of 'comp2'}
-\item{change}{factor with 3 levels: first, second, nochange.
-If doses for different time periods combined using simplify=TRUE,
+\item{\code{textid}}{numeric or character; text identifier}
+\item{\code{order}}{numeric; if \code{simplify} = TRUE, this column contains '1'.
+If \code{simplify} = FALSE, there may be multiple result lines per text
+entry, and this column states the order of the result lines.}
+\item{\code{qty}}{numeric; dose quantity}
+\item{\code{units}}{numeric; dose units}
+\item{\code{units}}{character; dose units}
+\item{\code{freq}}{numeric; dose frequency per time period}
+\item{\code{tot}}{numeric; total dose per time period}
+\item{\code{max}}{factor with 3 levels: max, average, exact}
+\item{\code{time}}{numeric; time interval in number of days}
+\item{\code{change}}{factor with 3 levels: first, second, nochange, combined.
+If doses for different time periods combined using \code{simplify} = TRUE,
 \code{change} states which dose contributes to the output.}
-\item{choice}{whether there is a choice of dose.}
+\item{\code{choice}}{factor with 3 levels: choice, asneeded, nochoice}
+\item{\code{duration}}{numeric; duration of prescription}
+\item{\code{daily_dose}}{numeric; calculated daily dose (0 = missing)}
 
 If \code{simplify} = TRUE, the row.names are the \code{ids} if supplied, or equal to the row numbers otherwise.
 If \code{simplify} = FALSE, the row.names are \code{ids}.X where X (=1, 2, 3 etc.) is the order of the partial
@@ -132,9 +145,10 @@ the_lookups <- as.drugdose_lookups(lookups)
 
 # Write a function to use pre-loaded dictionaries
 doseconvert_fast <- function(text, textid){
-	doseconvert(text = text, textid = textid, simplify = TRUE,
-	singlewords = the_singlewords, multiwords = the_multiwords,
-	patterns = the_patterns, lookups = the_lookups, cores = 1)
+    doseconvert(text = text, textid = textid, simplify = TRUE,
+    singlewords = the_singlewords, multiwords = the_multiwords,
+    patterns = the_patterns, usebuiltinlookups = FALSE,
+    customlookups = the_lookups, cores = 1)
 }
 
 system.time(doseconvert_fast(text = '2 tablets daily', textid = 3))

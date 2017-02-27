@@ -144,21 +144,21 @@ as.drugdose_patterns <- function(patterns){
 			
 		# Convert category variables to factors
 		patterns$max[is.na(patterns$max)] <- 'exact'
-		patterns$max[patterns$max==''] <- 'exact'
+		patterns$max[patterns$max == ''] <- 'exact'
 		patterns$max <- factor(patterns$max, c('max', 'average', 'exact'))
 		
 		patterns$change[is.na(patterns$change)] <- 'nochange'
-		patterns$change[patterns$change==''] <- 'nochange'
+		patterns$change[patterns$change == ''] <- 'nochange'
 		patterns$change <- factor(patterns$change,
-			c('first', 'second', 'nochange'))
+			c('first', 'second', 'nochange', 'combined'))
 		
 		patterns$choice[is.na(patterns$choice)] <- 'nochoice'
-		patterns$choice[patterns$choice==''] <- 'nochoice'
+		patterns$choice[patterns$choice == ''] <- 'nochoice'
 		patterns$choice <- factor(patterns$choice,
 			c('choice', 'asneeded', 'nochoice'))
 		
 		# Doubledose Boolean variable
-		patterns$doubledose <- (patterns$doubledose=='double')
+		patterns$doubledose <- (patterns$doubledose == 'double')
 		
 		# Zero for blank priority
 		patterns$priority[is.na(patterns$priority)] <- 0
@@ -188,18 +188,6 @@ as.drugdose_lookups <- function(lookups){
 		} else {
 			stop('Lookups is not a data.frame or filepath.')
 		}
-	
-		# Standardise names
-		thenames <- colnames(lookups)
-		thenames[thenames == 'dose_number'] <- 'qty'
-		thenames[thenames == 'dose_unit'] <- 'units'
-		thenames[thenames == 'dose_frequency'] <- 'freq'
-		thenames[thenames == 'dose_inteval'] <- 'time'
-		thenames[thenames == 'choice_of_dose'] <- 'choice'
-		thenames[thenames == 'dose_max_average'] <- 'max'
-		thenames[thenames == 'change_dose'] <- 'change'
-		thenames[thenames == 'dose_duration'] <- 'duration'
-		colnames(lookups) <- thenames
 		
 		# Convert missing into blank
 		for (item in c('qty', 'freq', 'tot', 'time', 'duration')){
@@ -207,21 +195,21 @@ as.drugdose_lookups <- function(lookups){
 		}
 		
 		# Convert words to lower case
-		lookups$words <- tolower(trim(lookups$words))
+		lookups$text <- tolower(trim(lookups$text))
 		lookups$units <- tolower(lookups$units)
 			
 		# Convert category variables to factors
 		lookups$max[is.na(lookups$max)] <- 'exact'
-		lookups$max[lookups$max==''] <- 'exact'
+		lookups$max[lookups$max == ''] <- 'exact'
 		lookups$max <- factor(lookups$max, c('max', 'average', 'exact'))
 		
 		lookups$change[is.na(lookups$change)] <- 'nochange'
-		lookups$change[lookups$change==''] <- 'nochange'
+		lookups$change[lookups$change == ''] <- 'nochange'
 		lookups$change <- factor(lookups$change,
-			c('first', 'second', 'nochange'))
+			c('first', 'second', 'nochange', 'combined'))
 		
 		lookups$choice[is.na(lookups$choice)] <- 'nochoice'
-		lookups$choice[lookups$choice==''] <- 'nochoice'
+		lookups$choice[lookups$choice == ''] <- 'nochoice'
 		lookups$choice <- factor(lookups$choice,
 			c('choice', 'asneeded', 'nochoice'))
 		
@@ -230,7 +218,7 @@ as.drugdose_lookups <- function(lookups){
 		# Default is simplify = TRUE, i.e. one output row.
 		
 		lookups <- as.data.table(lookups)
-		colnames_lookups <- c('words', 'qty', 'units', 'freq', 'tot',
+		colnames_lookups <- c('textid', 'text', 'qty', 'units', 'freq', 'tot',
 			'max', 'time', 'change', 'choice', 'duration', 'daily_dose')
 		
 		if (all(colnames_lookups %in% colnames(lookups))){
@@ -245,7 +233,7 @@ as.drugdose_lookups <- function(lookups){
 			lookups[, time := as.numeric(time)]
 			lookups[, daily_dose := as.numeric(daily_dose)]
 			
-			setkey(lookups, words)
+			setkey(lookups, text)
 		} else {
 			warning(paste('Lookups ignored because table in incorrect format.\n',
 				'It should have columns:', paste(colnames_lookups, collapse = ', ')))
@@ -333,24 +321,32 @@ addterm <- function(x, ...){
 	UseMethod("addterm")
 }
 
-addterm.drugdose_singlewords <- function(x, ...){
-	addtermSinglewords(x, ...)
+addterm.drugdose_singlewords <- function(x, words = "",
+	replacement = ""){
+	addtermSinglewords(x, words = words, replacement = replacement)
 }
 
-addterm.drugdose_multiwords <- function(x, ...){
-	addtermMultiwords(x, ...)
+addterm.drugdose_multiwords <- function(x, order = NA, words = "",
+    replacement = "", comment = ""){
+	addtermMultiwords(x, order = order, words = words,
+		replacement = replacement, comment = comment)
 }
 
-addterm.drugdose_lookups <- function(x, words = '',
+addterm.drugdose_lookups <- function(x, textid = 0, text = '',
 	qty = NA, units = '', freq = NA, tot = NA, max = 'exact',
 	time = NA,	change = 'nochange', choice = 'nochoice',
 	duration = NA, daily_dose){
 	
 	max <- factor(max, c('max', 'average', 'exact'))
-	change <- factor(change, c('first', 'second', 'nochange'))
+	change <- factor(change, c('first', 'second', 'nochange', 'combined'))
 	choice <- factor(choice, c('choice', 'asneeded', 'nochoice'))
 	
-	toadd <- data.table(words = tolower(words),
+	# Generate new value of textid
+	if (textid == 0){
+		textid <- max(x$textid) + 1
+	}
+	
+	toadd <- data.table(textid, text = tolower(text),
 		qty = as.numeric(qty), units = tolower(units), 
 		freq = as.numeric(freq), tot = as.numeric(tot),
 		max = max, time = as.numeric(time),
@@ -375,7 +371,7 @@ addterm.drugdose_patterns <- function(x, order = NA, words = '',
 	}
 
 	max <- factor(max, c('max', 'average', 'exact'))
-	change <- factor(change, c('first', 'second', 'nochange'))
+	change <- factor(change, c('first', 'second', 'nochange', 'combined'))
 	choice <- factor(choice, c('choice', 'asneeded', 'nochoice'))
 	
 	toadd <- data.frame(words = words, qty = qty, units = units, 

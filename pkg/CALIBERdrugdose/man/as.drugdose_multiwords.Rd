@@ -24,12 +24,20 @@ see 'Details' below.
 }
 
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+The data.frame, data.table or file should have the following columns:
+  \describe{
+    \item{\code{words}}{character; regular expression to match dosage
+    text in a standardised format (one space between words,
+    no capitals)}
+    \item{\code{replacement}}{character; replacement text}
+    \item{\code{comments}}{character; comments}
+    \item{\code{order}}{numeric; order in which the rules are applied}
+  }
 }
 
 
 \value{
-A data.frame with class 'drugdose_multiwords'.
+A data.frame with class \code{drugdose_multiwords}.
 }
 
 \references{
@@ -51,5 +59,8 @@ Anoop Shah
 }
 
 \examples{
+data(multiwords)
 
+# Convert to multiwords dictionary for analysis
+multiwords <- as.drugdose_multiwords(multiwords)
 }
