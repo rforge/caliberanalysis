@@ -2,7 +2,7 @@
 \alias{doseconvert}
 
 \title{
-Convert a set of dosage texts into structured dosage information
+Convert a Set of Dosage Texts to Structured Dosage Information
 }
 
 \description{

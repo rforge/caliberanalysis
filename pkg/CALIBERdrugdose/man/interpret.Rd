@@ -2,7 +2,7 @@
 \alias{interpret}
 
 \title{
-Convert a single dosage text into structured dosage information
+Convert a Single Dosage Text to Structured Dosage Information
 }
 
 \description{

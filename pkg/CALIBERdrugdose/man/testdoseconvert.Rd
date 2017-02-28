@@ -2,7 +2,7 @@
 \alias{testdoseconvert}
 
 \title{
-Test the dose conversion program against a set of texts with gold standard interpretation
+Test the Dose Conversion Program Against a Set of Texts With Gold Standard Interpretation
 }
 
 \description{

@@ -3,7 +3,7 @@
 \alias{drugdose_multiwords}
 
 \title{
-Import or convert a drugdose_multiwords table
+Import or Convert a drugdose_multiwords Table
 }
 
 \description{

@@ -4,7 +4,7 @@
 \docType{package}
 
 \title{
-CALIBER dose conversion program
+Extract Drug Dose From Unstructured Dosage Text
 }
 
 \description{

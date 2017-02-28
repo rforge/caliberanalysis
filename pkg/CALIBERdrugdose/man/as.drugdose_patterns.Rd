@@ -3,7 +3,7 @@
 \alias{drugdose_patterns}
 
 \title{
-Import or convert a drugdose_patterns table
+Import or Convert a drugdose_patterns Table
 }
 
 \description{

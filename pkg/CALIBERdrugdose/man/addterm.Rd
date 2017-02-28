@@ -6,7 +6,7 @@
 \alias{addterm.drugdose_lookups}
 
 \title{
-Add a single row to a lookup table
+Add a Single Row to a Lookup Table
 }
 
 \description{

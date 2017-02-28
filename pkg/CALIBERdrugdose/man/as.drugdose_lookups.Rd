@@ -3,7 +3,7 @@
 \alias{drugdose_lookups}
 
 \title{
-Import or convert a drugdose_lookups table
+Import or Convert a drugdose_lookups Table
 }
 
 \description{

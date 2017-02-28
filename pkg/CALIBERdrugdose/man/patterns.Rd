@@ -2,7 +2,7 @@
 \alias{patterns}
 \docType{data}
 \title{
-Patterns lookup table for extracting components of the dosage instruction
+Patterns Lookup Table for Extracting Components of Dosage Instruction
 }
 
 \description{

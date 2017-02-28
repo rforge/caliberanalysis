@@ -1,6 +1,6 @@
 Package: CALIBERdrugdose
 Type: Package
-Title: Extract drug dose from unstructured dosage text
+Title: Extract Drug Dose From Unstructured Dosage Text
 Version: 0.1-2
 Date: 2017-02-27
 Authors@R: c(person("Anoop", "Shah", role=c("aut", "cre"), email="anoop@doctors.org.uk"))

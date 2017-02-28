@@ -2,7 +2,7 @@
 \alias{multiwords}
 \docType{data}
 \title{
-Multiwords lookup table for simplifying a dosage text
+Multiwords Lookup Table for Simplifying a Dosage Text
 }
 
 \description{

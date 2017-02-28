@@ -2,7 +2,7 @@
 \alias{singlewords}
 \docType{data}
 \title{
-Lookup table for replacing individual words
+Lookup Table for Replacing Individual Words
 }
 
 \description{

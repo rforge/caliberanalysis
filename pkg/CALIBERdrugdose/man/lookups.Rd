@@ -2,7 +2,7 @@
 \alias{lookups}
 \docType{data}
 \title{
-Lookups table
+Lookups Table
 }
 \description{
 A lookup table of pre-analysed dosage texts to speed up the processing of new texts. Texts which are difficult to interpret or which cause errors can also be added to this table.

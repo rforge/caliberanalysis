@@ -6,7 +6,7 @@
 \alias{export.drugdose_lookups}
 
 \title{
-Export dictionary lookups
+Export Dictionary Lookup Tables
 }
 
 \description{
