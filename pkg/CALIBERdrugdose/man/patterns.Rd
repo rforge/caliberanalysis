@@ -48,7 +48,7 @@ Pharmacoepidemiol Drug Saf 2006; 15(3): 161-166. doi: 10.1002/pds.1151
 }
 
 \examples{
-data(patterns)
+data("patterns")
 
 # Convert to patterns dictionary for analysis
 patterns <- as.drugdose_patterns(patterns)

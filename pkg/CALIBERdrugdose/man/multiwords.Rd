@@ -35,7 +35,7 @@ Pharmacoepidemiol Drug Saf 2006; 15(3): 161-166. doi: 10.1002/pds.1151
 }
 
 \examples{
-data(multiwords)
+data("multiwords")
 
 # Convert to multiwords dictionary for analysis
 multiwords <- as.drugdose_multiwords(multiwords)

@@ -50,7 +50,7 @@ Pharmacoepidemiol Drug Saf 2006; 15(3): 161-166. doi: 10.1002/pds.1151
 
 \examples{
 # Import the raw table
-data(lookups)
+data("lookups")
 
 # Convert into the lookup table format
 lookups <- as.drugdose_lookups(lookups)

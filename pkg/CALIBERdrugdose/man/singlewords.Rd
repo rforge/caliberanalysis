@@ -37,7 +37,7 @@ Pharmacoepidemiol Drug Saf 2006; 15(3): 161-166. doi: 10.1002/pds.1151
 }
 
 \examples{
-data(singlewords)
+data("singlewords")
 
 # Convert to singlewords dictionary for analysis
 singlewords <- as.drugdose_singlewords(singlewords)

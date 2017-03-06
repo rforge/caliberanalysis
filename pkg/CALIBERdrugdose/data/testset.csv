@@ -1,0 +1,19 @@
+"textid","order","text","qty","units","freq","tot","max","time","change","choice","duration","daily_dose"
+1,1,"Take three tablets twice daily",3,"tab",2,6,"exact",1,"nochange","nochoice",0,6
+2,1,"10-15ml twice a day for constipation",15,"ml",2,30,"max",1,"nochange","choice",0,30
+3,1,"2 sprays when needed",2,"spray",0,2,"exact",0,"nochange","asneeded",0,0
+4,1,"one in the morning and one at night",1,,2,2,"exact",1,"nochange","nochoice",0,2
+5,1,"tds with food",0,,3,3,"exact",1,"nochange","nochoice",0,3
+6,1,"take one daily (you must have your thyroxine level checked yearly)",1,,1,1,"exact",1,"nochange","nochoice",0,1
+7,1,"apply at night twice weekly",0,,2,2,"exact",7,"nochange","nochoice",0,0.2857143
+8,1,"2 drops in each eye daily",4,"drops",1,4,"exact",1,"nochange","nochoice",0,4
+9,1,"2x5ml sppon twice daily",10,"ml",2,20,"exact",1,"nochange","nochoice",0,20
+10,1,"1 tab daily dispense weekly",1,"tab",1,1,"exact",1,"nochange","nochoice",7,1
+11,1,"1 tablet taken in the morning once a week before food",1,"tab",1,1,"exact",7,"nochange","nochoice",0,0.1428571
+12,1,"1 daily for 3 weeks per month",0.75,,1,0.75,"exact",1,"combined","nochoice",28,0.75
+13,1,"two tablets now then one tablet twice daily for 5 days",1.09090909,"tab",2,2.18181818,"exact",1,"combined","nochoice",5.5,2.18181818
+14,1,"two tablets tds for 3 days then one tablet daily for 5 days",0.95833333,"tab",3,2.875,"exact",1,"combined","nochoice",8,2.875
+15,1,"two tablets tds for 3 days then daily for 5 days",2,"tab",1.75,3.5,"exact",1,"combined","nochoice",8,3.5
+16,1,"apply twice daily for 1 week then once daily for 2 weeks",0,,1.33333333,1.33333333,"exact",1,"combined","nochoice",21,1.33333333
+17,1,"1 tablet increasing to 2 daily",2,"tab",1,2,"exact",1,"second","nochoice",0,2
+18,1,"apply twice daily for 1 week then as needed",0,,2,2,"exact",1,"first","nochoice",7,2
