@@ -85,7 +85,8 @@ assigncat <- function(number, definition=NULL, logic=NULL,
 	}
 	if (!is.null(logic)){
 		oldnum <- sum(CALIBER_DICT$category==number, na.rm=TRUE)
-		CALIBER_DICT[condition & logic, category:=as.integer(number)]
+		CALIBER_DICT[as.logical(condition & logic),
+			category := as.integer(number)]
 		newnum <- sum(CALIBER_DICT$category==number, na.rm=TRUE)
 		if (oldnum==0){
 			cat('\n' %&% newnum %&% ' terms assigned to category ' %&%

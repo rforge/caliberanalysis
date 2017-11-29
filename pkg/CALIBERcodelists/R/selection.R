@@ -70,27 +70,39 @@ print.selection <- function(x, ...){
 	printSelection(x, ...)
 }
 
+length.selection <- function(x){
+	# Number of selected terms in currently active dictionaries
+	sum(x & dictis(getdictionary()))
+}
+
 printSelection <- function(x, ...){
 	# Prints the selected terms in the form of a codelist
 	whichdicts <- getdictionary()
-	if (length(whichdicts)==0){
+	if (length(whichdicts) == 0){
 		whichdicts <- ALLDICTS
 	}
+	# Always use as.logical(x) to convert a selection to
+	# a logical vector (so that length is reported correctly)
+	# when using it to index CALIBER_DICT 
 	if ('read' %in% whichdicts){
 		cat('\nRead terms:\n')
-		printTerms(CALIBER_DICT[x & dict=='read', list(medcode, code, term, events)])
+		printTerms(CALIBER_DICT[as.logical(x) & dict == 'read',
+			list(medcode, code, term, events)])
 	}
 	if ('icd9' %in% whichdicts){
 		cat('\nICD-9 terms:\n')
-		printTerms(CALIBER_DICT[x & dict=='icd9', list(code, term)])
+		printTerms(CALIBER_DICT[as.logical(x) & dict == 'icd9',
+			list(code, term)])
 	}
 	if ('icd10' %in% whichdicts){
 		cat('\nICD-10 terms:\n')
-		printTerms(CALIBER_DICT[x & dict=='icd10', list(code, term)])
+		printTerms(CALIBER_DICT[as.logical(x) & dict == 'icd10',
+			list(code, term)])
 	}
 	if ('opcs' %in% whichdicts){
 		cat('\nOPCS terms:\n')
-		printTerms(CALIBER_DICT[x & dict=='opcs', list(code, term)])
+		printTerms(CALIBER_DICT[as.logical(x) & dict == 'opcs',
+			list(code, term)])
 	}
 	invisible(x)
 }
@@ -108,14 +120,10 @@ printTerms <- function(x, ...){
 			sum(pmax(nchar(colnames(temp)), unlist(temp))) - length(temp), 20)
 		x2 <- copy(x)
 		x2[, term := truncateChar(term, termwidth)]
-	} else {
+	} else {t <- copy(x)
 		x2 <- copy(x)
 	}
 	setattr(x2, 'class', c('data.table', 'data.frame'))
 	show(x2)
 }
 
-length.selection <- function(x){
-	# Number of terms in a selection
-	sum(x & dictis(getdictionary()))
-}

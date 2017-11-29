@@ -47,8 +47,8 @@ You can re-run it using the "source" function, e.g.\nsource("' %&%
 		tempdir() %&% '/interactive.log", echo=TRUE)\n')
 	sink()
   
-  # Make text into comments and R commands into commands
-  sinkToScript(tempdir() %&% '/interactive.log')
+	# Make text into comments and R commands into commands
+	sinkToScript(tempdir() %&% '/interactive.log')
   
 	if (showLog){
 		if (.Platform$OS=='unix'){

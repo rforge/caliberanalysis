@@ -156,7 +156,8 @@ selectionToCodelist <- function(x, category=1,
 		dictionary <- getdictionary()
 	}
 
-	getDict <- unique(sub('icdhead', 'icd10', unique(CALIBER_DICT[x, dict])))
+	getDict <- unique(sub('icdhead', 'icd10',
+		unique(CALIBER_DICT[as.logical(x), dict])))
 	if (!is.null(dictionary)){
 		getDict <- intersect(dictionary, getDict)
 	}
@@ -172,9 +173,9 @@ selectionToCodelist <- function(x, category=1,
 		getDict <- dictionary[1]
 	} else {
 		cat('\nUsing terms from ' %&% getDict)
-		x <- copy(CALIBER_DICT[x==TRUE & dict==getDict,
-			list(category=newcategory, code, term, medcode, events)])
-	} 
+		x <- copy(CALIBER_DICT[as.logical(x) == TRUE & dict == getDict,
+			list(category = newcategory, code, term, medcode, events)])
+	}  
 	
 	if (getDict!='read'){
 		# medcode is irrelevant
@@ -314,13 +315,13 @@ tableToCodelist <- function(x, noisy = FALSE){
 			'termlc', 'ref_events', 'test_events', 'immun_events',
 			'metadata', 'icd', 'icd_code', 'icd_term', 'icd9_code',
 			'icd9_term', 'opcs_code', 'opcs_term',
-			'code', 'term', 'db_date', 'lc_readterm', "prodcode",
-			"multilex", "events", "prodname", "drugsubstance",
-			"strength", "formulation", "route", "bnfcode", "bnf",
-			"bnfheader", "db", "therapyevents", "drugsubstancename",
-			"substancestrength", "formulation", "routeofadministration",
-			"databasebuild", "clinicalevents", "referralevents",
-			"testevents", "immunisationevents"))[1]
+			'code', 'term', 'db_date', 'lc_readterm', 'prodcode',
+			'multilex', 'events', 'prodname', 'drugsubstance',
+			'strength', 'formulation', 'route', 'bnfcode', 'bnf',
+			'bnfheader', 'db', 'therapyevents', 'drugsubstancename',
+			'substancestrength', 'formulation', 'routeofadministration',
+			'databasebuild', 'clinicalevents', 'referralevents',
+			'testevents', 'immunisationevents'))[1]
 		if (is.na(catname)){
 			# create a category with 1
 			if (nrow(x) > 0){
@@ -604,7 +605,6 @@ as.codelist <- function(x=NULL, ...){
 	}
 }
 
-
 addAttributesToCodelist <- function(x, metadata){
 	# Returns the codelist with attributes added from a list
 	# Arguments: x - codelist for which attributes are to be added
@@ -677,7 +677,6 @@ extractMetadataFromCodelist <- function(codelist){
 	return(metadata)
 }
 
-
 extractMetadataFromDatalabel <- function(datalabel, time.stamp){
 	# Extracts metadata (except category table) from a Stata datalabel
 	# Data elements are expected to be in the order:
@@ -698,7 +697,6 @@ extractMetadataFromDatalabel <- function(datalabel, time.stamp){
 	metadata$Source <- toupper(tmp[length(tmp)])
 	return(metadata)
 }
-
 
 extractMetadataFromColumn <- function(metadata){
 	# Extracts metadata from a character vector (e.g. a metadata column

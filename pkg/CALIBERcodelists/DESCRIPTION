@@ -1,8 +1,8 @@
 Package: CALIBERcodelists
 Type: Package
 Title: Generate ICD10, Read and OPCS codelists
-Version: 0.2-9
-Date: 2015-05-28
+Version: 0.2-10
+Date: 2017-11-27
 Authors@R: c(person("Anoop", "Shah", role=c("aut", "cre"), email="anoop@doctors.org.uk"),
     person("Harry", "Hemingway", role="ths"),
     person("Aroon", "Hingorani", role="ths"),

@@ -17,8 +17,8 @@ showhtml <- function(show_not_selected = TRUE){
 	
 	if (show_not_selected){
 		# Mark unselected but related terms
-		CALIBER_DICT[explode(!CALIBER_DICT[,
-			category < 1 | is.na(category)]), category:=-1L]
+		CALIBER_DICT[as.logical(explode(!CALIBER_DICT[,
+			category < 1 | is.na(category)])), category:=-1L]
 	}
 		
 	# Get category table

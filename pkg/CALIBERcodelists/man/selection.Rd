@@ -45,7 +45,7 @@ a selection object.
 }
 
 \seealso{
-\code{\link{print.selection}}.
+\code{\link{print.selection}}, \code{\link{length.selection}}.
 Functions which return a selection: \code{\link{termhas}}, \code{\link{codematch}}
 }
 

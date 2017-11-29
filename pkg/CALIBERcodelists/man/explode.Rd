@@ -6,7 +6,7 @@ Show terms not included in the selection but sharing the first few characters of
 }
 
 \description{
-Returns the selection of terms which have the same first few characters as selected terms but which are not included in the selection.
+Returns the selection of terms whose code shares the first few characters with a selected term but which are not included in the selection.
 }
 
 \usage{
@@ -53,7 +53,7 @@ print(as.codelist())
 
 angina <- selection('angina')
 explode(angina)
-stopifnot('Preinfarction syndrome' \%in\% CALIBER_DICT[explode(angina), term])
+stopifnot('Preinfarction syndrome' \%in\% as.codelist(explode(angina))[, term])
 
 setdictionary('icd10')
 mi <- codematch('I213', 'icd10')

@@ -1,4 +1,4 @@
-TODO:
+FEATURE REQUESTS
 
 - Ensure that Read codes are interpreted as character
   not number
@@ -7,12 +7,21 @@ TODO:
 - Trim excess spaces from terms in codelists
 - Ensure there is no error if codelist is empty when
   using demo(makecodelist)
-- Erase codelist under construction when 
 - Provide a menu-driven way to continue editing an
   existing codelist (adding categories etc.)
 - Harmonise the commands for editing a codelist and
   creating a new codelist
 - Allow codelists to use arbitrary dictionaries
+
+==================================================
+Changes in CALIBERcodelists version 0.2-10
+==================================================
+
+BUG FIXES
+
+- Selection functions updated to work with data.table
+  1.10.4.2, which checks the length of a logical
+  vector used for indexing
 
 ==================================================
 Changes in CALIBERcodelists version 0.2-9

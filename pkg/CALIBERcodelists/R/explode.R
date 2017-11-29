@@ -19,8 +19,8 @@ explode <- function(x = NULL, level = 3,
 	}
 
 	setDictKey()
-	sel1 <- copy(CALIBER_DICT[selected==TRUE,
-		list(dict, partcode=substr(code, 1, level), sel=TRUE)])
+	sel1 <- copy(CALIBER_DICT[as.logical(selected == TRUE),
+		list(dict, partcode = substr(code, 1, level), sel = TRUE)])
 
 	# ICD-10 and ICD9 codes should also match to the headers
 	temp <- sel1[dict=='icd10']
@@ -63,7 +63,7 @@ explode <- function(x = NULL, level = 3,
 		
 		# Return new terms which were not already selected
 		# require mininum number of events if not GPRD
-		out <- matchto[, sel2match] & !selected & 
+		out <- matchto[, sel2match] & !as.logical(selected) & 
 			(CALIBER_DICT[, events>=minFreqGPRD] |
 			CALIBER_DICT[, dict!='read'])	
 		class(out) <- 'selection'
