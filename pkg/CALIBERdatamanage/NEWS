@@ -1,4 +1,14 @@
 =================================================
+CALIBERdatamanage Version 0.1-14
+=================================================
+
+BUG FIXES:
+
+- with=FALSE together with := was deprecated in data.table
+- Corrected error in summaryTable when data.table is
+  specified as an argument, and clarified the documentation.
+
+=================================================
 CALIBERdatamanage Version 0.1-13
 =================================================
 

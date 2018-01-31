@@ -42,6 +42,8 @@ OR a function which takes a vector of
 values and returns a single value, e.g. mean, median,
 max, min, any, all. Default is to choose the maximum
 and ignore missing values.
+\code{value_choice = function(x) TRUE} can be used
+to return TRUE for any rows that match.
 }
   \item{date_priority}{
 if multiple records for a patient, which
@@ -139,10 +141,14 @@ addToCohort(COHORT, "newvar", newdata2, "value", value_choice = c(3,
     1, 2))
 print(COHORT)
 
-# Now over-writing
+# Now over-writing previous column
 addToCohort(COHORT, "newvar", newdata2, "value",
     value_choice = c(3, 1, 2), overwrite = TRUE)
+# TRUE if exists
+addToCohort(COHORT, "trueifexists", newdata2, "eventdate",
+    value_choice = function(x) TRUE)
 print(COHORT)
+
 
 # Trials with FFDF cohort
 # Need to assign the modified cohort to a name using <-

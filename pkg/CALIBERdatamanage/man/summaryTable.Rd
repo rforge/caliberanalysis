@@ -17,13 +17,17 @@ summaryTable(template, output = NULL, datatable = NULL,
 
 \arguments{
   \item{template}{
-Template, either a character string for the filepath of a CSV (comma separated values) file or a data.frame.
+template, either a character string for the filepath of a CSV (comma
+separated values) file or a data.frame. The format is described in
+'details' below.
 }
   \item{output}{
 Output file. If it has the extension .tex, it is output as LaTeX.
 }
   \item{datatable}{
-The data.table from which to construct the summary statistics. If not supplied as an argument to the function, the name of the data.table can be the first row, 
+the data.table from which to construct the summary statistics. If not
+supplied as an argument to the function, the name of the data.table is
+taken from the second column of the first row of \code{template}.
 }
   \item{latex}{
 TRUE or FALSE, whether to produce output in LaTeX format.
@@ -37,20 +41,7 @@ other arguments to pass to exportTable, e.g. \code{align}
 }
 
 \details{
-The first column states whether there is a horizontal line below each row.
-
-The \%&\% operator can be used to concatenate text.
-The condition '<text>' means that the column contains entirely text, which should be interpreted as is.
-
-In the body of the template, the following convention is used:
-
-A period (.) means that the function above is repeated.
-
-The text 'MULTIXy contents', where X is a number betweeen 1 and 9 and y is one of 'c' (centre), 'l' (left) or 'r' (right) puts the contents into a multi-column cell spanning X columns aligned according to y. The required number of columns to the right must be blank.
-
-A function with an opening bracket but no closing bracket means that the variable name in the second column of the row should be used as the argument.
-
-Anything else is interpreted as an R expression. For text to be interpreted as text, enclose it in single quotes (double quotes will be discarded when importing the CSV file).
+The template must be in the following format:
 
 \preformatted{
 1,mydatatable,condition1,condition2 ...
@@ -59,6 +50,45 @@ Anything else is interpreted as an R expression. For text to be interpreted as t
 1,Var2,Expr1a,Expr2a ...
 }
 
+ROW 1, COLUMN 2: The name of the data.table from which the
+summary statistics should be calculated. This is ignored if the
+\code{datatable} argument is supplied.
+
+ROW 1, COLUMNS 3+: Condition for defining a subset of 
+rows of the data.table, from which the statistics for that column will be
+derived. If blank, the entire data.table is used. If '<text>',
+the column contains entirely text and is interpreted as is.
+
+COLUMN 1, ROW 1: 1 if there is to be a horizontal line above the
+table, 0 otherwise.
+
+COLUMN 1, ROWS 2+: Each cell must contain 1 or 0, stating whether there is a
+horizontal line below each row.
+
+COLUMN 2, ROWS 2+: Either blank, or an expression for a variable on which
+calculations can be performed in the body of the table. This may be a
+variable name in the data.table or an expression evaluated within the
+data.table. 
+
+ROWS 2+, COLUMNS 3+: Each cell is interpreted as an R expression,
+using the variable in column 2 evaluated within the data.table
+for the subset of rows defined in row 1. 
+
+For text to be interpreted as text, enclose it in single quotes
+(double quotes will be discarded when importing the CSV file).
+
+The \%&\% operator can be used to concatenate text.
+
+A period (.) means that the function above is repeated.
+
+The text 'MULTIXy contents', where X is a number betweeen 1 and 9 and y
+is one of 'c' (centre), 'l' (left) or 'r' (right) puts the contents into
+a multi-column cell spanning X columns aligned according to y.
+This cell will span the relevant number of additional columns to the right,
+which must be blank.
+
+A function with an opening bracket but no closing bracket means that the
+variable name in column 2 should be used as the argument.
 }
 
 \value{

@@ -18,7 +18,7 @@ summaryTable <- function(template, output = NULL,
 	#                exportTable
 
 	# Format of template:
-  # The first column should state whether a
+	# The first column should state whether a
 	# horizontal line should be drawn below this row (1 / 0)
 	# or 1 / blank or TRUE / FALSE
 
@@ -54,15 +54,15 @@ summaryTable <- function(template, output = NULL,
 				# include all observations
 				subset_expr <- expression(TRUE)
 			} else {
-				subset_expr <- parse(text=temp[1, j])
+				subset_expr <- parse(text = temp[1, j])
 			}
 			thetext <- ''
 			for (i in 2:nrow(temp)){
-				if (temp[i, 2]=='<text>'){
+				if (temp[i, 2] == '<text>'){
 					# this row contains text only, so keep as is
 				} else {
 					# the row might contain a function
-					if (temp[i, j]=='.'){
+					if (temp[i, j] == '.'){
 						# use previous function
 					} else {
 						thetext <- temp[i, j]
@@ -70,11 +70,14 @@ summaryTable <- function(template, output = NULL,
 					if (grepl('\\($', thetext)){
 						# this is a function with an argument
 						# the argument is in column 2
-						try(out[i, j] <- DT[eval(subset_expr),
-							eval(parse(text=thetext %&% temp[i, 2] %&% ')'))])
+						# try to evaluate expression (hide errors)
+						capture.output(try(out[i, j] <- DT[eval(subset_expr),
+							eval(parse(text = thetext %&% temp[i, 2] %&% ')'))]),
+							type = 'message') -> hide
 					} else {
-						try(out[i, j] <- DT[eval(subset_expr),
-							eval(parse(text=thetext))])
+						capture.output(try(out[i, j] <- DT[eval(subset_expr),
+							eval(parse(text = thetext))]),
+							type = 'message') -> hide
 					}
 				}
 			}

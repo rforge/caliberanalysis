@@ -187,11 +187,11 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 	} else {
 		# overwrite variable
 		if (varname %in% colnames(x)){
-			x[, varname := NULL, with = FALSE]
+			x[, (varname) := NULL]
 		}
 		setnames(x, '.transferChosen', varname)
 		if (!is.null(date_varname)){
-			x[, date_varname := NULL, with = FALSE]
+			x[, (date_varname) := NULL]
 			setnames(x, '.transferDate', date_varname)
 		}		
 	}

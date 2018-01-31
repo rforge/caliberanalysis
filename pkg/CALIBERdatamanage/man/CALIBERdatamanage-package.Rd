@@ -15,8 +15,8 @@ Tools for handling data in the GPRD, HES, ONS and MINAP linked dataset (CALIBER)
 \tabular{ll}{
 Package: \tab CALIBERdatamanage\cr
 Type: \tab Package\cr
-Version: \tab 0.1-13\cr
-Date: \tab 2015-05-27\cr
+Version: \tab 0.1-14\cr
+Date: \tab 2018-01-31\cr
 License: \tab GPL-3\cr
 }
 
