@@ -16,6 +16,7 @@ library(missForest)
 library(survival)
 library(xtable)
 library(rpart)
+library(mice)
 
 kPmiss <- 0.2 # probability of missingness
 kLogHR <- 0.5 # true log hazard ratio
@@ -265,7 +266,21 @@ coximpute <- function(imputed_datasets){
 	}
 	mirafits <- as.mira(lapply(imputed_datasets, docoxmodel))
 	out <- summary(pool(mirafits))
-	out <- cbind(out, kLogHR >= out[, 'lo 95'] & kLogHR <= out[, 'hi 95'])
+	if ('lo 95' %in% colnames(out)){
+		# older version of mice
+		out <- cbind(out, data.frame(cover = 
+			kLogHR >= out[, 'lo 95'] & kLogHR <= out[, 'hi 95']))
+	} else if ('estimate' %in% colnames(out)){
+		# newer version of mice
+		# use normal approximation for now, as assume large sample
+		# and large degrees of freedom for t distribution
+		CI_lo <- out$estimate + qnorm(0.025) * out$std.error
+		CI_hi <- out$estimate + qnorm(0.975) * out$std.error
+		out <- cbind(out, data.frame(cover =
+			kLogHR >= CI_lo & kLogHR <= CI_hi))
+	} else {
+		stop('Unable to handle format of summary.mipo object')
+	}
 	# Whether this confidence interval contains the true hazard ratio
 	colnames(out)[length(colnames(out))] <- 'cover'
 	out
@@ -393,7 +408,7 @@ if (!exists('N')){
 # Number of imputations (set to at least 10 when
 # running an actual simulation)
 if (!exists('NIMPS')){
-	NIMPS <- 3
+	NIMPS <- 4
 }
 # Use parallel processing if the 'parallel' package is loaded
 if ('parallel' %in% loadedNamespaces() &&

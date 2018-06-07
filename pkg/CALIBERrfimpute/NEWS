@@ -1,4 +1,14 @@
 =====================================
+Version 1.0-1
+sixth release on CRAN
+=====================================
+
+BUG FIXES:
+
+- Vignette updated to work with mice 3
+  format of multiple imputation results.
+
+=====================================
 Version 1.0-0
 fifth release on CRAN
 =====================================

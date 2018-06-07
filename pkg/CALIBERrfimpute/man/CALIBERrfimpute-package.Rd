@@ -28,8 +28,8 @@ This package contains reports of two simulation studies:
 \tabular{ll}{
 Package: \tab CALIBERrfimpute\cr
 Type: \tab Package\cr
-Version: \tab 1.0-0\cr
-Date: \tab 2014-10-23\cr
+Version: \tab 1.0-1\cr
+Date: \tab 2018-06-05\cr
 License: \tab GPL-3\cr
 }
 
