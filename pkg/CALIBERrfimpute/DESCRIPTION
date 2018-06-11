@@ -1,6 +1,6 @@
 Package: CALIBERrfimpute
 Type: Package
-Title: Multiple imputation using MICE and Random Forest
+Title: Multiple Imputation Using MICE and Random Forest
 Version: 1.0-1
 Date: 2018-06-05
 Authors@R: c(person("Anoop", "Shah", role=c("aut", "cre"), email="anoop@doctors.org.uk"),
