@@ -1,5 +1,6 @@
-\name{removeColumns}
+\name{removeVariables}
 \alias{removeColumns}
+\alias{removeVariables}
 
 \title{
 Remove columns from a cohort object
@@ -12,6 +13,7 @@ if a flat file data frame the modified object is returned.
 }
 
 \usage{
+removeVariables(x, colnames)
 removeColumns(x, colnames)
 }
 
