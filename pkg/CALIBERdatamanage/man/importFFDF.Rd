@@ -28,9 +28,7 @@ which columns to cenvert to Date or IDate.
 It can be either a vector of date column names, or
 an empty string (for no dates to be converted) or NULL if an attempt
 should be made to convert all columns. Columns which cannot be
-coerced to date are left unchanged.
-Non-missing dates are not permitted. Dates must be in a format recognisable by
-as.Date directly (i.e. ISO format 'YYYY-MM-DD' with no missing dates)
+coerced to date are left unchanged. Non-missing dates are not permitted.
 }
   \item{verbose}{
 whether to print information about the file loaded.

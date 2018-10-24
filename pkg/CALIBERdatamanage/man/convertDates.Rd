@@ -53,6 +53,6 @@ print(myffdf)
 
 # Convert dates in data.table
 # (updated by reference so no assignment is needed)
-convertDates(mydata) # is the same as mydaat <- convertDates(mydata)
+convertDates(mydata) # is the same as mydata <- convertDates(mydata)
 print(mydata)
 }

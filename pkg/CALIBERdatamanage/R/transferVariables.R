@@ -158,7 +158,7 @@ transferVariables <- function(fromdata, todata, varnames,
 				removeColumns(fromdata, varnames)
 			} else {
 				for (varname in varnames){
-					fromdata[, varname := NULL, with = FALSE]
+					fromdata[, (varname) := NULL]
 				}
 			}
 		} else {

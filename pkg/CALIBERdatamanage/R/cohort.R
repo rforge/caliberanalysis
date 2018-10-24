@@ -215,7 +215,7 @@ truncateChar <- function(x, maxchar){
 	x
 }
 
-subset.cohort <- function(x, subset, select){
+subset.cohort <- function(x, subset, select, ...){
 	# S3 method for subsetting a cohort
 	# Arguments: x - cohort
 	#            subset - a logical expression for rows to keep,

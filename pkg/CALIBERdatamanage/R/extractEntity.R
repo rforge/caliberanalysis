@@ -96,7 +96,7 @@ extractEntity <- function(data, enttype,
 	# Remove any blank data columns
 	for (i in 9:(template$data_fields + 1)){
 		if ('data' %&% i %in% names(A)){
-			A[, 'data' %&% i := NULL, with = FALSE]
+			A[, ('data' %&% i) := NULL]
 		}
 	}
 
@@ -128,13 +128,13 @@ extractEntity <- function(data, enttype,
 					temp <- uselookup(A[['data' %&% i]],
 						'CALIBER_PRODDICT', 'prodcode', 'prodname',
 						stringsAsFactors = FALSE)
-					A[, newname := temp, with = FALSE]
+					A[, (newname) := temp]
 					# Convert the name of the original data column
 					setnames(A, 'data' %&% i, newname %&% '.prodcode')
 				} else if (datatype == 'Scoring'){
 					temp <- uselookup(A[['data' %&% i]],
 						'CALIBER_SCOREMETHOD', 'code', 'scoringmethod')
-					A[, newname := temp, with = FALSE]
+					A[, (newname) := temp]
 				} else if (datatype == 'YYYYMMDD'){
 					# Find out type of result
 					newtype <- rep('missing', nrow(A))
@@ -144,15 +144,14 @@ extractEntity <- function(data, enttype,
 						A[['data' %&% i]] < 205000)] <- 'yearmonth'
 					newtype[istrue(A[['data' %&% i]] > 18000000 &
 						A[['data' %&% i]] < 20500000)] <- 'date'
-					A[, newname := YYYYMMDDtoDate(A[['data' %&% i]], ...),
-						with = FALSE]
-					A[, newname %&% '.datetype' := newtype, with = FALSE]
+					A[, (newname) := YYYYMMDDtoDate(A[['data' %&% i]], ...)]
+					A[, (newname %&% '.datetype') := newtype]
 				} else if (datatype == 'GEN_SDC'){
 					newtype <- rep('missing', nrow(A))
 					newtype[istrue(A[['data' %&% i]] > 3)] <- 'date'
 					A[, newname := GEN_SDCtoDate(A[['data' %&% i]]),
 						with = FALSE]
-					A[, newname %&% '.datetype' := newtype, with = FALSE]
+					A[, (newname %&% '.datetype') := newtype]
 				} else if (datatype == ''){
 					# No conversion necessary, just change the name
 					setnames(A, 'data' %&% i, newname)

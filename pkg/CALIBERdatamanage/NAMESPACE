@@ -29,3 +29,7 @@ S3method(as.data.table, cohort)
 S3method(as.ffdf, cohort)
 
 import(grid, ffbase, ff, foreign, data.table, xtable)
+importFrom("grDevices", "dev.off", "pdf", "png")
+importFrom("graphics", "par", "plot.new")
+importFrom("stats", "binom.test", "median", "pt", "qt", "quantile", "sd")
+importFrom("utils", "capture.output", "read.csv", "read.delim", "unzip", "write.table")

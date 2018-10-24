@@ -3,7 +3,7 @@ removeColumns <- function(x, colnames){
 	# Removes one or more columns from a cohort file and description
 	for (colname in colnames){
 		if (is.data.table(x)){
-			x[, colname := NULL, with = FALSE]
+			x[, (colname) := NULL]
 		} else if (is.ffdf(x)){
 			# <- creates a copy of the object and leads to loss of 
 			# attributes. Hence it is necessary to store these

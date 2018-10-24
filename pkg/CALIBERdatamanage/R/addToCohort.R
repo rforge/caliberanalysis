@@ -134,8 +134,8 @@ addToCohort <- function(cohort, varname, data, old_varname = 'value',
 	setkey(DATA, .id)
 
 	#### Identifying events of interest ####
-	DATA[, indexdate := x[DATA][, indexcolname, with = FALSE]]
-	DATA[, daysdiff := as.numeric(.eventdate - indexdate)]
+	DATA[, indexdate := x[DATA][[indexcolname]]]
+	DATA[, daysdiff := as.numeric(difftime(.eventdate, indexdate), units = 'days')]
 	DATA[, include := istrue(!is.na(.eventdate) &
 		daysdiff >= limit_days[1] & daysdiff <= limit_days[2])]
 	if (date_priority == 'first'){

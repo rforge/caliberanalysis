@@ -20,7 +20,7 @@ is.cohort(x)
 
 \method{print}{cohort}(x, \dots)
 \method{summary}{cohort}(object, \dots)
-\method{subset}{cohort}(x, subset, select)
+\method{subset}{cohort}(x, subset, select, \dots)
 \method{merge}{cohort}(x, y, by = attr(x, "idcolname"), \dots)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -49,9 +49,6 @@ additional arguments
 }
 }
 
-\details{
-
-}
 
 \value{
 \code{as.cohort} coerces its argument to a cohort if possible. If it is already a data.table, it is updated by reference, and the new name will be an alias to the existing object. Use \code{copy = TRUE} explicitly to create a cohort object without altering the original object.

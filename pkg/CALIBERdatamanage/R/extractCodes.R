@@ -122,8 +122,7 @@ extractCodes <- function(data, codelist, categories = NULL,
 			out <- subset(data, keep)
 		} else {
 			out <- subset(data, !is.na(tomatch$category))
-			out[, varname := tomatch[!is.na(category), category],
-				with = FALSE]
+			out[, (varname) := tomatch[!is.na(category), category]]
 		}
 
 	} else {

@@ -7,6 +7,7 @@ BUG FIXES:
 - with=FALSE together with := was deprecated in data.table
 - Corrected error in summaryTable when data.table is
   specified as an argument, and clarified the documentation.
+- Date data type discrepancies - fixed bug in addToCohort
 
 =================================================
 CALIBERdatamanage Version 0.1-13
