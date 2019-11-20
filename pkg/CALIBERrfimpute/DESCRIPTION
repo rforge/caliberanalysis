@@ -1,8 +1,8 @@
 Package: CALIBERrfimpute
 Type: Package
 Title: Multiple Imputation Using MICE and Random Forest
-Version: 1.0-1
-Date: 2018-06-05
+Version: 1.0-2
+Date: 2019-11-20
 Authors@R: c(person("Anoop", "Shah", role=c("aut", "cre"), email="anoop@doctors.org.uk"),
    person("Jonathan", "Bartlett", role="ctb"),
    person("Harry", "Hemingway", role="ths"),
@@ -19,4 +19,4 @@ Author: Anoop Shah [aut, cre],
   Owen Nicholas [ths],
   Aroon Hingorani [ths]
 Maintainer: Anoop Shah <anoop@doctors.org.uk>
-
+BuildVignettes: FALSE

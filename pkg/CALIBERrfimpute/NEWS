@@ -1,4 +1,16 @@
 =====================================
+Version 1.0-2
+seventh release on CRAN
+=====================================
+
+BUG FIXES:
+
+- Vignette updated to work with latest
+  version of survival package (ensuring
+  that it works in the event of a missing
+  cumulative hazard estimate).
+
+=====================================
 Version 1.0-1
 sixth release on CRAN
 =====================================

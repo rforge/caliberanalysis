@@ -133,6 +133,11 @@ makeMarSurv <- function(data, pmissing = kPmiss){
 		}
 		stepsize <- 32
 		lptrial <- lp
+		# To avoid errors due to missing linear predictors (ideally
+		# there should not be any missing), replace with the mean
+		if (any(is.na(lptrial))){
+			lp[is.na(lptrial)] <- mean(lptrial, na.rm = TRUE)
+		}
 		while(abs(trialn(lptrial) - n) > 1){
 			if (trialn(lptrial) > n){
 				# trialn bigger than required 
