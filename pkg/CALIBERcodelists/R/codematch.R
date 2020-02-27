@@ -99,7 +99,7 @@ codematch <- function(regexpr,
 		}	
 	} else if (dictionary == 'read'){
 		if (exact){
-			out <- CALIBER_DICT[, dict=='read' & regexpr %in% code]
+			out <- CALIBER_DICT[, dict=='read' & code %in% regexpr]
 		} else {
 			out <- CALIBER_DICT[, dict=='read' & grepl(regexpr, code)]
 		}

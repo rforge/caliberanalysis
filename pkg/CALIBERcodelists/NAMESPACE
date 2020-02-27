@@ -26,5 +26,4 @@ S3method("!", selection)
 S3method(print, codelistComparison)
 
 import(data.table, markdown, knitr, foreign)
-
-
+importFrom("utils", "capture.output", "data", "menu", "packageVersion", "read.csv", "read.delim", "select.list", "write.csv", "write.table")

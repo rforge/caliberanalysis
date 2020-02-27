@@ -1,4 +1,4 @@
-FEATURE REQUESTS
+FEATURE REQUESTS - FOR THE FUTURE
 
 - Ensure that Read codes are interpreted as character
   not number
@@ -12,6 +12,15 @@ FEATURE REQUESTS
 - Harmonise the commands for editing a codelist and
   creating a new codelist
 - Allow codelists to use arbitrary dictionaries
+
+==================================================
+Changes in CALIBERcodelists version 0.2-11
+==================================================
+
+BUG FIXES
+
+- codematch returned all Read terms when exact = T and
+  selecting on Read terms, now fixed
 
 ==================================================
 Changes in CALIBERcodelists version 0.2-10
