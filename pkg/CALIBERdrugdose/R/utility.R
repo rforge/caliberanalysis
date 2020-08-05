@@ -41,18 +41,16 @@ isNumeric <- function(instring){
 strsplitPos <- function(text, splitpoints){
 	# splits a string into a vector based on a vector of splitpoints
 	# splitpoints are the start of each segment
-	if (length(splitpoints)==nchar(text)) {
-		# it is probably a Boolean vector
+	if (is.logical(splitpoints)) {
+		# it is a Boolean vector, convert into split positions
 		splitpoints <- which(splitpoints)
 	}
 	splitpoints <- unique(c(1, splitpoints))
 	splitpoints <- sort(splitpoints[splitpoints <= nchar(text)])
-	if (length(splitpoints)==0) return(text)
+	if (length(splitpoints) == 0) return(text)
 	# generate a matrix of start and end positions for substrings
-	splitpoints <- cbind(splitpoints,
-											 c(splitpoints[-1]-1, nchar(text)))
-	apply(splitpoints, MARGIN=1,
-				function(x) substr(text, x[1], x[2]))
+	splitpoints <- cbind(splitpoints, c(splitpoints[-1]-1, nchar(text)))
+	apply(splitpoints, MARGIN=1, function(x) substr(text, x[1], x[2]))
 }
 
 docalc <- function(myvector) {

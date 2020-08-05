@@ -11,9 +11,9 @@ extract structured information such as quantity, frequency and units.
 }
 
 \usage{
-doseconvert(text, textid = seq_along(text), simplify = TRUE,
-    singlewords = NULL, multiwords = NULL, patterns = NULL,
-    maxifchoice = TRUE, usebuiltinlookups = TRUE,
+doseconvert(text, textid = seq_along(text), dosage_mg = NULL,
+    simplify = TRUE, singlewords = NULL, multiwords = NULL,
+    patterns = NULL, maxifchoice = TRUE, usebuiltinlookups = TRUE,
     customlookups = NULL, cores = 1, noisy = FALSE)
 }
 
@@ -23,6 +23,10 @@ Dosage strings to be interpreted.
 }
   \item{textid}{
 Optional vector of text or numeric identifiers for the dosage strings.
+}
+  \item{dosage_mg}{
+Optional vector of numeric milligram dose quantities for each
+prescription item.
 }
   \item{simplify}{
 FALSE if multiple periods with different doses should be returned as separate
@@ -125,6 +129,8 @@ Converted from the original Visual Basic algorithm.
 doseconvert(c('2 tab twice daily',
     'one daily for 1 week then two daily'),
     textid = 1:2, simplify = FALSE)
+doseconvert(c('2 tab twice daily', '2 drops in left eye qds',
+    '5mcg daily'), textid = 1:3, dosage_mg = c(5, 5, 5))
 doseconvert('one daily for 1 week then two daily',
     textid = 2, simplify = TRUE)
 

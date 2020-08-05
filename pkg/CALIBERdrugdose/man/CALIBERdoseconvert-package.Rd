@@ -55,8 +55,8 @@ run a conversion service (by preloading lookup dictionaries).
 \tabular{ll}{
 Package: \tab CALIBERdrugdose\cr
 Type: \tab Package\cr
-Version: \tab 0.1-2\cr
-Date: \tab 2017-02-27\cr
+Version: \tab 0.1-3\cr
+Date: \tab 2020-07-21\cr
 License: \tab GPL-3\cr
 }
 }
@@ -79,5 +79,9 @@ Pharmacoepidemiol Drug Saf 2006; 15(3): 161-166. doi: 10.1002/pds.1151
 }
 
 \examples{
-doseconvert('take 2 puffs twice daily') 
+doseconvert('take 2 puffs twice daily', noisy = TRUE) 
+
+# Interpret onw text from lookups and one new
+data(lookups)
+doseconvert(c('2 daily', lookups$text[2]))
 }

@@ -231,6 +231,7 @@ as.drugdose_lookups <- function(lookups){
 			lookups[, freq := as.numeric(freq)]
 			lookups[, tot := as.numeric(tot)]
 			lookups[, time := as.numeric(time)]
+			lookups[, duration := as.numeric(duration)]
 			lookups[, daily_dose := as.numeric(daily_dose)]
 			
 			setkey(lookups, text)

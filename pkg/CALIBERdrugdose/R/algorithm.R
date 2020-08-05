@@ -3,9 +3,9 @@
 # Instead of partdata, the dosage string is stored in
 # an R character vector.
 
-doseconvert <- function(text, textid = seq_along(text), simplify = TRUE,
-	singlewords = NULL, multiwords = NULL, patterns = NULL,
-	maxifchoice = TRUE, usebuiltinlookups = TRUE, 
+doseconvert <- function(text, textid = seq_along(text), dosage_mg = NULL,
+	simplify = TRUE, singlewords = NULL, multiwords = NULL,
+	patterns = NULL, maxifchoice = TRUE, usebuiltinlookups = TRUE,
 	customlookups = NULL, cores = 1, noisy = FALSE){
 	# converts a set of dosages. dosestrings must be a character vector
 	# and ids should be a vector of unique IDs.
@@ -13,17 +13,27 @@ doseconvert <- function(text, textid = seq_along(text), simplify = TRUE,
 	# Arguments:
 	#    text = vector of dosestrings to analyse
 	#    textid = vector of identifiers for dosestrings
+	#    dosage_mg = vector of mg strength for dosage units. This is used
+	#        to calculate an additional column in the output 'daily_mg'
+	#        which is the daily dose in mg. If NULL, the 'daily_mg'
+	#        column is omitted from the output.
 	#    simplify = whether to return only a single row per dosestring
 	#    patterns = patterns lookup, loaded from data or imported from
 	#        parent / global environment if not available
-	#	 multiwords = multiwords lookup, loaded from data or imported from
+	#    multiwords = multiwords lookup, loaded from data or imported from
 	#        parent / global environment if not available
 	#    singlewords = singlewords lookup, loaded from data or imported from
 	#        parent / global environment if not available
-	#	 lookups = lookup table for common dosages to avoid the need to
+	#    lookups = lookup table for common dosages to avoid the need to
 	#        interpret
 	#    maxifchoice = whether to report the maximum if choice of dose,
 	#        otherwise report the average
+	#    usebuiltinlookups = whether to use the built-in table of common
+	#        interpreted dosages that can be looked up rather than
+	#        re-interpreted
+	#    cores = whether to use multiple cores (using parallel)
+	#    customlookups = a table of custom lookups
+	#    noisy = whether to print debug information
 	# For testing:
 	# textid = NULL; simplify = TRUE; singlewords = NULL; multiwords = NULL;
 	#    patterns = NULL; uselookups = TRUE; lookups = NULL;
@@ -83,16 +93,26 @@ doseconvert <- function(text, textid = seq_along(text), simplify = TRUE,
 	analysis <- function(text){
 		x <- trim(tolower(text))
 		if (!is.null(lookups)){
-			result <- lookups[x, nomatch = 0]
+			result <- lookups[x, .(qty, units, freq, tot, max, time,
+				change, choice, duration, daily_dose), nomatch = 0]
+			result[, order := rep(1L, nrow(result))]
 		} else {
 			#  Zero-row result if no lookup
-			result <- as.data.frame(cbind(0, 0))[-1,]
+			result <- data.frame(qty = numeric(0), units = character(0),
+				freq = numeric(0), tot = numeric(0),
+				max = factor(integer(0), c("max", "average", "exact")),
+				time = numeric(0), change = factor(integer(0),
+				c("first", "second", "nochange", "combined")),
+				choice = factor(integer(0), c("choice", "asneeded",
+				"nochoice")), duration = numeric(0), order = integer(0),
+				daily_dose = numeric(0))
 		}
 		if (nrow(result) == 0){
-			result <- interpret(x, singlewords = singlewords,
+			# wrap in 'try' to avoid stalling if there is an unexpected error
+			try(result <- interpret(x, singlewords = singlewords,
 				multiwords = multiwords, patterns = patterns,
 				simplify = simplify, maxifchoice = maxifchoice,
-				noisy = noisy)
+				noisy = noisy))
 		}
 		result
 	}
@@ -122,7 +142,7 @@ doseconvert <- function(text, textid = seq_along(text), simplify = TRUE,
 	# Order the output
 	setkey(results, originalorder, order)
 	# Remove temporary doseid and other unnecessary variables
-	results[, c('originalorder', 'doseid'):= NULL, with = FALSE]
+	results[, c('originalorder', 'doseid') := NULL]
 	if ('text' %in% colnames(results)) results[, text := NULL]
 	if ('i.textid' %in% colnames(results)) results[, i.textid := NULL]
 	setnames(results, 'dosestrings', 'text')
@@ -130,6 +150,44 @@ doseconvert <- function(text, textid = seq_along(text), simplify = TRUE,
 		'units', 'freq', 'tot', 'max', 'time', 'change',
 		'choice', 'duration', 'daily_dose'))
 	cat('\nAnalysed', length(text), 'dosage texts.\n')
+	
+	if (!is.null(dosage_mg)){
+		try(results <- calculate_mg(results, dosage_mg))
+	}
+	results[]
+}
+
+calculate_mg <- function(results, dosage_mg){
+	# Arguments:
+	#    results = output results, as from doseconvert
+	#    dosage_mg = numeric vector with the same length as number
+	#        of rows in results, with the strength of each dose unit
+	#        in mg (e.g. if the dose unit is a 500mcg tablet,
+	#        it will be 0.5). It should be missing if not 
+	#        meaningful (e.g. for creams)
+	# Adds a column 'daily_mg' to the output
+	
+	if (length(dosage_mg) != nrow(results)){
+		stop(paste0('dosage_mg has ', length(dosage_mg),
+			'elements but results has ', nrow(results), ' rows'))
+	}
+	
+	results[, daily_mg := as.numeric(NA)]
+	# Add dosage_mg column to results for ease of calculation
+	results[, dosage_mg := dosage_mg]
+	
+	# Units that are mg quantities
+	results[units == 'mg', daily_mg := daily_dose]
+	results[units == 'gram', daily_mg := daily_dose * 1000]
+	results[units == 'mcg', daily_mg := daily_dose / 1000]
+	
+	# Units that are dose units (or blank) e.g. tablets, capsules,
+	# metered dose sprays / puffs - not drops
+	results[units %in% c('', 'neb', 'pv', 'pre', 'puff', 'spray',
+		'suppos', 'sachet', 'blister', 'amp', 'pill', 'cap', 'tab'),
+		daily_mg := dosage_mg * daily_dose]
+	results[, dosage_mg := NULL]
+	
 	results[]
 }
 
@@ -161,7 +219,7 @@ interpret <- function(instring, singlewords, multiwords,
 		if (!all(replacement == '')) {
 			# do the replacement, and re-check against dictionaries
 			pd <- c(pd[1L:(dothis - 1L)], replacement,
-							pd[(dothis + 1L):length(pd)])
+				pd[(dothis + 1L):length(pd)])
 			pd_numeric <- isNumeric(pd)
 			replace <- singlewords[pd]
 			unmatched <- is.na(replace) & !pd_numeric
@@ -396,7 +454,7 @@ simplifydose <- function(regimens, noisy = FALSE) {
 				regimens$tot[2] <- regimens$tot[2] *
 					(regimens$time[1] / regimens$time[2])
 				regimens$time[2] <- regimens$time[1]
-				cat('\nStandarising time between dose lines:\n')
+				cat('\nStandardising time between dose lines:\n')
 				print(regimens[1:2,])
 			}
 			if (regimens$qty[1] == 0 & regimens$qty[2] == 0){
@@ -440,7 +498,7 @@ simplifydose <- function(regimens, noisy = FALSE) {
 				cat('\nAfter combining dose lines:\n')
 				print(regimens[1,])
 			}
-		} else {								
+		} else {
 			# use the first dose if:
 			# it is a valid dose AND (dose2 not valid OR dose2 is zero)
 			if (regimens$time[1] > 0 & (
@@ -487,7 +545,7 @@ simplifydose <- function(regimens, noisy = FALSE) {
 	regimens$divpos <- NULL
 	regimens
 }
-										 
+
 analyseDose <- function(pd, noisy = FALSE, patterns = patterns){
 	# Analyses the text after pre-processing.
 	# Splits the dose into sections, analyses each section,
@@ -579,7 +637,7 @@ analyseDose <- function(pd, noisy = FALSE, patterns = patterns){
 		cat('\nNow combining parts\n')
 	}
 
-	trial <- combineParts(trial, "or", noisy)	
+	trial <- combineParts(trial, "or", noisy)
 	trial <- combineParts(trial, "and", noisy)
 	trial <- combineParts(trial, "day", noisy)
 	trial <- combineParts(trial, "upto", noisy)
@@ -645,7 +703,7 @@ wordspace <- function(word, maxwd = 8, singlewords) {
 		# switches the last set of contiguous TRUE to FALSE
 		# and switches the immediately preceding item to TRUE
 		starttrue <- (mybool == TRUE &
-			c(FALSE, mybool[1:(length(mybool) - 1)])==FALSE)
+			c(FALSE, mybool[1:(length(mybool) - 1)]) == FALSE)
 		mybool[max(which(starttrue)) - 1] <- TRUE
 		mybool[max(which(starttrue)):length(mybool)] <- FALSE
 		mybool
@@ -821,16 +879,20 @@ numbersReplace <- function(pds, maxifchoice) {
 	pd <- pd[!is.na(pd)]
 	pd <- pd[pd != '' & pd != ' ']
 
-	# Only evaluate words without numbers, or if the text is 'max...'
-	hastext <- (grepl('[a-z]', pd) & !grepl('^max', pd)) | pd %in% c('(', ')')
+	# If pd contains an expression that can be converted to a number
+	# try to evaluate it. If it contains any letters (except 'max' as
+	# part of an expression, e.g. max(2, 3) then ignore. If it is just
+	# a single item of punctuation without numbers also ignore.
+	dont_evaluate <- (grepl('[a-z]', pd) & !grepl('^max', pd)) |
+		pd %in% c('(', ')', ':', '/', '&', '-')
 	for (i in seq_along(pd)){
-		if (!hastext[i]){
+		if (!dont_evaluate[i]){
 			try(pd[i] <- as.character(eval(parse(text = pd[i]))))
 		}
 	}
 	
 	pds <- paste(' ', paste(pd, collapse = ' '), ' ', sep = ' ')
-	list(pds=pds, choice=choice)
+	list(pds = pds, choice = choice)
 }
 
 singledosage <- function(words = '', qty = 0, units = '', freq = 0,
@@ -1001,7 +1063,7 @@ combineParts <- function(trial, linkword, noisy = FALSE) {
 				b$freq <- b$qty
 				b$qty <- 0
 			}
-		} else if (a$units != b$units) {		
+		} else if (a$units != b$units) {
 			# if both a and b are valid doses, make b replace a if
 			# higher priority (e.g. mcg over puffs) otherwise stick with a.
 			if (a$tot > 0 & b$tot > 0 & a$time > 0 & 
@@ -1032,7 +1094,7 @@ combineParts <- function(trial, linkword, noisy = FALSE) {
 			if (b$qty %in% c(0,1)) {
 				b$qty <- b$freq
 				b$freq <- 0
-			}			
+			}
 		}
 
 		# standardise the time period (but not if first dose is 'STAT')
@@ -1168,12 +1230,12 @@ combineParts <- function(trial, linkword, noisy = FALSE) {
 			# Dose 2 has freq but no qty; dose 1 has qty but no freq:
 			# combine doses and max=2
 			# If not, and Dose 2 has duration but nothing else:
-			#		combine doses using duration from 2 (max not affected)
+			#     combine doses using duration from 2 (max not affected)
 			# If not, and total dose 1 > dose 2, or dose 1 incomplete:
-			#		use dose 2
+			#     use dose 2
 			# If not and dose 2 is valid, combine doses
 			# Otherwise keep dose 1 and max=1
-			#						 
+			#
 			# If previous dose is more than maximum or it is an
 			# invalid dose, use max
 			
@@ -1215,7 +1277,7 @@ combineParts <- function(trial, linkword, noisy = FALSE) {
 			if (pos + 2 > nrow(trial)) {
 				trial <- trial[1:pos,]
 			} else {
-				trial <- trial[c(1:pos, (pos+2):nrow(trial)),]				
+				trial <- trial[c(1:pos, (pos+2):nrow(trial)),]
 			}
 		}
 		pos <- pos + 1
