@@ -17,3 +17,6 @@
 16,1,"apply twice daily for 1 week then once daily for 2 weeks",0,,1.33333333,1.33333333,"exact",1,"combined","nochoice",21,1.33333333
 17,1,"1 tablet increasing to 2 daily",2,"tab",1,2,"exact",1,"second","nochoice",0,2
 18,1,"apply twice daily for 1 week then as needed",0,,2,2,"exact",1,"first","nochoice",7,2
+19,1,"two mg a day",2,"mg",1,2,"exact",1,"nochange","nochoice",0,2
+20,1,"one tab am",1,"tab",1,1,"exact",1,"nochange","nochoice",0,1
+21,1,"three to be taken twice a day to a maximum of 12 tablets daily",3,"tab",2,6,"average",1,"nochange","nochoice",0,6

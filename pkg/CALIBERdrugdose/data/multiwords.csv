@@ -102,9 +102,8 @@
 "u","unit"," ",87
 "every blister","deleteme"," ",88
 "times ([[:digit:]\.]+) week","\1 times week"," ",89
-"([[:digit:]\.]+) ([[:digit:]\.]+) mg tab","\1 times \2 mg"," ",90
-"([[:digit:]\.]+) ([[:digit:]\.]+) mcg tab","\1 times \2 mcg"," ",91
-"([[:digit:]\.]+) ([[:digit:]\.]+) mg cap","\1 times \2 mg"," ",92
+"([[:digit:]\.]+) ([[:digit:]\.]+) mg (tab|cap)","\1 times \2 mg"," ",90
+"([[:digit:]\.]+) ([[:digit:]\.]+) mcg (tab|cap)","\1 times \2 mcg"," ",91
 "start x ([[:digit:]\.]+)","start \1"," ",93
 "x","times"," ",94
 "od alt","alt"," ",95
@@ -122,6 +121,8 @@
 "(a|per|in|every|same day.*) week","weekly"," ",102
 "times week","times weekly",,103
 "weekly weekly","weekly"," ",104
+"weekly dispense","dispense every 7 days"," ",104.5
+"fortnightly dispense","dispense every 14 days"," ",104.6
 "weekly","every 7 days"," ",105
 "(every fortnight|fortnightly)","every 14 days"," ",106
 "tid","tds"," ",107
@@ -134,10 +135,10 @@
 "72 hours","3 days"," ",115
 "in ([[:digit:]\.]+) days","every \1 days"," ",116
 "alternate","alt"," ",120
-"(24 hours|a day)","day"," ",121
-"(daily|per day|in day)","every day"," ",122
-"8 am","at 8 am",,123
-"6 pm","at 6 pm"," ",124
+"24 hours","day"," ",121
+"(daily|per day|in day|a day)","every day"," ",122
+"(7|8|9|10|11) am","at \1 am",,123
+"(6|7|8|9|10|11|12) pm","at \1 pm"," ",124
 "day([[:print:]]*) ([[:digit:]\.]+) am","day\1","remove time (XX am)",125
 "day([[:print:]]*) ([[:digit:]\.]+) pm","day\1","remove time (XX pm)",126
 "night([[:print:]]*) after evening","night\1","remove qualification of timing (e.g. at night after evening meal)",127
@@ -145,12 +146,14 @@
 "at ([[:digit:]\.]+) pm","1 times day"," ",129
 "o m","om"," ",130
 "([[:digit:]\.]+) am","\1 every morning"," ",131
+"([[:digit:]\.]+) ([[:alpha:]]+) am","\1 \2 every morning"," ",131.5
 "am ([[:print:]]*) pm","every morning \1 pm"," ",132
 "(mane|every day in morning|in morning|morning)","every morning"," ",133
 "morning ([[:print:]]*)every morning","\1every morning","remove duplicate statements of time of day",134
 "(mid - day|midday)","every midday"," ",135
 "midday ([[:print:]]*)every midday","\1every midday","remove duplicate statements of time of day",136
 "([[:digit:]\.]+) pm","\1 every afternoon"," ",137
+"([[:digit:]\.]+) ([[:alpha:]]+) pm","\1 \2 every afternoon"," ",137.5
 "every morning([[:print:]]*) pm","every morning\1 every afternoon"," ",138
 "(qpm|every day in afternoon|in afternoon|afternoon)","every afternoon"," ",139
 "afternoon ([[:print:]]*)every afternoon","\1every afternoon","remove duplicate statements of time of day",140
@@ -190,7 +193,7 @@
 "days day","days"," ",173
 "(with|before|after) meals","food"," ",174
 "(at mealtimes|at meal - times|ac|pc)","food"," ",175
-"(with|before|after) food","food","added 'before food'",176
+"(with|before|after) (food|any food)","food","added 'before food' and 'any food'",176
 "(after|before|with) every","every"," ",177
 "(3|4) times day([[:print:]]*) food and every night","\1 times day\2","if exact daily frequency stated, ignore 'with food' etc.",178
 "food and every night","4 times day"," ",179
@@ -250,7 +253,7 @@
 "changeto changeto","changeto"," ",231
 "changeto by.*","changeto"," ",232
 "([[:digit:]\.]+) tab upto ([[:digit:]\.]+) times day","upto \1 tab \2 times day"," ",233
-"food > when needed","deleteme"," ",234
+"food > when needed","deleteme"," ",234	
 "fprn","prn"," ",235
 "tu","when needed"," ",236
 "upto ([[:digit:]\.]+) dose every day","upto \1 times day"," ",237

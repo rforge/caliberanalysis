@@ -449,10 +449,12 @@ simplifydose <- function(regimens, noisy = FALSE) {
 			}
 			# Check that time is the same between the dose lines
 			if (regimens$time[1] != regimens$time[2]){
-				regimens$freq[2] <- regimens$freq[2] *
-					(regimens$time[1] / regimens$time[2])
-				regimens$tot[2] <- regimens$tot[2] *
-					(regimens$time[1] / regimens$time[2])
+				if (regimens$time[2] > 0){
+					regimens$freq[2] <- regimens$freq[2] *
+						(regimens$time[1] / regimens$time[2])
+					regimens$tot[2] <- regimens$tot[2] *
+						(regimens$time[1] / regimens$time[2])
+				}
 				regimens$time[2] <- regimens$time[1]
 				cat('\nStandardising time between dose lines:\n')
 				print(regimens[1:2,])
@@ -1252,7 +1254,7 @@ combineParts <- function(trial, linkword, noisy = FALSE) {
 				a$duration <- b$duration
 			} else if ((b$tot < a$tot & a$time > 0 & b$time > 0) |
 				(a$time == 0 & a$tot > 0) | (b$tot > 0 & a$duration == 1) |
-				(a$tot == 0 | b$tot > 0)) {
+				(a$tot == 0 & b$tot > 0)) {
 				# use dose 2
 				items <- c('freq', 'qty', 'tot', 'duration')
 				a[,items] <- b[,items]

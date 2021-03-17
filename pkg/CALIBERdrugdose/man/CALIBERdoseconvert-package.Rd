@@ -55,8 +55,8 @@ run a conversion service (by preloading lookup dictionaries).
 \tabular{ll}{
 Package: \tab CALIBERdrugdose\cr
 Type: \tab Package\cr
-Version: \tab 0.1-3\cr
-Date: \tab 2020-07-21\cr
+Version: \tab 0.1-4\cr
+Date: \tab 2021-03-17\cr
 License: \tab GPL-3\cr
 }
 }

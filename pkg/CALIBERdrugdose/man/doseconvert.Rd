@@ -47,7 +47,11 @@ dictionary. If NULL it is loaded from the package data directory.
 }
   \item{maxifchoice}{
 Whether to return the maximum dose if there is a choice of dose (e.g.
-1 or 2 tablets daily). If FALSE, the average is returned. 
+1 or 2 tablets daily). If FALSE, the average is returned. This does
+not apply for a choice between dose phrases (e.g. '2 tab 3 times daily,
+max 12 daily'), where the first dose phrase is returned with max = 'average'
+if it less than the maximum, otherwise the maximum dose is returned with
+max = 'max'.
 }
   \item{usebuiltinlookups}{
 Whether to use the lookup table of exact dose strings and their conversion
