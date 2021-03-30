@@ -28,8 +28,8 @@ This package contains reports of two simulation studies:
 \tabular{ll}{
 Package: \tab CALIBERrfimpute\cr
 Type: \tab Package\cr
-Version: \tab 1.0-2\cr
-Date: \tab 2018-11-20\cr
+Version: \tab 1.0-3\cr
+Date: \tab 2021-03-25\cr
 License: \tab GPL-3\cr
 }
 
@@ -42,9 +42,9 @@ Maintainer: anoop@doctors.org.uk
 }
 
 \references{
-Shah AD, Bartlett JW, Carpenter J, Nicholas O, Hemingway H. Comparison of Random Forest and parametric imputation models for imputing missing data using MICE: a CALIBER study. American Journal of Epidemiology 2014. doi: \href{http://dx.doi.org/10.1093/aje/kwt312}{10.1093/aje/kwt312}
+Shah AD, Bartlett JW, Carpenter J, Nicholas O, Hemingway H. Comparison of Random Forest and parametric imputation models for imputing missing data using MICE: a CALIBER study. American Journal of Epidemiology 2014. doi: \doi{10.1093/aje/kwt312}
 
-Doove LL, van Buuren S, Dusseldorp E. Recursive partitioning for missing data imputation in the presence of interaction effects. Computational Statistics and Data Analysis 2014;72:92--104. doi: \href{http://dx.doi.org/10.1016/j.csda.2013.10.025}{10.1016/j.csda.2013.10.025}
+Doove LL, van Buuren S, Dusseldorp E. Recursive partitioning for missing data imputation in the presence of interaction effects. Computational Statistics and Data Analysis 2014;72:92--104. doi: \doi{10.1016/j.csda.2013.10.025}
 }
 
 \keyword{ package }

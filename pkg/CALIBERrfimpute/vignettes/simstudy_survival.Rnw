@@ -36,6 +36,10 @@ if (!exists('NPATS')){
 # To analyse more than 3 samples, set N to a number greater than 3
 # e.g.
 # N <- 1000
+
+# To use more than 4 imputations, set NIMPS to a number greater than 4
+# e.g.
+# NIMPS <- 10
 @
 
 \title{\Large Comparison of parametric and Random Forest MICE in imputation of missing data in survival analysis}
@@ -102,7 +106,8 @@ makeSurv <- function(n = 2000, loghr = kLogHR){
 	obstime <- runif(nrow(data), min = 0,
 		max = quantile(data$survtime, 0.5))
 	data$event <- as.integer(data$survtime <= obstime)
-	data$time <- pmin(data$survtime, obstime)
+	# Generate integer survival times
+	data$time <- ceiling(100 * pmin(data$survtime, obstime))
 	
 	# Observed marginal cumulative hazard for imputation models
 	data$cumhaz <- nelsonaalen(data, time, event) 
@@ -273,6 +278,9 @@ coximpute <- function(imputed_datasets){
 	}
 	mirafits <- as.mira(lapply(imputed_datasets, docoxmodel))
 	coefs <- as.data.frame(summary(pool(mirafits)))
+	if ('term' %in% colnames(coefs)){
+		row.names(coefs) <- as.character(coefs$term)
+	}
 	if (!('lo 95' %in% colnames(coefs))){
 		# newer version of mice
 		# use normal approximation for now, as assume large sample
